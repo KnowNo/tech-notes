@@ -1,0 +1,26 @@
+
++ Ad Exchange APIs and Protocol
+https://developers.google.com/ad-exchange/
+https://developers.google.com/ad-exchange/rtb/downloads/realtime-bidding-proto.txt
+
+- Buyer SOAP API 
+The Ad Exchange Buyer SOAP API allows buyers to build applications that interact with Ad Exchange to efficiently and creatively manage large Ad Exchange accounts and campaigns. The API is an extension of the AdWords API, and although they share common features, the two APIs can be considered independent of each other.
+用于管理AdExchange帐号和投放。是AdWords(关键词竞价广告) API的扩展，但可以认为两者相互独立。
+   
+- Buyer REST API
+The Ad Exchange Buyer REST API allows you to programmatically
+    .access and update your real-time bidding account information  访问和更新RTB帐号信息
+    .submit creatives for verification                             提交创意以审核
+    .check the status of a submitted creative                      检查提交的创意状态
+    .discover available direct deals                               发现可用的直接交易 ？
+
+- Real-Time Bidding Protocol *
+The Real-Time Bidding (RTB) Protocol specifies how your application can evaluate and bid on each impression as it becomes available in real time, in response to bid requests from Ad Exchange. We'll show you how to handle requests, construct bids, and take full advantage of the protocol.
+*RTB接口
+
+- Seller REST API
+The Ad Exchange Seller REST API is intended for individual developers who want to get reports on Ad Exchange earnings and manage Ad Exchange inventory.
+*SSP接口 
+
+
+
