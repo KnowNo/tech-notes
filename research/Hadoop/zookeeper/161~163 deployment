@@ -1,0 +1,11 @@
+
+启动ZooKeeper Service (172.16.0.161 ~ 163)：
+
+lscm@puma:~/workspace/zookeeper-server1$ bin/zkServer.sh start
+
+lscm@jaguar:~/workspace/zookeeper-server2$ bin/zkServer.sh start
+
+lscm@panther:~/workspace/zookeeper-server3$ bin/zkServer.sh start
+
+
+

@@ -1,0 +1,177 @@
+HDFS 评价：
+---
+运行于Java 环境；
+部署不复杂, 启动/停止简单；
+其contri项目fuse-hdfs使其支持FUSE；
+Data节点上可以与其他应用程序共享磁盘空间；
+一方面，支持挂载到本地文件系统；另一方面，当需要在API层直接使用时，支持Java和C/C++客户端，SF1和Bridge都可以使用HDFS。
+
+
+
+HDFS 部署环境：
+
+$ bin/hadoop dfsadmin -report
+Configured Capacity: 4557440724992 (4.14 TB)
+Present Capacity: 3652729204736 (3.32 TB)
+DFS Remaining: 3652728492032 (3.32 TB)
+DFS Used: 712704 (696 KB)
+DFS Used%: 0%
+Under replicated blocks: 0
+Blocks with corrupt replicas: 0
+Missing blocks: 0
+
+-------------------------------------------------
+Datanodes available: 3 (3 total, 0 dead)
+
+Name: 172.16.0.162:50010
+Decommission Status : Normal
+Configured Capacity: 565583912960 (526.74 GB)
+DFS Used: 237568 (232 KB)
+Non DFS Used: 434047520768 (404.24 GB)
+DFS Remaining: 131536154624(122.5 GB)
+DFS Used%: 0%
+DFS Remaining%: 23.26%
+Last contact: Thu Oct 13 09:54:00 CST 2011
+
+
+Name: 172.16.0.36:50010
+Decommission Status : Normal
+Configured Capacity: 59056844800 (55 GB)
+DFS Used: 237568 (232 KB)
+Non DFS Used: 12440449024 (11.59 GB)
+DFS Remaining: 46616158208(43.41 GB)
+DFS Used%: 0%
+DFS Remaining%: 78.93%
+Last contact: Thu Oct 13 09:53:58 CST 2011
+
+
+Name: 172.16.0.163:50010
+Decommission Status : Normal
+Configured Capacity: 3932799967232 (3.58 TB)
+DFS Used: 237568 (232 KB)
+Non DFS Used: 458223550464 (426.75 GB)
+DFS Remaining: 3474576179200(3.16 TB)
+DFS Used%: 0%
+DFS Remaining%: 88.35%
+Last contact: Thu Oct 13 09:54:00 CST 2011
+
+
+HDFS 测试
+（将HDFS挂载到本地文件系统后读写,复制文件）
+=====
+读hdfs比读local性能差约2倍
+写hdfs比写local性能差约70～80倍？
+=====
+
+
+1. local -> local
+
+File Size: 735M 
+-----------------
+copy file from "../../corpus/sogou-10m/B-00-201005211454-42000-I-C.SCD" to "./scd.data"
+open src file in 7.39098e-05s
+open dest file in 0.218864s
+read len 64000000B,  wrote in 0.076932s,  read next in 0.0353131s, 
+read len 64000000B,  wrote in 0.0759761s,  read next in 0.0351281s, 
+read len 64000000B,  wrote in 0.0755s,  read next in 0.035023s, 
+read len 64000000B,  wrote in 0.0752571s,  read next in 0.035938s, 
+read len 64000000B,  wrote in 0.0704782s,  read next in 0.0342s, 
+read len 64000000B,  wrote in 0.062505s,  read next in 0.03548s, 
+read len 64000000B,  wrote in 0.0631461s,  read next in 0.035403s, 
+read len 64000000B,  wrote in 0.061748s,  read next in 0.034261s, 
+read len 64000000B,  wrote in 0.0624008s,  read next in 0.035466s, 
+read len 64000000B,  wrote in 0.0619531s,  read next in 0.0342381s, 
+read len 64000000B,  wrote in 0.062047s,  read next in 0.035322s, 
+read len 64000000B,  wrote in 0.06161s,  read next in 0.00104213s, 
+read len 2449494B,  wrote in 0.00241113s,  read next in 9.53674e-07s, 
+copy finished in 4.77219s
+-------------
+copy file from "../../corpus/sogou-10m/B-00-201005211454-42000-I-C.SCD" to "./scd.data"
+open src file in 7.48634e-05s
+open dest file in 5.19753e-05s
+read len 760000000B,  wrote in 0.753542s,  read next in 0.00476694s, 
+read len 10449494B,  wrote in 0.010123s,  read next in 9.53674e-07s, 
+copy finished in 1.21742s
+-------------
+
+
+2. local -> hdfs
+~~~~~
+不能overwrite 已有文件？ remove first
+~~~~~
+
+File Size: 735M 
+-----------------
+copy file from "../../corpus/sogou-10m/B-00-201005211454-42000-I-C.SCD" to "/tmp/hdfs/user/lscm/test/scd.data"
+open src file in 7.00951e-05s
+open dest file in 0.675586s
+read len 64000000B,  wrote in 5.80957s,  read next in 0.028909s, 
+read len 64000000B,  wrote in 5.7571s,  read next in 0.028908s, 
+read len 64000000B,  wrote in 5.75969s,  read next in 0.0288639s, 
+read len 64000000B,  wrote in 5.70528s,  read next in 0.028621s, 
+read len 64000000B,  wrote in 5.74167s,  read next in 0.0277641s, 
+read len 64000000B,  wrote in 6.44871s,  read next in 0.0296981s, 
+read len 64000000B,  wrote in 5.76731s,  read next in 0.0294361s, 
+read len 64000000B,  wrote in 6.07048s,  read next in 0.02894s, 
+read len 64000000B,  wrote in 7.60324s,  read next in 0.029562s, 
+read len 64000000B,  wrote in 5.94719s,  read next in 0.0294621s, 
+read len 64000000B,  wrote in 5.9396s,  read next in 0.029866s, 
+read len 64000000B,  wrote in 5.75986s,  read next in 0.00103498s, 
+read len 2449494B,  wrote in 0.212231s,  read next in 1.90735e-06s, 
+copy finished in 72.8725s
+-----------------
+copy file from "../../corpus/sogou-10m/B-00-201005211454-42000-I-C.SCD" to "/tmp/hdfs/user/lscm/test/scd.data"
+open src file in 7.00951e-05s
+open dest file in 0.0651588s
+read len 760000000B,  wrote in 69.3961s,  read next in 0.00547886s, 
+read len 10449494B,  wrote in 0.91678s,  read next in 9.53674e-07s, 
+copy finished in 70.7633s
+----------------
+
+3. hdfs -> local
+
+File Size: 735M 
+-----------------
+copy file from "/tmp/hdfs/user/lscm/test/scd.data" to "./scd.data"
+open src file in 0.643011s
+open dest file in 6.38962e-05s
+read len 64000000B,  wrote in 0.075618s,  read next in 0.604996s, 
+read len 64000000B,  wrote in 0.0751281s,  read next in 0.400404s, 
+read len 64000000B,  wrote in 0.0759161s,  read next in 0.41729s, 
+read len 64000000B,  wrote in 0.0753062s,  read next in 0.413939s, 
+read len 64000000B,  wrote in 0.0770452s,  read next in 0.599333s, 
+read len 64000000B,  wrote in 0.077105s,  read next in 0.614383s, 
+read len 64000000B,  wrote in 0.0757668s,  read next in 0.398148s, 
+read len 64000000B,  wrote in 0.075686s,  read next in 0.39504s, 
+read len 64000000B,  wrote in 0.0752411s,  read next in 0.653167s, 
+read len 64000000B,  wrote in 0.0758948s,  read next in 0.392903s, 
+read len 64000000B,  wrote in 0.07742s,  read next in 0.371319s, 
+read len 64000000B,  wrote in 0.0793438s,  read next in 0.016928s, 
+read len 2449494B,  wrote in 0.00294304s,  read next in 9.53674e-07s, 
+copy finished in 6.66232s
+-----------------
+
+4. hdfs -> hdfs
+
+File Size: 735M 
+-----------------
+copy file from "/tmp/hdfs/user/lscm/test/scd.data" to "/tmp/hdfs/user/lscm/test3/scd.data"
+open src file in 0.952298s
+open dest file in 0.654918s
+read len 64000000B,  wrote in 5.68243s,  read next in 0.59864s, 
+read len 64000000B,  wrote in 5.70014s,  read next in 0.40001s, 
+read len 64000000B,  wrote in 5.7077s,  read next in 0.398541s, 
+read len 64000000B,  wrote in 5.74628s,  read next in 0.401143s, 
+read len 64000000B,  wrote in 5.70605s,  read next in 0.408121s, 
+read len 64000000B,  wrote in 6.01709s,  read next in 0.393947s, 
+read len 64000000B,  wrote in 5.92743s,  read next in 0.411303s, 
+read len 64000000B,  wrote in 5.72547s,  read next in 0.43891s, 
+read len 64000000B,  wrote in 7.72953s,  read next in 0.466338s, 
+read len 64000000B,  wrote in 5.78624s,  read next in 0.444253s, 
+read len 64000000B,  wrote in 6.10005s,  read next in 0.392828s, 
+read len 64000000B,  wrote in 5.97834s,  read next in 0.0489652s, 
+read len 2449494B,  wrote in 0.166025s,  read next in 9.53674e-07s, 
+copy finished in 77.2304s
+-----------------
+
+

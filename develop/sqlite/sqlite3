@@ -1,0 +1,13 @@
+安装sqlite3
+sudo apt-get install sqlite3
+sudo apt-get install libsqlite3-dev
+sudo gem install sqlite3-ruby        <----- ruby
+
+全部导出
+sqlite3 data.db
+>.output dd.sql
+>.dump
+
+全部导入
+sqlite3 mydb.db
+>.read dd.sql

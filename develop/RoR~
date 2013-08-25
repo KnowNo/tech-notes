@@ -1,0 +1,32 @@
+=======================
+Rail on practice
+
+- /home/kevin/codebase/stats-collector/source/rails_pages/config/routes.rb
+  # See how all your routes lay out with "rake routes"
+  map.connect '',:controller=>"index",:action=>"index"  
+
+- scaffold
+ scaffold :book
+
+ error:
+ undefined method `scaffold' for BookController:Class
+ 
+ resolve:
+ 1. ruby script/plugin install scaffolding
+ 2. ruby script/plugin install http://tools.assembla.com/svn/breakout/breakout/vendor/plugins/classic_pagination/
+ XXXX
+
+- 设置db，(2.0.2 默认 sqlite3)
+work> rails --database=mysql depot
+
+- ERb
+ <%=h .. %> : 将mark当作字符串
+ <%= .. %> : 解释mak后显示
+
+- 在Ruby on Rails里面，首先应该明确的一点 —– Helper默认是view的helper.
+
+- 调试：
+  rails_root> tail -f log/production.log
+  controller/model 中:
+  logger.info("--- debug info ---")
+  RAILS_DEFAULT_LOGGER.debug(" debug info ")

@@ -1,0 +1,28 @@
+172 Hadoop Map/Reduce Administration
+Quick Links
+
+    * Scheduling Info
+    * Running Jobs
+    * Retired Jobs
+    * Local Logs
+
+State: RUNNING
+Started: Tue Oct 11 12:21:40 CST 2011
+Version: 0.20.203.0, r1099333
+Compiled: Wed May 4 07:57:50 PDT 2011 by oom
+Identifier: 201110111221
+Cluster Summary (Heap Size is 119.69 MB/888.94 MB)
+Running Map Tasks	Running Reduce Tasks	Total Submissions	Nodes	Occupied Map Slots	Occupied Reduce Slots	Reserved Map Slots	Reserved Reduce Slots	Map Task Capacity	Reduce Task Capacity	Avg. Tasks/Node	Blacklisted Nodes	Graylisted Nodes	Excluded Nodes
+0	0	0	2	0	0	0	0	4	4	4.00	0	0	0
+
+Scheduling Information
+Queue Name 	State 	Scheduling Information
+default 	running 	N/A
+Filter (Jobid, Priority, User, Name)
+Example: 'user:smith 3200' will filter by 'smith' only in the user field and '3200' in all fields
+Running Jobs
+none
+Retired Jobs
+none
+Local Logs
+Log directory, Job Tracker History This is Apache Hadoop release 0.20.203.0 

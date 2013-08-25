@@ -1,0 +1,18 @@
+==== Open Flash Chart 2
+-Reference
+http://pullmonkey.com/projects/open_flash_chart2/
+
+==== Calendar date select
+-install
+script/plugin install http://calendardateselect.googlecode.com/svn/tags/calendar_date_select
+
+-view
+<%= javascript_include_tag "prototype" %>
+<%= calendar_date_select_includes :style => :silver %>
+<% CalendarDateSelect.format = :iso_date %>
+
+<%= calendar_date_select_tag "e_date", nil, :embedded => true, :year_range => 10.years.ago..0.years.ago %>
+
+-Reference
+http://www.rubyinside.com/calendar-date-select-a-lightweight-prototype-based-datetime-picker-for-rails-developers-573.html
+http://code.google.com/p/calendardateselect/

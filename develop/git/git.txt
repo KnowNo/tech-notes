@@ -1,0 +1,61 @@
+How to Generate Key File, ssh-keygen is used to generate key pairs, and ssh-copy-id copies the public key file to server.
+___________________________________________________________________
+$ ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa
+$ ssh-copy-id -i ~/.ssh/id_rsa.pub first.last@xxxxxx.com
+___________________________________________________________________
+
+How to Configure GIT User Name
+___________________________________________________________________
+$ git config --global user.name "Firstname Lastname"
+$ git config --global user.email "youremail@example.com"
+___________________________________________________________________
+
+Brief Tutorial
+___________________________________________________________________
+Installation
+• Fedora/Centos
+$ sudo yum install git
+• Ubuntu/Debian
+$ sudo apt-get install git git-core
+• Other
+Download source package from its homepage, and built it.
+___________________________________________________________________
+
+Create GIT Repository
+———————————————————————————————————————————————————————————————————
+$ mkdir Hello-World
+$ cd Hello-World
+$ git init
+$ touch README
+
+$ git add README
+$ git commit -m 'first commit'
+
+$ git remote add origin git@github.com:username/Hello-World.git
+$ git push -u origin master
+———————————————————————————————————————————————————————————————————
+
+创建分支: 
+(1) git branch <branch-name>
+(2) git branch -b <branch-name>
+显示分支:
+git branch      # 本地
+git branch -r   # 服务器
+git branch -a   # 全部
+切换分支:
+git checkout <branch-name>
+下载分支:
+(1) git checkout -b <branch-name> <remote-branch-name>
+(2) git checkout -t <remote-branch-name>
+删除分支:
+git branch [-d|-D] <branch-name> # 本地，-d 需合并; -D 不需合并
+git push origin :<branch-name>   # 远程
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,52 @@
+Super 敲击打开托盘
+Super + A 打开应用程序托盘
+Super + F 打开文件及文件夹托盘
+Super + W 平铺模式列出所有窗口
+Super + S 浏览模式，缩小所有工作区，让你管理窗口
+Super + T 打开回收站
+
+Alt + Tab 在不同程序窗口间切换
+Alt + F2 类似Windows下的Win + R组合键，在GNOME中运行应用程序
+Alt + F4 关闭窗口
+Alt + F5 取消最大化窗口 (恢复窗口原来的大小)
+Alt + F7 移动窗口 (注: 在窗口最大化的状态下无效)
+Alt + F8 改变窗口大小 (注: 在窗口最大化的状态下无效)
+Alt + F9 最小化窗口
+Alt + F10 最大化窗口
+Alt + Space 打开窗口的控制菜单 (点击窗口左上角图标出现的菜单)
+PrintScreen 全屏抓图
+Alt + PrintScreen 当前窗口抓图
+
+Ctrl + Alt + L 锁定桌面，不同在于同时启动屏幕保护程序
+Ctrl + Alt + Del 从当前用户注销
+Ctrl + Alt + D组合键，显示桌面
+Ctrl + Alt + Left/Right/Up/Down 在不同工作台间切换
+Ctrl + Alt + Shift + Left/Right/Up/Down 移动当前窗口到不同工作台
+Ctrl + Alt + F1-F6 进入全屏终端
+Ctrl + Alt + F7 返回图形界面
+
+Ctrl+N 新建窗口
+Ctrl+X 剪切
+Ctrl+C 复制
+Ctrl+V 粘贴
+Ctrl+Z 撤销上一步操作
+Ctrl+Shift+Z / Ctrl+Y 重做刚撤销的一步操作
+Ctrl+S 保存
+Ctrl+B 书签
+Ctrl+H 显示隐藏文件
+Ctrl+T 新建标签
+Ctrl+W 关闭标签
+Ctrl+Page Up 上一个标签
+Ctrl+Page Down 下一个标签
+Alt+N 切换到第N个标签
+
+Ctrl + a - 跳到行首
+Ctrl + b - 左移一个字符  
+Ctrl + c - 终端进程  
+Ctrl + d - 从光标处向右删除  
+Ctrl + e - 跳到行尾  
+Ctrl + f - 右移一个字符  
+Ctrl + k - 删除从光标到行尾的部分
+Ctrl + u - 删除从光标到行首的部分
+Ctrl + l - 清屏，类似 clear 命令  
+Ctrl + r - 查找历史命令 

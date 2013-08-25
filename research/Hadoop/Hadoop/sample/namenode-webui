@@ -1,0 +1,26 @@
+NameNode '172.16.0.161:9000'
+Started: 	Tue Oct 11 12:20:34 CST 2011
+Version: 	0.20.203.0, r1099333
+Compiled: 	Wed May 4 07:57:50 PDT 2011 by oom
+Upgrades: 	There are no upgrades in progress.
+
+Browse the filesystem
+Namenode Logs
+Cluster Summary
+6 files and directories, 1 blocks = 7 total. Heap Size is 119.69 MB / 888.94 MB (13%)
+Configured Capacity	:	4.09 TB
+DFS Used	:	48.03 KB
+Non DFS Used	:	823.92 GB
+DFS Remaining	:	3.29 TB
+DFS Used%	:	0 %
+DFS Remaining%	:	80.33 %
+Live Nodes 	:	2
+Dead Nodes 	:	0
+Decommissioning Nodes 	:	0
+Number of Under-Replicated Blocks	:	1
+
+NameNode Storage:
+Storage Directory	Type	State
+/tmp/hadoop-lscm/dfs/name	IMAGE_AND_EDITS	Active
+
+This is Apache Hadoop release 0.20.203.0 

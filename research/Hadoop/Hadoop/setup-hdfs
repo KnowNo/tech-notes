@@ -1,0 +1,151 @@
+Home Page
+http://hadoop.apache.org/common/docs/stable/
++ Getting Started (Single Node Setup , Cluster Setup)
++ HDFS
+
+=== env
+conf/hadoop-env.sh
+set at least JAVA_HOME
+
+=== configure
+conf/
+core-site.xml           
+hdfs-site.xml               
+mapred-site.xml
+masters 
+slaves
+
+For a multimachine cluster to run, the configuration must include the following:
+	 •	 List of slave machines (conf/slaves)
+	 •	 Network location of the JobTracker server (mapred.job.tracker)
+	 •	 Network location of the NameNode server (fs.default.name)
+	 •	 Persistent location on the cluster machines to store the data for HDFS (hadoop.tmp.dir)
+
+
+= ssh
+Hadoop Core requires that passwordless SSH work between the master machines and all of
+the slave and secondary machines.
+
+$ ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa 
+
+append the contents of the ~/.ssh/id_dsa.pub file to the ~/.ssh/authorized_keys on slaves
+
+= 
+conf/slaves
+---
+lscm@172.16.0.163        # 或者在 /etc/hosts 建立地址到主机名定义
+lscm@172.16.0.162
+---
+
+conf/masters
+---
+lscm@172.16.0.161
+---
+
+/etc/hosts
+----
+172.16.0.161    puma
+172.16.0.162    jaguar
+172.16.0.163    panther
+----
+
+
+=== start hadoop
+所有节点hadoop安装目录需要一致，默认路径不一致时可以在 bin/hadoop-config.sh 
+中设置 HADOOP_HOME=
+
+=
+to start a hadoop cluster, we only need to start through the namenode.
+
+Format a new distributed filesystem:
+$ bin/hadoop namenode -format
+
+Start the HDFS with the following command, run on the designated NameNode:
+$ bin/start-dfs.sh
+
+The bin/start-dfs.sh script also consults the ${HADOOP_CONF_DIR}/slaves file on the NameNode and starts the DataNode daemon on all the listed slaves.
+
+Start Map-Reduce with the following command, run on the designated JobTracker:
+$ bin/start-mapred.sh
+
+The bin/start-mapred.sh script also consults the ${HADOOP_CONF_DIR}/slaves file on the JobTracker and starts the TaskTracker daemon on all the listed slaves. 
+
+= webui
+Browse the web interface for the NameNode and the JobTracker:
+JobTracker
+http://172.16.0.161:50030
+NomeNode
+http://172.16.0.161:50070
+
+= stats
+bin/hadoop dfsadmin -report
+
+
+= clear
+lscm@puma:~/workspace/hadoop-0.20.203.0$ rm -rf /tmp/hadoop-lscm
+lscm@puma:~/workspace/hadoop-0.20.203.0$ rm -rf logs
+
+
+=== test ... (Single Node Setup, Execution)
+
+在HDFS文件系统中创建一个新文件夹：
+---------------------------
+>$bin/hadoop fs -mkdir /user/lscm/inp1
+---------------------------
+
+grep searh
+----
+Copy the input files into the distributed filesystem:
+$ bin/hadoop fs -put conf input
+
+Run some of the examples provided:
+$ bin/hadoop jar hadoop-examples-*.jar grep input output 'dfs[a-z.]+'
+
+Examine the output files:
+
+Copy the output files from the distributed filesystem to the local filesytem and examine them:
+$ bin/hadoop fs -get output output
+$ cat output/*
+
+or
+
+View the output files on the distributed filesystem:
+$ bin/hadoop fs -cat output/* 
+----
+
+Errors:
+--- 
+java.lang.IllegalArgumentException: Wrong FS: hdfs://172.16.0.161:9000/tmp/hadoop-lscm/mapred/system/job_201110111344_0001/jobToken, expected: hdfs://puma:9000
+11/10/11 13:45:32 WARN mapred.JobClient: Error reading task outputjaguar
+
+--->  在 jaguar（162）上注释掉下面的行： ？  或在配置中使用主机名？
+/etc/hosts
+---
+#172.16.0.161 puma puma.izenesoft.cn
+---
+
+==== Refer
+
++ Default Ports Used by Hadoop Core：[Pro Hadoop] p81, Table3-3
+
+Port	 Setting	 Description
+50030	 mapred.job.tracker.http.address	 JobTracker administrative web GUI
+50070	 dfs.http.address	 NameNode administrative web GUI
+50010	 dfs.datanode.address	 DataNode control port (each DataNode
+				listens on this port and registers it with the
+				NameNode on startup)
+50020	 dfs.datanode.ipc.address	 DataNode IPC port, used for block transfer
+50060	 mapred.task.tracker.http.address	 Per TaskTracker web interface
+50075	 dfs.datanode.http.address	 Per DataNode web interface
+50090	 dfs.secondary.http.address	 Per secondary NameNode web interface
+50470	 dfs.https.address	 NameNode web GUI via HTTPS
+50475	 dfs.datanode.https.address	 Per DataNode web GUI via HTTPS
+
++ http://hi.baidu.com/%F1%FB%D7%F3%D1%D4/blog/item/d59af0865bfcc821c75cc340.html
+
+清理HDFS文件、临时文件和日志文件：
+--------------------------------
+>rm $HADOOP_HOME/filesystem -rf
+>rm $HADOOP_HOME/logs -rf
+>rm /tmp/hadoop-$USER -rf
+--------------------------------

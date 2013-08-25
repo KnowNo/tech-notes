@@ -1,0 +1,22 @@
+--Q
+name.gsub(/ /, '_')
+NoMethodError: private method `sub!' called for #<Array:0x7d180>
+--A 
+name.to_s.gsub()
+
+--Q
+ActionController::Session::CookieStore::CookieOverflow
+--A
+session..
+
+--Q
+no such file to load -- rufus/scheduler (LoadError)
+--A (定时任务)
+gem install resque-scheduler
+
+--Q
+no such file to load -- rufus/scheduler (LoadError)
+--A
+gem install erubis
+
+

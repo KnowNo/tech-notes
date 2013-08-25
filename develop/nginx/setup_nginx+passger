@@ -1,0 +1,60 @@
+ubuntu 
+
+1. Nginx
+----------
+安装 nginx 服务器
+
+下载最新 stable 版 nginx
+
+mkdir -p /opt/src && cd /opt/src
+wget http://nginx.org/download/nginx-0.7.64.tar.gz
+tar xvf nginx-0.7.64.tar.gz
+
+安装编译相关类库
+
+apt-get install libpcre3-dev
+
+...
+---------
+
+Or
+2. passenger + Nginx
+
+$gem install passenger
+
+$find / -name "passenger*" -type d # 查找安装目录
+
+$apt-get install libpcre3-de # ?
+
+/var/lib/gems/1.8/gems/passenger-2.2.15/bin$./passenger-install-nginx-module    # =>  download nginx and install with passenger module
+
+
+
+
+3. QAs
+
++----
+[emerg]: bind() to 0.0.0.0:80 failed (98: Address already in use)   这个是nginx重启是 经常遇到的。 nginx重复重启。自己占用了端口。 解决
+方法  killall -9 nginx 杀掉nginx 进程  然后重启就行了。  service nginx restart 
+这样就解决了。  
+
++----
+Nginx said "The page you are looking for is temporarily unavailable."
+
+check error log:
+upstream sent too big header while reading response header from upstream, lient...
+
+参考：
+http://hi.baidu.com/icej/blog/item/5f7ae103af92a1703812bb75.html
+
+https://community.engineyard.com/discussions/problems/1132-nginx-error-upstream-sent-too-big-header-while-reading-response-header-from-upstream
+
+http://blog.rackcorp.com/?p=14
+
++----
+400 bad request
+清空密码
+
+
+
+

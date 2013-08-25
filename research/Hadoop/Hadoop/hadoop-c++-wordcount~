@@ -1,0 +1,140 @@
+=== 
+http://hi.baidu.com/duh_top/blog/item/8d1addf2e22b73ccf3d3854d.html
+http://wiki.apache.org/hadoop/C%2B%2BWordCount
+
+-- core-site.xml  
+<property>    
+        <name>hadoop.tmp.dir</name>    
+        <value>/home/zhongxia/hadoop</value>
+</property> 
+
+
+==== wordcount.cpp
+--------------
+#include "hadoop/Pipes.hh"
+#include "hadoop/TemplateFactory.hh"
+#include "hadoop/StringUtils.hh"
+
+class WordCountMap: public HadoopPipes::Mapper {
+public:
+  WordCountMap(HadoopPipes::TaskContext& context){}
+  void map(HadoopPipes::MapContext& context) {
+    std::vector<std::string> words =
+      HadoopUtils::splitString(context.getInputValue(), " ");
+    for(unsigned int i=0; i < words.size(); ++i) {
+      context.emit(words[i], "1");
+    }
+  }
+};
+
+class WordCountReduce: public HadoopPipes::Reducer {
+public:
+  WordCountReduce(HadoopPipes::TaskContext& context){}
+  void reduce(HadoopPipes::ReduceContext& context) {
+    int sum = 0;
+    while (context.nextValue()) {
+      sum += HadoopUtils::toInt(context.getInputValue());
+    }
+    context.emit(context.getInputKey(), HadoopUtils::toString(sum));
+  }
+};
+
+int main(int argc, char *argv[]) {
+  return HadoopPipes::runTask(HadoopPipes::TemplateFactory<WordCountMap,
+                              WordCountReduce>());
+}
+--------------
+
+==== Makefile
+--------------
+HADOOP_INSTALL=/home/zhongxia/Software/hadoop-0.20.2+737
+PLATFORM=Linux-amd64-64
+
+CC = g++
+CPPFLAGS = -m64 -I$(HADOOP_INSTALL)/c++/$(PLATFORM)/include
+
+wordcount: wordcount.cpp
+	$(CC) $(CPPFLAGS) $< -Wall -L$(HADOOP_INSTALL)/c++/$(PLATFORM)/lib -lhadooppipes -lhadooputils -lpthread -lcrypto -lssl -g -O2 -o $@
+--------------
+1. note: -lcrypto -lssl
+
+
+-- DFHS
+$ bin/hadoop namenode -format
+$ bin/start-all.sh             #  启动服务
+$ bin/hadoop fs -lsr
+$ bin/hadoop fs -mkdir bin
+
+-- 上传可执行文件到伪dfs中
+$ bin/hadoop fs -put c++-examples/wordcount bin/wordcount
+
+zhongxia@zhongxia-desktop:~/Software/hadoop-0.20.2+737$ bin/hadoop fs -lsr /tmp/hadoop-zhongxia/
+drwxr-xr-x   - zhongxia supergroup          0 2012-05-15 11:22 /tmp/hadoop-zhongxia/bin
+-rw-r--r--   1 zhongxia supergroup     253530 2012-05-15 11:22 /tmp/hadoop-zhongxia/bin/wordcount
+drwxr-xr-x   - zhongxia supergroup          0 2012-05-15 10:26 /tmp/hadoop-zhongxia/mapred
+drwx------   - zhongxia supergroup          0 2012-05-15 10:26 /tmp/hadoop-zhongxia/mapred/system
+-rw-------   1 zhongxia supergroup          4 2012-05-15 10:26 /tmp/hadoop-zhongxia/mapred/system/jobtracker.info
+
+
+
+-- word.xml
+-----
+<?xml version="1.0"?>
+<configuration>
+	<property>
+		<!-- Set the binary path on DFS-->
+		<name>hadoop.pipes.executable</name>
+		<value>/tmp/hadoop-zhongxia/bin/wordcount</value>
+	</property>
+	<property>
+		<name>hadoop.pipes.java.recordreader</name>
+		<value>true</value>
+	</property>
+	<property>
+		<name>hadoop.pipes.java.recordwriter</name>
+		<value>true</value>
+	</property>
+</configuration>
+----
+
+-- 输入文件
+$ vi hello.txt
+hello world!
+$ vi hello2.txt
+hello hadoop
+$ bin/hadoop fs -copyFromLocal c++-examples/hello.txt input/wordcount
+$ bin/hadoop fs -copyFromLocal c++-examples/hello2.txt input/wordcount
+
+-- 运行代码
+$ bin/hadoop pipes -conf word.xml -input /tmp/hadoop-zhongxia/input -output /tmp/hadoop-zhongxia/output
+								
+$ hadoop pipes -conf word.xml -input input/wordcount -output output/wordcount
+																																																										
+-- 或 运行代码
+$ bin/hadoop pipes \
+-D hadoop.pipes.java.recordreader=true -D hadoop.pipes.java.recordwriter=true \
+-input /tmp/hadoop-zhongxia/input -output /tmp/hadoop-zhongxia/output \
+-program /tmp/hadoop-zhongxia/bin/wordcount
+
+---> error
+attempt_201205151026_0003_m_000000_0: Server failed to authenticate. Exiting
+12/05/15 11:41:44 INFO mapred.JobClient: Task Id : attempt_201205151026_0003_m_000001_0, Status : FAILED
+java.io.IOException
+	at org.apache.hadoop.mapred.pipes.OutputHandler.waitForAuthentication(OutputHandler.java:188)
+----
+64位系统下，重新编译src/c++/pipes
+$ cd src/c++/pipes
+$ 编辑 configure
+将 LIBS="-lssl $LIBS" 出现的地方，改成 LIBS="-lssl -lcrypto $LIBS" 
+$ ant -Dcompile.c++=yes
+$ cp build/c++/Linux-amd64-64/lib/* c++/Linux-amd64-64/lib/
+重新编译wordcount并上传至hdfs
+
+-- 查看结果
+$ hadoop fs -cat output/wordcount/*
+hadoop	1
+hello	2
+world!	1
+
+
+

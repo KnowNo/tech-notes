@@ -1,0 +1,116 @@
+====== 
+
+HDFS Architecture Guide 
+
+http://hadoop.apache.org/common/docs/stable/hdfs_design.html
+
+- Simple Coherency Model
+HDFS applications need a write-once-read-many access model for files. A file once created, written, and closed need not be changed. *
+This assumption simplifies data coherency issues and enables high throughput data access. A MapReduce application or a web crawler application fits perfectly with this model. 
+There is a plan to support appending-writes to files in the future. *
+
+- The File System Namespace 
+HDFS supports a traditional hierarchical file organization.
+A user or an application can create directories and store files inside these directories. The file system namespace hierarchy is similar to most other existing file systems; 
+one can create and remove files, move a file from one directory to another, or rename a file. *
+HDFS does not yet implement user quotas. HDFS does not support hard links or soft links. However, the HDFS architecture does not preclude implementing these features. 
+
+
+
+======  FUSE-HDFS
+
+http://wiki.apache.org/hadoop/MountableHDFS
+
+http://blog.sina.com.cn/s/blog_5cf546320100is1d.html
+http://savagegarden.iteye.com/blog/1170752
+
+
+= BUILDING
+
+$
+$ ant compile-c++-libhdfs -Dlibhdfs=1
+$ ant package
+
+---> error
+/home/zhongxia/workspace/hadoop-0.20.203.0/build.xml:1220: 'java5.home' is not defined.  Forrest requires Java 5.  Please pass -Djava5.home=<base of Java 5 distribution> to Ant on the command-line.
+---
+1. 在build.xml中注释掉Documentation相关的target (含forrest.check), 在package target中去掉对doc相关target的依赖。
+2. 注释掉 target: test-patch, hudson-test-patch
+
+$ cd build
+$ mkdir libhdfs
+$ cp ../c++/Linux-amd64-64/lib/* libhdfs/
+$ cd ../
+$ ant compile-contrib -Dlibhdfs=1 -Dfusedfs=1
+
+---> error
+fuse_connect.c:40: error: too many arguments to function ‘hdfsConnectAsUser’
+
+--- see, https://issues.apache.org/jira/browse/HDFS-1267
+src/contrib/fuse-dfs/src/fuse_connect.c
+-  hdfsFS fs = hdfsConnectAsUser(hostname, port, user, (const char **)groups, numgroups);
++  hdfsFS fs = hdfsConnectAsUser(hostname, port, user);
+
+
+= CONFIGURING & MOUNT
+
+$ cd build/contrib/fuse-dfs/
+$ sudo mkdir /mnt/hdfs 
+$ mkdir /tmp/hdfs
+$ ./fuse_dfs_wrapper.sh dfs://172.16.0.161:9000 /tmp/hdfs
+
+---> error
+./fuse_dfs: error while loading shared libraries: libhdfs.so.0: cannot open shared object file: No such file or directory
+---
+在 fuse_dfs_wrapper.sh 设置正确的路径，
+HADOOP_HOME=...
+LD_LIBRARY_PATH=...:$HADOOP_HOME/build/libhdfs:$LD_LIBRARY_PATH
+
+---> error
+fusermount: failed to open /etc/fuse.conf: Permission denied
+fusermount: option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf
+---
+$ sudo chmod a+r /etc/fuse.conf
+$ sudo vi /etc/fuse.conf
+#user_allow_other 去掉注释，允许非root用户进行mount操作。
+
+---> error
+./fuse_dfs: error while loading shared libraries: libjvm.so: cannot open shared object file: No such file or directory
+---
+check
+$ ldd fuse_dfs
+libjvm.so => not found
+
+$ sudo ldconfig -p | grep libjvm ??
+
+fuse_dfs_wrapper.sh
+--
+LD_LIBRARY_PATH=/usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server:...
+--
+ or
+sudo ln -s /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so /lib/libjvm.so
+
+---> error
+fuse-dfs didn't recognize /tmp/hdfs,-2
+---
+
+
+==  其他
+
+修改cluster配置hdfs-site.xml, 取消权限验证，方便从集群外的客户端机器访问。 ？？？
+<configuration>
+        <property>
+                <name>dfs.permissions</name>
+                <value>false</value>
+        </property> 
+</configuration>
+
+--->
+/bin/mount: unrecognized option '--no-canonicalize'
+
+
+
+
+
+
+

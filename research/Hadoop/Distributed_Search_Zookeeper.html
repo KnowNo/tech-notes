@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>Distributed Search</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style>
+body { font:80% Verdana,Tahoma,Arial,sans-serif; }
+h1, h2, h3, h4 {  font-family: "Trebuchet MS",Georgia,"Times New Roman",serif; }
+ul.toc { padding: 4px; margin-left: 0; }
+ul.toc li { list-style-type:none; }
+ul.toc li.heading2 { margin-left: 1em; }
+ul.toc li.heading3 { margin-left: 2em; }
+a.wiki-anchor { display: none; margin-left: 6px; text-decoration: none; }
+a.wiki-anchor:hover { color: #aaa !important; text-decoration: none; }
+h1:hover a.wiki-anchor, h2:hover a.wiki-anchor, h3:hover a.wiki-anchor { display: inline; color: #ddd; }
+</style>
+</head>
+<body>
+<h1 id="bfheader-d448b66de46dd7d0cffff83d2d741702">Distributed Search</h1>
+
+<h1 id="bfheader-121831bf431c5a1d3c5cb0ec925c3bca">1. 配置</h1>
+
+<p>SF1分布式的配置，可以参考<a href="https://ssl.izenesoft.cn/projects/sf1-knowledgebase/wiki/Configuring" title="SF1Config">SF1Config</a>的Deployment部分。</p>
+
+<h1 id="bfheader-be25d0d4aedb365aff25a91c571947d4">2. 部署</h1>
+
+<p>SF1 分布式系统使用ZooKeeper来进行分布式协作管理，所以同时需要部署ZooKeeper Service.</p>
+
+<h2 id="bfheader-bf6a5ad549f0d9fedd50a80791e8ce2f">2.1. 示例</h2>
+
+<p>下面的例子中，配置两个SF1节点，它们都作为Worker，其中一个节点为Master.</p>
+
+<h3 id="bfheader-eda8529fc4c226473489ddcfdc004bcb">2.1.1. 配置文件</h3>
+
+<p>SF1 节点1, 作为Worker和Master.</p>
+
+
+
+<pre><code>&lt;DistributedTopology enable="y" nodenum="2" mirrornum="1" &gt;
+      &lt;CurrentNode nodeid="1" mirrorid="1" host="172.16.0.163" &gt;
+        &lt;!--as master--&gt;
+        &lt;MasterAgent enable="y" port="18151" &gt;
+          &lt;Aggregator name="chinese-wiki-dist" /&gt;
+          &lt;Aggregator name="icson" /&gt; 
+        &lt;/MasterAgent&gt; 
+        &lt;!--as worker--&gt; 
+        &lt;WorkerAgent enable="y" port="18111" &gt;
+          &lt;Service name="chinese-wiki-dist" /&gt;
+          &lt;Service name="icson" /&gt;
+        &lt;/WorkerAgent&gt;
+      &lt;/CurrentNode&gt;
+
+      &lt;ZooKeeper servers="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183" sessiontimeout="2000" /&gt;
+    &lt;/DistributedTopology&gt;
+</code></pre>
+
+
+
+<p>SF1 节点2， 作为Worker.</p>
+
+
+
+<pre><code>&lt;DistributedTopology enable="y" nodenum="2" mirrornum="1" &gt;
+      &lt;CurrentNode nodeid="1" mirrorid="1" host="172.16.0.163" &gt;
+        &lt;WorkerAgent enable="y" port="18111" &gt;
+          &lt;Service name="chinese-wiki-dist" /&gt;
+          &lt;Service name="icson" /&gt;
+        &lt;/WorkerAgent&gt;
+      &lt;/CurrentNode&gt;
+
+      &lt;ZooKeeper servers="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183" sessiontimeout="2000" /&gt;
+    &lt;/DistributedTopology&gt;
+</code></pre>
+
+
+
+<h3 id="bfheader-38902142074d9f7ffb2f37158004b615">2.1.2. ZooKeeper 协作管理</h3>
+
+<p>SF1 节点1启动后（假如节点1先启动），将在ZooKeeper Service中创建如下信息，表示"Mirror1/Node1"节点已经启动,工作为Worker和Master。同时，Master开始等待另一个Worker（“Mirror1/Node2/Worker”）。</p>
+
+
+
+<pre><code>/
+|---
+    SF1
+    |--- Topology
+        |--- Mirror1
+         |--- Node1
+              |--- Master
+              |--- Worker
+</code></pre>
+
+
+
+<p>SF1 节点2启动后，将在ZooKeeper Service中创建如下信息，表示"Mirror1/Node2"节点启动了，工作为Worker。</p>
+
+
+
+<pre><code>/
+|---
+    SF1
+    |--- Topology
+        |--- Mirror1
+         |--- Node1
+              |--- Master
+              |--- Worker
+         |--- Node2
+              |--- Worker
+</code></pre>
+
+
+
+<p>此时，节点1上的Master将观察到 “Mirror1/Node2/Worker”，并取得此Worker的信息。Worker都启动后，Master将可以工作，并创建下面的信息，告知应用程序SF1 Server已经可以工作了（当通过ZooKeeper观察到Serverxxx节点）。</p>
+
+
+
+<pre><code>/
+|---
+    SF1
+    |--- Service
+        |--- Server00000000
+</code></pre>
+
+
+
+<h2 id="bfheader-e21e6ac91490e78c5975d886529dc0e6">2.2. ZooKeeper 安装、部署和应用</h2>
+
+<h3 id="bfheader-c5cd980889f3cec88eb1581d8b7db162">2.2.1 简介</h3>
+
+<p>ZooKeeper: A Distributed Coordination Service for Distributed Applications <a href="http://zookeeper.apache.org/" title="zookeeper">Home</a></p>
+
+<p>ZooKeeper 是一个用于对分布式系统进行协作管理的服务程序，它本身也是分布式的。对于我们的分布式系统来说，ZooKeeper就是一个用来进行分布式管理的服务, ZooKeeper提供了一个简单易用的框架，由Service和Client两部分组成。</p>
+
+<p><img src="http://zookeeper.apache.org/doc/trunk/images/zkservice.jpg" alt="ZooKeeper Service" title="ZooKeeper Service" /></p>
+
+<p>ZooKeeper的Service由若干运行的Server组成（1个或多个），这些Server相同且可部署在不同服务器上，每个Server都维护着相同的数据结构（类似于文件目录结构），这个树形结构中的节点叫znode，Server之间会自动同步数据。</p>
+
+<p>ZooKeeper的Client端可以连接到Service，每个Client对象可以连接到一个指定(或自动分配)的Server，用户通过client可以在Server中创建并维护数据。因为不同的Server维护的是同一份数据的复制，所以不同的client之间，通过ZooKeeper Service，就可以达到共享数据（信息）的目的。</p>
+
+<h3 id="bfheader-ca390ae3a7b9c7bf49be051b9e1439ed">2.2.2 ZooKeeper Service 安装和部署</h3>
+
+<p>Refer to <a href="http://zookeeper.apache.org/doc/trunk/zookeeperAdmin.html" title="guide">ZooKeeper Administrator's Guide</a>.</p>
+
+<h4 id="bfheader-469669cd4bf73fecbfb499776233b288">Required Software</h4>
+
+<p>ZooKeeper runs in Java, release 1.6 or greater (JDK 6 or greater).</p>
+
+<h4 id="bfheader-fb13885794fc64c42531c9656f8f6f73">Download and Installation</h4>
+
+<p>Install the ZooKeeper Server Package. It can be downloaded from:</p>
+
+
+
+<pre><code>http://hadoop.apache.org/zookeeper/releases.html
+</code></pre>
+
+
+
+<h4 id="bfheader-ea355214fd4bc7c57f471bd92918879b">Deployment</h4>
+
+<p>Three ZooKeeper servers is the minimum recommended size for an ensemble of ZooKeeper service. <br> 
+The following is an <em>example</em> of cluster setting up with three ZooKeeper servers on localhost (It's recommened to deploy them on different mechines).</p>
+
+<ul>
+<li><strong>Server1</strong></li>
+</ul>
+
+<p>配置文件<br> 
+zookeeper-3.3.3/conf/zoo.cfg  </p>
+
+
+
+<pre><code>tickTime=2000
+dataDir=./data
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=localhost:2888:3888
+server.2=localhost:2889:3889
+server.3=localhost:2810:3810
+</code></pre>
+
+
+
+<p><em>myid</em> 文件  (配置data目录) <br>
+zookeeper-3.3.3/data/myid</p>
+
+
+
+<pre><code>1
+</code></pre>
+
+
+
+<p>start server</p>
+
+
+
+<pre><code>zookeeper-3.3.3$ ./bin/zkServer.sh start
+</code></pre>
+
+
+
+<p>stop server</p>
+
+
+
+<pre><code>zookeeper-3.3.3$ ./bin/zkServer.sh stop
+</code></pre>
+
+
+
+<ul>
+<li><strong>Server2</strong></li>
+</ul>
+
+<p>配置文件<br> 
+zookeeper-2/conf/zoo.cfg  </p>
+
+
+
+<pre><code>tickTime=2000
+dataDir=./data
+clientPort=2182
+initLimit=5
+syncLimit=2
+server.1=localhost:2888:3888
+server.2=localhost:2889:3889
+server.3=localhost:2810:3810
+</code></pre>
+
+
+
+<p><em>myid</em> 文件 (配置data目录) <br>
+zookeeper-2/data/myid</p>
+
+
+
+<pre><code>2
+</code></pre>
+
+
+
+<p>start server</p>
+
+
+
+<pre><code>zookeeper-2$ ./bin/zkServer.sh start
+</code></pre>
+
+
+
+<ul>
+<li><strong>Server3</strong></li>
+</ul>
+
+<p>配置文件<br> 
+zookeeper-3/conf/zoo.cfg  </p>
+
+
+
+<pre><code>tickTime=2000
+dataDir=./data
+clientPort=2183
+initLimit=5
+syncLimit=2
+server.1=localhost:2888:3888
+server.2=localhost:2889:3889
+server.3=localhost:2810:3810
+</code></pre>
+
+
+
+<p><em>myid</em> 文件 (配置data目录) <br>
+zookeeper-3/data/myid</p>
+
+
+
+<pre><code>3
+</code></pre>
+
+
+
+<p>start server</p>
+
+
+
+<pre><code>zookeeper-3$ ./bin/zkServer.sh start
+</code></pre>
+
+
+
+<h3 id="bfheader-55db5b89214826990091fba69bd6f092">2.2.3 ZooKeeper Client</h3>
+
+<ul>
+<li>Connecting to ZooKeeper Service using client tool </li>
+</ul>
+
+<p>Refer to <a href="http://zookeeper.apache.org/doc/trunk/zookeeperStarted.html" title="gettingstarted">Getting Started</a> for more information.</p>
+
+
+
+<pre><code>zookeeper-server3$ ./bin/zkCli.sh -server 127.0.0.1:2183
+...
+[zk: 127.0.0.1:2183(CONNECTED) 0] ls /
+[zookeeper]
+</code></pre>
+
+
+
+<ul>
+<li>Client API</li>
+</ul>
+
+<p>The ZooKeeper client libraries come in two languages: Java and C. <br>
+Refer to <a href="http://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#ch_bindings" title="Programmer's Guide">Programmer's Guide</a>, <em>Bindings</em> section.</p>
+
+<p>For SF1, we have encapsulated the C client into C++, the C++ ZooKeeper client has been put into izenelib/3rdparty/zookeeper.<br> 
+Refer to the following header files: </p>
+
+
+
+<pre><code>#include &lt;3rdparty/zookeeper/ZooKeeper.hpp&gt; 
+#include &lt;3rdparty/zookeeper/ZooKeeperWatcher.hpp&gt;
+#include &lt;3rdparty/zookeeper/ZooKeeperEvent.hpp&gt;
+</code></pre>
+
+
+</body>
+</html>

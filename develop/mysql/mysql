@@ -1,0 +1,102 @@
+-- MySQL
+
+安装:
+MySql
+-----
+在system->administration->synaptic package manager中，安装
+mysql-server
+mysql-client
+
+mysql-admin GUI管理工具
+-----
+MySql + ruby
+-----
+1－mysql server
+sudo apt-get install mysql-server
+
+2－mysql ruby相关开发包
+sudo apt-get install libmysqlclient15-dev
+sudo apt-get install libmysql-ruby
+sudo apt-get install libruby liberuby-dev
+
+3－mysql native驱动
+sudo gem install mysql 
+-----
+
+
+—— 取消用户(root)密码
+－－－－－－－－－－
+mysql> grant usage on sf1_stats_development.* to root@localhost identified by '';
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.04 sec)
+－－－－－－－－－－
+
+—— 导入导出
+----------------
+1.导出整个数据库
+　　mysqldump -u 用户名 -p 数据库名 > 导出的文件名
+　　mysqldump -u wcnc -p smgp_apps_wcnc > wcnc.sql
+
+2.导出一个表
+　　mysqldump -u 用户名 -p 数据库名 表名> 导出的文件名
+　　mysqldump -u wcnc -p smgp_apps_wcnc users> wcnc_users.sql
+
+3.导出一个数据库结构
+　　mysqldump -u wcnc -p -d --add-drop-table smgp_apps_wcnc >d:wcnc_db.sql
+　　-d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table
+
+4.导入数据库
+
+　　常用source 命令
+　　进入mysql数据库控制台，
+　　如mysql -u root -p
+
+　　mysql>use 数据库
+　　然后使用source命令，后面参数为脚本文件(如这里用到的.sql)
+　　mysql>source d:wcnc_db.sql  （注：如果写成source d:\wcnc_db.sql，就会报语法错误）
+--------------
+
++-----------------------+
+| Database              |
++-----------------------+
+| information_schema    | 
+| depot_development     | 
+| if_development        | 
+| mybook                | 
+| mysql                 | 
+| railstest_development | 
+| sf1_stats_development | 
++-----------------------+
+
+========= development =========
+-- Q
+mysql/mysql.h  No such file
+-- A
+sudo apt-get install libmysqlclient15-dev
+-- Q
+no such file to load -- mysql
+-- A
+安装mysql + ruby相关包和驱动
+
+//访问http://www.tmtm.org/en/ruby/mysql/ 下载ruby-mysql-0.2.x.tar.gz加压后，使用 ruby ./install.rb 命令安装mysql.rb .
+
+-- Q
+No such file or directory - /tmp/mysql.sock
+-- A
+登录mysql查看
+> status
+...
+UNIX socket:		/var/run/mysqld/mysqld.sock
+...
+修改 config/
+database.yml
+socket: /var/run/mysqld/mysqld.sock
+-- Q
+Client does not support authentication protocol requested by server; consider upgrading MySQL client
+-- A
+因为和新版密码算法不匹配，执行
+mysql> update mysql.user set password=old_password('izene123') where host='localhost' and user='root';
+mysql> FLUSH PRIVILEGES;
+
