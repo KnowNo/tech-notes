@@ -18,17 +18,36 @@ http://tech.cnr.cn/list/201308/t20130823_513399103.shtml
 http://tech.cnr.cn/list/201308/t20130805_513232883.shtml
 ===========
 
-#什么是 ad server ？ad network 和 ad exchange 有什么区别？DSP 是什么？ 
+#1 什么是 ad server ？ad network 和 ad exchange 有什么区别？DSP 是什么？ 
 http://www.zhihu.com/question/19794762
 http://www.zhihu.com/question/20320181/answer/16624803
 
-#品友互动联合创始人、副总裁谢鹏：广告主需要知道的10个事实
+#2 品友互动联合创始人、副总裁谢鹏：广告主需要知道的10个事实
 http://a.iresearch.cn/others/20130823/209718.shtml
 --> 关于RTB的
 
-#品友互动在Adworld2013*夏表示：独立DSP发展决定国内RTB未来 
+#3 品友互动在Adworld2013*夏表示：独立DSP发展决定国内RTB未来 
 http://news.xinhuanet.com/tech/2013-07/30/c_125088438.htm
 -> 一个真正的DSP必须具备强大的RTB架构和算法实力以及拥有先进的人群定向 (Audience Targeting) 技术和庞大的人群数据。
+
+#4 在营销大数据时代，DMP是如何同步数据给DSP的？
+http://www.domarketing.org/html/2013/ad_0506/9141.html
+由于DMP介入广告主的极其敏感信息，比如客户消费记录，DMP将与DSP的职能分开，DMP全心全意为广告主服务梳理核心数据，而DSP负责竞价投放，并且DSP只是数据激活渠道的一种，当然是比较核心的。
+
+DMP与DSP做了server到server的对接
+
+#5 Citrusleaf推出新款实时数据存取产品，助力DSP和Trading Desk进行实时广告竞价
+http://www.rtbchina.com/citrusleaf-rta-dsp-rtb.html
+
+#6 网络广告购买方式，RTB, DSP, AdExchange扫盲知识点汇总
+http://www.rtbchina.com/basic-terms-rtb-dsp-adexchange.html 
+-> DMP 公司
+
+#7 *品友互动CTO评中国DSP发展势态 ｜”It’s Time For The Demand-Side Platform In China”, iPinyou CTO Shen Says
+http://www.rtbchina.com/category/trade-news/dsp/page/3
+http://www.rtbchina.com/ipinyou-cto-rtb-dsp.html
+
+
 
 -------------------------------------------------------------------------------
 Ad Exchange:
