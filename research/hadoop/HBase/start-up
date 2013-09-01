@@ -55,3 +55,18 @@ WARN org.apache.hadoop.hbase.regionserver.wal.HLogSplitter: Could not open hdfs:
 
 
 
+
+
+
+
+
+
+
+
+
+
+== ./stop-hbase.sh
+Incorrect header or version mismatch from 127.0.0.1:49864 got version 47 expected version 3
+
+
+
