@@ -41,6 +41,10 @@ xfsprogs cannot be built without a working gettext installation.
 -->
 sudo apt-get install gettext
 
+make: aclocal: Command not found
+-->
+sudo apt-get install automake
+
 $ make 
 $ sudo make install
 $ sudo make install-dev   ***
@@ -133,14 +137,30 @@ node: localhost
 rundir: /home/zhongxia/kfsRun/chunk1
 baseport: 30000
 space: 10 G
-[chunkserver1]
+[chunkserver2]
 node: localhost
 rundir: /home/zhongxia/kfsRun/chunk2
 baseport: 40000
 space: 10000 M
 ---------------
 
+= ssh
+Hadoop Core requires that passwordless SSH work between the master machines and all of
+the slave and secondary machines.
+
+$ ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa 
+append the contents of the ~/.ssh/id_dsa.pub file to the ~/.ssh/authorized_keys on slaves
+
+---
+$ sudo apt-get install openssh-server openssh-client
+---
+
 = install
+
+webui$ vi all-machines.txt  (for web ui)
+------------
+localhost
+-----------
 
 scripts$ python kfssetup.py -f machines.cfg.local -b ../build -w ../webui -s
 
@@ -156,8 +176,16 @@ s=127.0.1.1, p=30000, rack=0, used=0(GB), free=10(GB), util=0%, nblocks=0, lasth
 
 build/bin/tools$ ./kfsping -c -s localhost -p 30000
 Meta-server: localhost 20100
-Total-space: 10240 (MB) 
+Total-space: 2048 (MB) 
 Used-space: 0 (MB) 
+build/bin/tools$ ./kfsping -c -s localhost -p 40000
+Meta-server: localhost 20100
+Total-space: 2000 (MB) 
+Used-space: 0 (MB) 
+build/bin/tools$ ./kfsping -m -s localhost -p 20000
+Up servers: 2
+s=127.0.1.1, p=40000, rack=0, used=0(GB), free=1.95312(GB), util=0%, nblocks=0, lastheard=15 (sec), ncorrupt=0, nchunksToMove=0, numDrives=1
+s=127.0.1.1, p=30000, rack=0, used=0(GB), free=2(GB), util=0%, nblocks=0, lastheard=15 (sec), ncorrupt=0, nchunksToMove=0, numDrives=1
 
 - web ui
 http://localhost:20050/
@@ -166,10 +194,10 @@ http://localhost:20050/
 scripts$ python kfslaunch.py -f machines.cfg.local --stop
 
 = uninstall
-python kfssetup.py -f machines.cfg.local -b ../build/bin -U
+scripts$ python kfssetup.py -f machines.cfg.local -b ../build/bin -U
 
 = shell client
-./kfsshell -s 172.16.0.163 -p 20000
+build/bin/tools$ ./kfsshell -s 172.16.0.163 -p 20000
 
 
 === Multiple nodes 多节点
@@ -226,6 +254,7 @@ SET(Fuse_INCLUDE_DIR "/usr/local/include")
 The kfs_fuse binary uses the KFS client library to interface with KFS.
 config file: kfs.prp in the directory in which the kfs_fuse binary is executed from:
 
+kfs.prp
 -----
 metaServer.host = kfs1
 metaServer.port = 20000
@@ -234,6 +263,24 @@ metaServer.port = 20000
 build/bin$ vi kfs.prp
 $ mkdir /tmp/kfs-fuse  # create a mount-point
 $ kfs_fuse /tmp/kfs-fuse -f  # force the system to run the process in foreground
+
+---> Error
+build/bin$ ./kfs_fuse /tmp/kfs-fuse -f
+kfs_fuse: /usr/include/boost/smart_ptr/shared_ptr.hpp:418: T* boost::shared_ptr< <template-parameter-1-1> >::operator->() const [with T = KFS::KfsClient]: Assertion `px != 0' failed.
+Aborted
+-----
+kfs.prp 中 metaServer.host 改为： metaServer.name， （host跟代码不一致。）
+
+---> Error
+build/bin$ ./kfs_fuse /tmp/kfs-fuse -f
+fuse: bad mount point `/tmp/kfs-fuse': Transport endpoint is not connected
+----
+sudo umount /tmp/kfs-fuse 
+
+
+
+
+
 
 
 

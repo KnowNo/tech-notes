@@ -1,0 +1,79 @@
+= src/cc/access
+
+access kfs from java
+
+--> libkfs_access.so
+
+= src/cc/chunk
+
+--> chunkserver chunkscrubber chunktrimmer 
+
+= src/cc/common
+
+--> libkfsCommon.so
+
+= src/cc/Emulator
+
+--> libkfsEmulator.so
+
+= src/cc/fuse
+
+--> kfs_fuse
+
+= src/cc/libkfsClient
+
+--> libkfsClient.so
+
+= src/cc/libkfsIO
+
+--> libkfsIO.so
+
+= src/cc/meta
+
+--> libkfsMeta.so
+
+= src/cc/qcdio
+
+--> libqcdio.so
+
+= src/cc/rebalancer
+
+--> rebalancer
+
+= src/cc/telemetry
+
+--> telemetry_server telemetry_repeater
+
+= src/cc/tests
+
+-->
+KfsDataGen
+KfsDirFileTester
+KfsPerfReader
+KfsPerfWriter
+KfsRecordAppend
+KfsReader
+KfsSeekWrite
+KfsTrunc
+KfsWriter
+KfsDirScanTest
+mkfstree
+KfsRW
+KfsLogTest
+
+= src/cc/tools
+
+-->
+cptokfs
+cpfromkfs
+kfsshell
+kfsping
+kfstoggleworm
+kfsput
+kfsstats
+kfsfileenum
+kfsdataverify
+kfsretire
+kfscp
+kfsls
+

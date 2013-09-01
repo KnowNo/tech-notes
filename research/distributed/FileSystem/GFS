@@ -1,0 +1,37 @@
+The Google File System
+
+ABSTRACT 
+It provides fault tolerance while running on inexpensive commodity hardware, 
+and it delivers high aggregate performance to a large number of clients. 
+
+1. INTRODUCTION
+First, component failures are the norm rather than the exception.
+Second, files are huge by traditional standards.  Multi-GB files are common
+
+Third, most files are mutated by appending new data rather than overwriting existing data. Random writes within
+a file are practically non-existent.
+
+2.DESIGN OVERVIEW
+
+2.1 Assumptions
+The system is built from many inexpensive commodity components that often fail. 
+
+The system stores a modest number of large files. 
+We expect a few million files, each typically 100 MB or larger in size.
+
+High sustained bandwidth is more important than low latency.
+
+2.2 Interface
+We support the usual operations to create, delete, open, close, read, and write files.
+*Moreover, GFS has <snapshot> and <record append> operations.
+
+2.3 Architecture
+A GFS cluster consists of a single master and multiple chunkservers and is accessed by multiple clients
+
+Files are divided into fixed-size chunks.
+
+The master maintains all file system metadata.
+
+Neither the client nor the chunkserver caches file data.
+
+
