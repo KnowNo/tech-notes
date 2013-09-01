@@ -43,6 +43,9 @@ For a multimachine cluster to run, the configuration must include the following:
 
 
 = ssh
+
+sudo apt-get install openssh-server
+
 Hadoop Core requires that passwordless SSH work between the master machines and all of
 the slave and secondary machines.
 
@@ -58,6 +61,10 @@ If you cannot ssh to localhost without a passphrase, execute the following comma
 $ ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
 $ cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys 
 -----
+
+对于普通用户authorized_keys的权限必须限定为600（go-rwx），否则普通用户无法实现无密钥访问，而ROOT用户按照默认即可实现无密钥访问
+chmod go-rwx ~/.ssh/authorized_keys
+------
 
 = 
 conf/slaves

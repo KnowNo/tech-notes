@@ -1,0 +1,11 @@
+
+https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+
+HIVE_HOME
+PATH=PATH:$HIVE_HOME/bin
+
+hadoop fs -mkdir /tmp
+hadoop fs -chmod g+w /tmp
+hadoop fs -ls /user/hive/warehouse
+hadoop fs -chmod g+w /user/hive/warehouse
+

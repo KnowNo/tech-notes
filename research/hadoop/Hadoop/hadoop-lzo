@@ -1,0 +1,134 @@
+1. 安装lzo 
+
+http://www.oberhumer.com/opensource/lzo/download/
+
+lzo-2.06$ ./configure --enable-shared
+lzo-2.06$ make
+lzo-2.06$ sudo make install
+
+支持lib64:
+sudo cp /usr/local/lib/liblzo2.* /usr/lib64/
+#如果没有这一步，最终会导致以下错误：
+lzo.LzoCompressor: java.lang.UnsatisfiedLinkError: Cannot load liblzo2.so.2 (liblzo2.so.2: cannot open shared object file: No such file or directory)!
+
+2. 安装Hadoop Lzo
+
+https://github.com/kevinweil/hadoop-lzo.git  
+(不要从google code取)
+
+hadoop-lzo$ export CFLAGS=-m64
+hadoop-lzo$ export CXXFLAGS=-m64
+hadoop-lzo$ ant compile-native tar
+
+#问题
+[exec] make: *** No rule to make target `/home/zhongxia/Software/hadoop-lzo/src/native/impl/lzo/LzoCompressor.c', needed by `impl/lzo/LzoCompressor.lo'.  Stop.
+
+---->  Note: 'lzo-devel' rpm is needed to compile.
+
+http://pkgs.repoforge.org/lzo/
+
+$ rpm -ivh lzo-2.06-1.el5.rf.x86_64.rpm  
+$ rpm -ivh lzo-devel-2.06-1.el5.rf.x86_64.rpm  
+
+#error: Failed dependencies:
+	/sbin/ldconfig is needed by lzo-2.06-1.el5.rf.x86_64
+	libc.so.6()(64bit) is needed by lzo-2.06-1.el5.rf.x86_64
+	libc.so.6(GLIBC_2.2.5)(64bit) is needed by lzo-2.06-1.el5.rf.x86_64
+	libc.so.6(GLIBC_2.4)(64bit) is needed by lzo-2.06-1.el5.rf.x86_64
+	rtld(GNU_HASH) is needed by lzo-2.06-1.el5.rf.x86_64
+	zlib >= 1.0.0 is needed by lzo-2.06-1.el5.rf.x86_64
+-->
+强制安装：
+sudo rpm -ivh  --nodeps lzo-2.06-1.el5.rf.x86_64.rpm
+sudo rpm -ivh --nodeps lzo-devel-2.06-1.el5.rf.x86_64.rpm
+
+#问题
+[javah] Error: Class org.apache.hadoop.conf.Configuration could not be found.
+BUILD FAILED
+/home/zhongxia/software/hadoop-lzo/build.xml:269: compilation failed
+
+编辑 build.xml:      
+-------
+    <javah classpath="${build.classes}"
+       destdir="${build.native}/src/com/hadoop/compression/lzo"
+           force="yes"
+       verbose="yes">
+      <class name="com.hadoop.compression.lzo.LzoCompressor" />
+      <class name="com.hadoop.compression.lzo.LzoDecompressor" />
+    </javah>
+-------------
+    <javah classpath="${build.classes}"
+       destdir="${build.native}/src/com/hadoop/compression/lzo"
+           force="yes"
+       verbose="yes">
+      <class name="com.hadoop.compression.lzo.LzoCompressor" />
+      <class name="com.hadoop.compression.lzo.LzoDecompressor" />
+      <classpath refid="classpath"/>    ##增加这行
+    </javah>
+-----------   
+
+编译成功后：
+cp build/hadoop-lzo-0.4.15.jar $HADOOP_HOME/lib/
+cp build/native/Linux-amd64-64/lib/* $HADOOP_HOME/lib/native/Linux-amd64-64/
+
+cp build/hadoop-lzo-0.4.15.jar /home/zhongxia/software/hadoop-0.20.2-cdh3u5/lib/
+cp build/native/Linux-amd64-64/lib/* /home/zhongxia/software/hadoop-0.20.2-cdh3u5/lib/native/Linux-amd64-64/
+cp build/native/Linux-amd64-64/lib/* /home/zhongxia/software/hbase-0.90.6-cdh3u5/lib/native/Linux-amd64-64
+
+3.  配置Hadoop Lzo
+------------------ core-site.xml
+<configuration>
+    <property>
+         <name>fs.default.name</name>
+         <value>hdfs://localhost:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/home/zhongxia/hadoop</value>
+    </property>
+    <property>
+        <name>io.compression.codecs</name>
+<value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,com.hadoop.compression.lzo.LzoCodec,com.hadoop.compression.lzo.LzopCodec</value>
+    </property>
+    <property>
+        <name>io.compression.codec.lzo.class</name>
+        <value>com.hadoop.compression.lzo.LzoCodec</value>
+    </property>
+</configuration>
+------------------  mapred-site.xml
+<configuration>
+    <property>
+       <name>mapred.job.tracker</name>
+       <value>localhost:9001</value>
+    </property>
+    <property>
+        <name>mapred.compress.map.output</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>mapred.output.compress</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>mapred.output.compression.codec</name>
+        <value>com.hadoop.compression.lzo.LzopCodec</value>
+    </property>
+    <property>
+        <name>mapred.child.env</name>
+        <value>JAVA_LIBRARY_PATH=/home/zhongxia/software/hadoop-0.20.2-cdh3u5/lib/native/Linux-amd64-64</value>
+    </property>
+    <property>
+        <name>mapreduce.map.output.compress.codec</name>
+        <value>com.hadoop.compression.lzo.LzoCodec</value>
+    </property>
+</configuration>
+
+
+
+4. 安装lzop    lzop-1.03
+
+
+
+
+
+

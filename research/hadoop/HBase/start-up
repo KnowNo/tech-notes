@@ -1,0 +1,57 @@
+http://hbase.apache.org/book/quickstart.html
+
+1. 下载地址
+http://archive.cloudera.com/cdh/3/hadoop-0.20.2-cdh3u5.tar.gz
+http://archive.cloudera.com/cdh/3/zookeeper-3.3.5-cdh3u5.tar.gz
+http://archive.cloudera.com/cdh/3/hive-0.7.1-cdh3u5.tar.gz
+http://archive.cloudera.com/cdh/3/hbase-0.90.6-cdh3u5.tar.gz
+
+2. /etc/hosts 注释掉下面这行:
+127.0.1.1      zhongxia-desktop
+ 改为
+127.0.0.1      zhongxia-desktop
+
+
+3.1 local filesystem
+
+3.2 hadoop hdfs
+
+---- conf/hbase-site.xml
+<configuration>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>hdfs://localhost:9000/hbase</value>
+    </property>
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>true</value>
+    </property>
+</configuration>
+
+-----
+hbase(main):003:0> create 'test', 'cf'
+ERROR: org.apache.hadoop.hbase.NotAllMetaRegionsOnlineException: org.apache.hadoop.hbase.NotAllMetaRegionsOnlineException: Timed out (10000ms)
+
+--------
+This got fixed when I removed the 127.0.1.1 entry in /etc/hosts and moved
+the entries corresponding to it to 127.0.0.1.
+
+Excellent! thanks so much mate, in Ubuntu 11.04 there's a duplicate loop back
+address, removing one fixed it... thanks again!
+
+(1)/etc/hosts 移除一行
+127.0.0.1   localhost
+127.0.0.1  zhongxia-desktop 主机
+
+sudo /etc/init.d/networking restart
+
+
+
+查看hbase 日志：logs/hbase-zhongxia-master-zhongxia-desktop.log
+WARN org.apache.hadoop.hbase.regionserver.wal.HLogSplitter: Could not open hdfs://localhost:9000/hbase/.logs/localhost,60020,1373855014318-splitting/localhost%3A60020.1373899576361 for reading. File is empty
+
+。。。。
+
+
+
+
