@@ -1,0 +1,29 @@
+
+DSP基础算法与模型研究
+http://www.techinads.com/archives/41
+
+
+江申 北京力美广告有限公司（www.limei.com）
+
+
+=======================================================
+
+DSP基础算法与模型研究-续
+http://www.techinads.com/archives/168
+
+通过参加品友的RTB比赛，对DSP的了解也加深了一层，也积累了一点点实战经验。把新的收获都分享在Data Science Workshop @ Beijing 的Slides里了，地址如下：
+http://vdisk.weibo.com/s/I4K4O/1372658170
+
+[DSP中的算法初探1.5.pdf]
+
+Slides中的主要内容有：
+
+    RTB模式下各个角色与Ad Network模式下的差异。
+    DSP的三种主要Audience Selection方法：基于标签，基于重定向，基于Look-alike Model。
+    DSP的基础出价算法（分别介绍了M6D的，品友比赛中采用的）。
+    DSP中的CTR预估与传统CTR预估的三个差异点。
+    如何在线根据反馈实时调整出价模型？
+
+This entry was posted in 未分类 on 2013 年 7 月 2 日. 
+
+
