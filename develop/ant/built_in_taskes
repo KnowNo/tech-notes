@@ -1,0 +1,164 @@
+Example:
+
+
+
+
+
+
+built-in tasks
+================
+    Ant
+    AntCall
+    ANTLR
+    AntStructure
+    AntVersion
+    Apply/ExecOn
+    Apt
+    Attrib
+    Augment
+    Available
+    Basename
+    Bindtargets
+    BuildNumber
+    BUnzip2
+    BZip2
+    Cab
+    Continuus/Synergy Tasks
+    CvsChangeLog
+    Checksum
+    Chgrp
+    Chmod
+    Chown
+    Clearcase Tasks
+    Componentdef
+    Concat
+    Condition
+    Supported conditions
+    Copy
+    Copydir
+    Copyfile
+    Cvs
+    CVSPass
+    CvsTagDiff
+    CvsVersion
+    Defaultexcludes
+    Delete
+    Deltree
+    Depend
+    Dependset
+    Diagnostics
+    Dirname
+    Ear
+    Echo
+    Echoproperties
+    EchoXML
+    EJB Tasks
+    Exec
+    Fail
+    Filter
+    FixCRLF
+    FTP
+    GenKey
+    Get
+    GUnzip
+    GZip
+    Hostinfo
+    Image
+    Import
+    Include
+    Input
+    Jar
+    Jarlib-available
+    Jarlib-display
+    Jarlib-manifest
+    Jarlib-resolve
+    Java
+    Javac
+    JavaCC
+    Javadoc/Javadoc2
+    Javah
+    JDepend
+    JJDoc
+    JJTree
+    Jlink
+    JspC
+    JUnit
+    JUnitReport
+    Length
+    LoadFile
+    LoadProperties
+    LoadResource
+    Local
+    MacroDef
+    Mail
+    MakeURL
+    Manifest
+    ManifestClassPath
+    MimeMail
+    Mkdir
+    Move
+    Native2Ascii
+    NetRexxC
+    Nice
+    Parallel
+    Patch
+    PathConvert
+    PreSetDef
+    ProjectHelper
+    Property
+    PropertyFile
+    PropertyHelper
+    Pvcs
+    Record
+    Rename
+    RenameExtensions
+    Replace
+    ReplaceRegExp
+    ResourceCount
+    Retry
+    RExec
+    Rmic
+    Rpm
+    SchemaValidate
+    Scp
+    Script
+    Scriptdef
+    Sequential
+    ServerDeploy
+    Setproxy
+    SignJar
+    Sleep
+    SourceOffSite
+    Sound
+    Splash
+    Sql
+    Sshexec
+    Sshsession
+    Subant
+    Symlink
+    Sync
+    Tar
+    Taskdef
+    Telnet
+    Tempfile
+    Touch
+    Translate
+    Truncate
+    TStamp
+    Typedef
+    Unjar
+    Untar
+    Unwar
+    Unzip
+    Uptodate
+    VerifyJar
+    Microsoft Visual SourceSafe Tasks
+    Waitfor
+    War
+    WhichResource
+    Weblogic JSP Compiler
+    XmlProperty
+    XmlValidate
+    XSLT/Style
+    Zip
+

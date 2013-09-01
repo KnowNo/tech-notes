@@ -1,0 +1,139 @@
+http://ant.apache.org/manual/index.html
+
+Using Apache Ant
+Writing a Simple Buildfile
+
+
+Apache Ant's buildfiles are written in XML.
+
+Each buildfile contains one project and at least one (default) target. Targets contain task elements.
+
+==== Projects
+A project has three attributes: 
+name 
+default
+basedir
+
+<project name="MyProject" default="dist" basedir=".">
+    <description>
+        simple example build file
+    </description>
+
+==== Targets
+A target is a container of tasks that cooperate to reach a desired state during the build process.
+A target can depend on other targets 
+and Apache Ant ensures that these other targets have been executed before the current target. 
+
+<target name="A"/>
+<target name="B" depends="A"/>
+<target name="C" depends="B"/>
+<target name="D" depends="C,B,A"/>
+
+Call-Graph:  A --> B --> C --> D
+
+each target gets executed only once, even when more than one target depends on it. 
+
+----
+A target has the following attributes:
+name
+depends
+if
+unless
+description
+extensionOf
+onMissingExtensionPoint
+
+----
+A target also has the ability to perform its execution if (or unless) a property has been set.
+    <target name="build-module-A" if="module-A-pre
+sent"/>
+    <target name="build-own-fake-module-A" unless="module-A-present"/>
+
+Only one propertyname can be specified in the if/unless clause. If you want to check multiple conditions, you can use a dependend target for computing the result for the check:
+<target name="myTarget" depends="myTarget.check" if="myTarget.run">
+    <echo>Files foo.txt and bar.txt are present.</echo>
+</target>
+<target name="myTarget.check">
+    <condition property="myTarget.run">
+        <and>
+            <available file="foo.txt"/>
+            <available file="bar.txt"/>
+        </and>
+    </condition>
+</target>
+
+==== Tasks
+A task is a piece of code that can be executed.
+
+Tasks have a common structure:
+    <name attribute1="value1" attribute2="value2" ... />
+There is a set of built-in tasks, but it is also very easy to write your own.
+
+
+==== Properties
+Properties are an important way to customize a build process 
+or to just provide shortcuts for strings that are used repeatedly inside a build file. 
+
+A property has a name and a value; the name is case-sensitive. 
+Properties may be used in the value of task attributes or in the nested text of tasks that support them. 
+This is done by placing the property name between "${" and "}" in the attribute value. 
+
+Parameters:
+name
+value
+location 	Sets the property to the absolute filename of the given file. 
+refid 		Reference to an object defined elsewhere. 
+resource 	the name of the classpath resource containing properties settings in properties file format.
+file 		the location of the properties file to load.
+url 		a url containing properties-format settings.
+environment 	the prefix to use when retrieving environment variables.
+classpath 	the classpath to use when looking up a resource.
+classpathref 	the classpath to use when looking up a resource, given as reference to a <path> defined elsewhere.
+prefix 		Prefix to apply to properties loaded using file, resource, or url.
+prefixValues 	Whether to apply the prefix when expanding the right hand side of properties loaded using file, resource, or url.
+relative 	If set to true the relative path to basedir is set.
+basedir 	The basedir to calculate the relative path from. 
+
+==== Token Filters
+A project can have a set of tokens that might be automatically expanded if found when a file is copied, 
+when the filtering-copy behavior is selected in the tasks that support this.
+
+  <filter token="year" value="2000"/>
+  <copy todir="${dest.dir}" filtering="true">
+    <fileset dir="${src.dir}"/>
+  </copy>
+replace all the occurrences of the string @year@ with 2000.
+
+==== Path-like Structures
+You can specify PATH- and CLASSPATH-type references using both ":" and ";" as separator characters.
+
+==== Path Shortcut
+shortcut for converting paths to OS specific strings.
+One can use the expression ${toString:pathreference} to convert a path element reference to a string 
+  <javac srcdir="src" destdir="classes">
+    <compilerarg arg="-Xbootclasspath/p:${toString:lib.path.ref}"/>
+  </javac>
+
+==== Command-line Arguments
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
