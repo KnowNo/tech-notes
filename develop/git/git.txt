@@ -35,6 +35,21 @@ $ git remote add origin git@github.com:username/Hello-World.git
 $ git push -u origin master
 ———————————————————————————————————————————————————————————————————
 
+$ cat .git/config 
+———————————————————————————————————————————————————————————————————
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	url = git@10.200.28.18:OptimusPrime_workspace.git
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+——————————————————————————————————————————————————————————————————
+
 创建分支: 
 (1) git branch <branch-name>
 (2) git branch -b <branch-name>
@@ -50,8 +65,15 @@ git checkout <branch-name>
 删除分支:
 git branch [-d|-D] <branch-name> # 本地，-d 需合并; -D 不需合并
 git push origin :<branch-name>   # 远程
-
-
+修改origin地址:
+$ git remote -v
+origin	git@10.0.3.229:xxx.git (fetch)
+origin	git@10.0.3.229:xxx.git (push)
+$ git remote rm origin
+$ git remote add origin git@10.200.28.18:xxx.git
+$ git remote -v
+origin	git@10.200.28.18:xxx.git (fetch)
+origin	git@10.200.28.18:xxx.git (push)
 
 
 

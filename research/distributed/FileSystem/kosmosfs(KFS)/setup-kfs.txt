@@ -1,0 +1,283 @@
+Home page:
+http://code.google.com/p/kosmosfs/
+http://sourceforge.net/projects/kosmosfs/
+http://sourceforge.net/apps/trac/kosmosfs/wiki/UsingWithFUSE
+
+==== KfsFeatures 
+Incremental scalability 增量可扩展性
+Availability 持续有效性
+*Per file degree of replication 单个文件级别的备份
+Re-replication 重备份
+Rack-aware data placement 
+Data integrity
+File writes
+*Leases  
+Chunk versioning
+*Client side fail-over 客户端故障切换
+Language support: KFS client library can be accessed from C++, Java, and Python. 
+*FUSE support on Linux: 
+Tools:
+Job placement support：
+Local read optimization: When applications are run on the same nodes as chunkservers, the KFS client library contains an optimization for reading data locally. 
+
+==== Compile
+http://code.google.com/p/kosmosfs/wiki/HowToCompile
+http://sourceforge.net/apps/trac/kosmosfs/wiki/HowToCompile
+
+== Building C++ Components
+
+= 安装 xfs
+
+$ git clone git://oss.sgi.com/xfs/cmds/xfsprogs
+$ make (./configure)
+
+FATAL ERROR: could not find a valid UUID header.
+Install the Universally Unique Identifiers development package.
+--->
+sudo apt-get install uuid-dev 
+(http://sourceforge.net/projects/e2fsprogs/ 下载并安装 ??)
+
+FATAL ERROR: msgfmt does not seem to be installed.
+xfsprogs cannot be built without a working gettext installation.
+-->
+sudo apt-get install gettext
+
+make: aclocal: Command not found
+-->
+sudo apt-get install automake
+
+$ make 
+$ sudo make install
+$ sudo make install-dev   ***
+
+---- ?? 
+apt-get install xfs
+apt-get install xfsprogs
+----
+
+= 编译 kfs-0.5$
+
+编辑 CMakeLists.txt 使生成 kfs_fuse :
+SET(Fuse_LIBRARY_DIR "/usr/local/lib")
+SET(Fuse_INCLUDE_DIR "/usr/local/include")
+
+?? on 163
+SET(JAVA_INCLUDE_PATH "/usr/lib/jvm/java-6-openjdk/include")
+SET(JAVA_INCLUDE_PATH2 "/usr/lib/jvm/java-6-openjdk/include/linux")
+
+$ mkdir build
+$ cd build
+$ cmake -D CMAKE_BUILD_TYPE=RelWithDebInfo ../
+$ make
+$ make install
+安装目录: build/lib, bin, include
+
+?? on 163
+error: openssl/rand.h: No such file or directory
+-->
+sudo apt-get install libssl-dev
+
+
+== Building Java Components
+
+$ 
+$ ant jar
+
+== Building Python Support
+
+src/cc/access$ vi kfs_setup.py (编辑)
+kfsext = Extension('kfs', include_dirs ['kfs/src/cc/', '<path to boost>'])
+
+src/cc/access$ python kfs_setup.py ../../../build/lib/ build
+生成 .../access/build/lib.linux-x86_64-2.6/kfs.so
+
+src/cc/access$ sudo python kfs_setup.py ../../../build/lib/ install
+[sudo] password for zhongxia: 
+running install
+running build
+running build_ext
+running install_lib
+copying build/lib.linux-x86_64-2.6/kfs.so -> /usr/local/lib/python2.6/dist-packages
+running install_egg_info
+Writing /usr/local/lib/python2.6/dist-packages/kfs-0.3.egg-info
+
+
+==== Deployment
+
+http://code.google.com/p/kosmosfs/wiki/HowToDeploy
+../kfs-0.5/doc/DEPLOYING.txt
+
+=== Songle node 单节点
+
+= configure
+
+scripts$ vi machines.cfg.local (编辑)
+----------------
+# KFS Machine configuration file
+[metaserver]
+clusterkey: kfs-local-cluster1
+node: localhost
+rundir: /home/zhongxia/workspace-c++/kfs-0.5/meta
+baseport: 20000
+[chunkserver1]
+node: localhost
+rundir: /home/zhongxia/workspace-c++/kfs-0.5/chunk1
+chunkDir:  /home/zhongxia/workspace-c++/kfs-0.5/chunk1/bin/kfschunk1 /home/zhongxia/workspace-c++/kfs-0.5/chunk1/bin/kfschunk2
+baseport: 30000
+space: 10 G
+---------------
+
+---------------
+[metaserver]
+node: localhost
+rundir: /home/zhongxia/kfsRun/meta
+baseport: 20000
+clusterkey: test-cluster
+[chunkserver1]
+node: localhost
+rundir: /home/zhongxia/kfsRun/chunk1
+baseport: 30000
+space: 10 G
+[chunkserver2]
+node: localhost
+rundir: /home/zhongxia/kfsRun/chunk2
+baseport: 40000
+space: 10000 M
+---------------
+
+= ssh
+Hadoop Core requires that passwordless SSH work between the master machines and all of
+the slave and secondary machines.
+
+$ ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa 
+append the contents of the ~/.ssh/id_dsa.pub file to the ~/.ssh/authorized_keys on slaves
+
+---
+$ sudo apt-get install openssh-server openssh-client
+---
+
+= install
+
+webui$ vi all-machines.txt  (for web ui)
+------------
+localhost
+-----------
+
+scripts$ python kfssetup.py -f machines.cfg.local -b ../build -w ../webui -s
+
+= start server
+
+scripts$ python kfslaunch.py -f machines.cfg.local --start
+
+= check status 
+
+build/bin/tools$ ./kfsping -c -s localhost -p 30000
+Meta-server: localhost 20100
+Total-space: 2048 (MB) 
+Used-space: 0 (MB) 
+build/bin/tools$ ./kfsping -c -s localhost -p 40000
+Meta-server: localhost 20100
+Total-space: 2000 (MB) 
+Used-space: 0 (MB) 
+build/bin/tools$ ./kfsping -m -s localhost -p 20000
+Up servers: 2
+s=127.0.1.1, p=40000, rack=0, used=0(GB), free=1.95312(GB), util=0%, nblocks=0, lastheard=15 (sec), ncorrupt=0, nchunksToMove=0, numDrives=1
+s=127.0.1.1, p=30000, rack=0, used=0(GB), free=2(GB), util=0%, nblocks=0, lastheard=15 (sec), ncorrupt=0, nchunksToMove=0, numDrives=1
+
+- web ui
+http://localhost:20050/
+
+= stop server
+scripts$ python kfslaunch.py -f machines.cfg.local --stop
+
+= uninstall
+scripts$ python kfssetup.py -f machines.cfg.local -b ../build/bin -U
+
+= shell client
+build/bin/tools$ ./kfsshell -s 172.16.0.163 -p 20000
+
+
+=== Multiple nodes 多节点
+
+= configure
+
+scripts$ vi machines_distributed.cfg
+------------------
+[metaserver]
+node: 172.16.0.163
+rundir: /home/lscm/kfsRun/meta
+baseport: 20000
+clusterkey: test-cluster
+[chunkserver1]
+node: 172.16.0.161
+rundir: /home/lscm/kfsRun/chunk
+baseport: 30000
+space: 10 G
+[chunkserver2]
+node: 172.16.0.162
+rundir: /home/lscm/kfsRun/chunk
+baseport: 30000
+space: 10 G
+----------------
+
+= install
+
+$ vi webui/all-machines.txt (for webui)
+172.16.0.162
+172.16.0.161
+$ python kfssetup.py -f machines_distributed.cfg -b ../build -w ../webui
+
+= uninstall
+$ python kfssetup.py -f machines_distributed.cfg -b ../build/bin -U
+
+= start
+$ python kfslaunch.py -f machines_distributed.cfg --start
+
+= status web ui
+http://172.16.0.163:20050/
+
+= stop
+python kfslaunch.py -f machines_distributed.cfg --stop
+
+
+===== Mounting KFS via FUSE 
+
+Edit ~/code/kfs/CMakeLists.txt and set the Fuse_INCLUDE_DIR and Fuse_LIBRARY_DIR. For instance,
+
+SET(Fuse_LIBRARY_DIR "/usr/local/lib")
+SET(Fuse_INCLUDE_DIR "/usr/local/include")
+
+
+The kfs_fuse binary uses the KFS client library to interface with KFS.
+config file: kfs.prp in the directory in which the kfs_fuse binary is executed from:
+
+kfs.prp
+-----
+metaServer.host = kfs1
+metaServer.port = 20000
+----
+
+build/bin$ vi kfs.prp
+$ mkdir /tmp/kfs-fuse  # create a mount-point
+$ kfs_fuse /tmp/kfs-fuse -f  # force the system to run the process in foreground
+
+---> Error
+build/bin$ ./kfs_fuse /tmp/kfs-fuse -f
+kfs_fuse: /usr/include/boost/smart_ptr/shared_ptr.hpp:418: T* boost::shared_ptr< <template-parameter-1-1> >::operator->() const [with T = KFS::KfsClient]: Assertion `px != 0' failed.
+Aborted
+-----
+kfs.prp 中 metaServer.host 改为： metaServer.host， （host跟代码不一致。）
+
+---> Error
+build/bin$ ./kfs_fuse /tmp/kfs-fuse -f
+fuse: bad mount point `/tmp/kfs-fuse': Transport endpoint is not connected
+----
+sudo umount /tmp/kfs-fuse 
+
+
+
+
+
+
+
+

@@ -15,6 +15,7 @@ MySql + ruby
 sudo apt-get install mysql-server
 
 2－mysql ruby相关开发包
+sudo apt-get install libmysqlclient-dev
 sudo apt-get install libmysqlclient15-dev
 sudo apt-get install libmysql-ruby
 sudo apt-get install libruby liberuby-dev

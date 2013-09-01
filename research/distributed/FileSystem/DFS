@@ -1,0 +1,37 @@
+几个DFS
+ceph
+hdfs
+kfs(kosmosfs)
+nfs
+还有fastdfs，淘宝的tfs等
+GFS的缺点主要是大批量比较好，我们的SCD可能大量小文件
+
+还有
+FUSE 
+上述文件系统的fuse可能有另外组件，或者第三方人员开发
+不是所有DFS都有FUSE支持。 
+ceph可能最先进，但也可能稳定性上有问题	
+
+如果一些DFS非常好，但缺乏FUSE支持，如果支持并不困难，也可以考虑为它写FUSE插件。
+
+--------------
+
++ Ceph
+
+基于 btrfs文件系统，linux2.6.34   (ubuntu 10.04, 2.6.32)
+
+-- FUSE
+
+http://fuse.sourceforge.net/
+
+> ./configure
+> make
+> sudo make install		
+
+--- MooseFS
+
+Master server installation
+*sudo groupadd mfs
+*sudo useradd -g mfs mfs
+
+--- HDFS

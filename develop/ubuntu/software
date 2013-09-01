@@ -7,6 +7,11 @@ sudo apt-get install latex-cjk-*
 apt-get install msn-pecan
 然后重启Pidgin，并新建一个帐号，帐号协议不要选MSN而选WLM，并把原来使用MSN协议的帐号禁用或删除。新的WLM协议的帐号，在群里面就能收到带成员名称的消息了。
 
+-- MSN
+kmess 是一个 KDE 环境下的 MSN 客户端，但在 GNOME 等其它桌面环境下仍可以完美工作
+安装
+Ubuntu 12.04 以上的用户可以直接从软件中心里安装：sudo apt-get install kmess 
+
 -- 安装中文输入法
 http://oracleseeker.com/2010/01/05/ubuntu_ibus_input_method/
 

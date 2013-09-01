@@ -1,0 +1,31 @@
+NFS
+
+Network File System (NFS) is a network file system protocol originally developed by Sun Microsystems in 1984,
+allowing a user on a client computer to access files over a network in a manner similar to how local storage is accessed. 
+
+==== Install & Start
+
+1. Server
+
+$ sudo aptitude install nfs-kernel-server
+
+$ sudo vi /etc/exports
+/home/zhongxia/nfsshare 172.16.0.*(rw,sync,no_root_squash)
+
+$ sudo service portmap start
+start: Job is already running: portmap
+$ sudo /etc/init.d/nfs-kernel-server restart 
+
+$ showmount -e localhost
+/home/zhongxia/nfsshare 172.16.0.*
+
+
+2. Client
+
+$ sudo apt-get install nfs-common (或 nfs-kernel-server)
+
+$ sudo service portmap start
+
+$ mkdir /tmp/nfs
+$ sudo mount -t nfs 172.16.0.36:/home/zhongxia/nfsshare /tmp/nfs
+

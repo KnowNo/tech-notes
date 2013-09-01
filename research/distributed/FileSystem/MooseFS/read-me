@@ -1,0 +1,14 @@
+安装时需要root权限，可在命令前加上sudo.
+
+refer
+http://sery.blog.51cto.com/10037/147756
+
+
+----------
+
+独立磁盘/分区作为存储？
+
+It is important to dedicate file systems used by MooseFS chunks exclusively to it - this is necessary to manage the free space properly. 
+MooseFS does not take into account that a free space accessible to it could be taken by other data. **
+If it's not possible to create a separate disk partition, filesystems in files can be used. 
+

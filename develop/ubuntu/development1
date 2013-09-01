@@ -37,6 +37,9 @@ sudo apt-get install pentium-builder
 -- cmake
 sudo apt-get install cmake
 
+--libxml
+sudo apt-get install libxml2-dev
+
 -- boost c++
 System -> adminstration -> Synaptic Package Manager (libboost-...)
 
@@ -57,3 +60,8 @@ automake
 make
 sudo make install
 ------------------------
+
+sudo apt-get install libbz2-dev
+sudo apt-get install python-dev
+
+
