@@ -10,9 +10,9 @@ Each buildfile contains one project and at least one (default) target. Targets c
 
 ==== Projects
 A project has three attributes: 
-name 
-default
-basedir
+name		the name of the project.
+default		the default target to use when no target is supplied.
+basedir		the base directory from which all path calculations are done.
 
 <project name="MyProject" default="dist" basedir=".">
     <description>
