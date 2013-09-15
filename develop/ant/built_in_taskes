@@ -1,6 +1,22 @@
 Example:
 
+==javac==
 
+===Parameters===
+Attribute 	Description 	Required
+srcdir
+destdir
+includes
+includesfile
+excludes
+excludesfile
+classpath
+sourcepath
+
+===Parameters specified as nested elements===
+This task forms an implicit FileSet and supports most attributes of <fileset> (dir becomes srcdir) as well as the nested <include>, <exclude> and <patternset> elements.
+
+srcdir, classpath, sourcepath, bootclasspath and extdirs
 
 
 

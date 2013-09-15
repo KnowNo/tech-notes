@@ -4,8 +4,37 @@ PUT
 SCAN
 DELETE
 
+http://blog.sina.com.cn/s/blog_8026da3a0101e9fo.html
+
+
 hbase(main):002:0> count 'mso-log2session-domain'
 
 hbase(main):002:0> scan 'mso-log2session-domain', {COLUMN => 'cf0:c20'}
 
 hbase(main):009:0> get 'mso-log2session-domain','40:2013-08-12:689:7110:6ovRN1s6f0c88CjO:1:1'
+
+hbase(main):002:0> scan 'mso-cs-stats'
+hbase(main):002:0> count 'mso-cs-stats'
+hbase(main):002:0> get 'mso-cs-stats','108:2013-08-01:03AA435F1E73CA40:1'
+hbase(main):002:0> scan 'mso-cs-stats',{COLUMNS => 'cf0:c11'}
+
+hbase(main):002:0> scan 'mso-cs-stats', {FILTER => "(SingleColumnValueFilter('cf0', 'c11', <, 'binary:0')"}
+
+hbase(main):002:0> scan 'mso-cs-stats', {FILTER => "PrefixFilter('40:2013-08-12')" }
+
+scan 'test_row_key', {
+	COLUMNS => ['cf:AREA_ID','cf:INDEX1'], 
+	FILTER => "
+		(SingleColumnValueFilter('cf', 'TIME_ID', =, 'binary:201206')) 
+		AND 
+		(SingleColumnValueFilter('cf', 'AREA_ID', =, 'binary:730'))" 
+}
+ROW                        COLUMN+CELL
+ row_key_1                 column=cf:AREA_ID, timestamp=1363820270491, value=730
+ row_key_1                 column=cf:INDEX1, timestamp=1363820270626, value=201206730
+ row_key_3                 column=cf:AREA_ID, timestamp=1363820271076, value=730
+ row_key_3                 column=cf:INDEX1, timestamp=1363820271110, value=201207730
+
+
+
+

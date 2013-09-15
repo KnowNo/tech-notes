@@ -1,0 +1,62 @@
+http://blog.cloudera.com/blog/2009/11/hadoop-at-twitter-part-1-splittable-lzo-compression/
+
+
+
+1. sudo apt-get install liblzo2-dev
+
+
+2. git clone https://github.com/kevinweil/hadoop-lzo.git
+
+http://code.google.com/a/apache-extras.org/p/hadoop-gpl-compression/wiki/FAQ?redir=1
+
+ant compile-native tar
+
+-------------
+BUILD FAILED
+/home/zhongxia/Software/hadoop-lzo/build.xml:269: compilation failed
+
+在build.xml中：
+      <class name="com.hadoop.compression.lzo.LzoDecompressor" />
+      <classpath refid="classpath" />                                  <------- 添加此行
+    </javah>
+-------------
+
+ 
+$ sudo mkdir -p /usr/local/hadoop/lib
+$ sudo cp build/hadoop-lzo-0.4.15.jar /usr/local/hadoop/lib/
+
+$ sudo mkdir -p /usr/local/hadoop/lib/native
+$ sudo tar -cBf - -C build/hadoop-lzo-0.4.15/lib/native . | sudo tar -xBvf - -C /usr/local/hadoop/lib/native/
+
+or
+$ sudo cp -r build/hadoop-lzo-0.4.15/lib/native /usr/local/hadoop/lib/
+
+core-site.xml
+-------------------------
+   <property>
+         <name>io.compression.codecs</name>
+         <value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.BZip2Codec,com.hadoop.compression.lzo.LzoCodec,com.hadoop.compression.lzo.LzopCodec</value>
+    </property>
+    <property>
+        <name>io.compression.codec.lzo.class</name>
+    <value>com.hadoop.compression.lzo.LzoCodec</value>
+    </property>
+-------------------------
+
+mapred-site.xml
+---------------------------
+  <property>
+    <name>mapred.compress.map.output</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>mapred.map.output.compression.codec</name>
+    <value>com.hadoop.compression.lzo.LzoCodec</value>
+  </property>
+
+---------------------------
+
+
+
+
+
