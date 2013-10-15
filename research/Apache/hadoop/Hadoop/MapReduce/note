@@ -1,0 +1,56 @@
+
+==Hadoop The Definitive Guide 2nd Edition==
+
+===Chapter 2. MapReduce===
+
+# Java MapReduce
+介绍用Java创建Job的基本接口，方法及作用。
+
+#* The new Java MapReduce API
+介绍Java MapReduce API新老接口的区别。
+
+# Data Flow
+
+Hadoop divides the input to a MapReduce job into fixed-size pieces called input splits, or just splits. 
+Hadoop creates one map task for each split, which runs the user-defined map function for each record in the split.
+
+For most jobs, a good split size tends to be the size of an HDFS block, 64 MB by default.
+
+Hadoop does its best to run the map task on a node where the input data resides in HDFS. 
+This is called the '''data locality optimization'''. It should now be clear why the
+optimal split size is the same as the block size: it is the largest size of input that can
+be guaranteed to be stored on a single node.
+
+Map tasks write their output to the local disk, not to HDFS. Why is this? Map output is 
+intermediate output.
+
+Reduce tasks don’t have the advantage of data locality, the input to a single reduce task 
+is normally the output from all mappers.
+The output of the reduce is normally stored in HDFS for reliability.
+
+The number of reduce tasks is not governed by the size of the input, but is specified independently.
+the map tasks partition their output, each creating one partition for each reduce task. 
+There can be many keys (and their associated values) in each partition, but the records for any 
+given key are all in a single partition.
+reduce数不由输入控制，单独指定(配置), 每个map为各reduce分割map的输出, 同一个key的记录在同一个partition.
+
+'''Partitioning Function'''的作用: 将一个map的输出partition到不同的reduce.
+The partitioning can be controlled by a user-defined '''partitioning function''', but normally the
+default partitioner—which buckets keys using a hash function—works very well.
+
+Finally, it’s also possible to have zero reduce tasks. ( “NLineInputFormat” on page 211)
+
+'''Combiner Functions''' 
+Hadoop allows the user to specify a combiner function to be run on the map output—the combiner function’s 
+output forms the input to the reduce function.
+The combiner function doesn’t replace the reduce function. But it can help cut down the amount of data 
+shuffled between the maps and the reduces
+map的输出到reduce之前的处理(可以用reducer来处理)，可以减少map传输到reduce节点的数据量，
+前提是不能改变reduce的结果，是可以考虑的优化。比如求最大值可以用reducer，但求平均值不能用reducer来combine。
+
+conf.setCombinerClass(MaxTemperatureReducer.class);
+
+
+
+
+

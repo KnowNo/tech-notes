@@ -1,0 +1,11 @@
+
+# vim如何将光标自动定位到上次关闭时的地方？ 
+/etc/vimrc
+---------------------------------
+    if has("autocmd")
+      autocmd BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal g`\"" |
+        \ endif
+    endif
+--------------------------------
