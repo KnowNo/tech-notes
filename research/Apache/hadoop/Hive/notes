@@ -1,0 +1,22 @@
+===The Hive Shell===
+
+HiveQL is Hive’s query language, a dialect of SQL.
+
+Like SQL, HiveQL is generally case insensitive (except for string comparisons).
+
+The -f option runs the commands in the specified file;
+% hive -f script.q
+The -e option to specify the commands inline;
+% hive -e 'SELECT * FROM dummy'
+Hive will print information to standard error, You can suppress these messages using 
+the -S option at launch time, which has the effect of only showing the output result for queries
+% hive -S -e 'SELECT * FROM dummy'
+
+
+HQL
+
+COUNT() 需要和 Group By 一起使用
+
+
+
+
