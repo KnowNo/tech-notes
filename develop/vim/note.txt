@@ -1,0 +1,39 @@
+
+ VIM
+=======
+
+~/.vimrc
+
+== colorscheme
+sudo cp ~/Downloads/freya.vim colors/
+
+== 支持在C/C++源文件和头文件之间切换 a.vim 
+sudo cp ~/Downloads/alternate.txt /usr/share/vim/vim73/doc/
+sudo cp ~/Downloads/a.vim /usr/share/vim/vim73/plugin/
+cd /usr/share/vim/vim73/doc/
+sudo vim
+:helptags .
+
+== C/C++代码补全插件 omnicppcomplete
+-------------------------------------------------------
+[http://blog.xuyu.org/?p=1207]
+1. 下载安装
+①官版下载:omnicppcomplete-0.41。
+②将压缩包(包含有after/autoload/doc三个文件夹)解压至~/.vim路径下
+③检查/修改Vim配置，确定关闭了Vi兼容模式，并打开了文件类型自动检测选项
+set nocompatible
+filetype plugin on
+④启动Vim后使用以下命令为Vim添加omnicppcomplete帮助信息
+:helptags ~/.vimrc/doc
+2. 使用ctags生成标签库
+对于C++代码，ctags需要额外使用以下选项：
+    --c++-kinds=+p : 为标签添加函数原型(prototype)信息
+    --fields=+iaS : 为标签添加继承信息(inheritance)，访问控制(access)信息，函数特征(function Signature,如参数表或原型等)
+    --extra=+q : 为类成员标签添加类标识
+ctags -R --c++-kinds=+p --fields=+iaS --extra=+q source/
+6. 其他
+更详尽帮助，可以在在官网获取，或在vim中使用以下命令获取：
+:help omnicppcomplete
+-------------------------------------------------------
+
+
