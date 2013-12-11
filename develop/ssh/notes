@@ -1,0 +1,15 @@
+
+# 配置ssh不需密码访问 (A --ssh--> B)
+
+A机器上生成密钥对:
+[user@A ]$ ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
+[user@A ]$ ls ~/.ssh/
+id_dsa  id_dsa.pub 
+
+将A的公钥上传到B机器:
+[user@B ]$ 将A的id_dsa.pub内容加到～/.ssh/authorized_keys
+[user@B ]$ chmod go-rwx authorized_keys                     # 普通用户authorized_keys的权限必须限定为600(go-rwx), root用户不需要
+
+从A机器ssh登录B机器:
+[user@A ]$ ssh (-p 8000) user@B
+Last login: Mon Aug 26 15:18:46 2013 from A
