@@ -1,0 +1,24 @@
+
++ ISSUE
+
+网络中断后，EPHEMERAL Node自动删除，网络恢复后不会重新创建节点。。
+[MasterNodeManager] [ZooKeeperEvent]  - ZOO_SESSION_EVENT - ZOO_CONNECTING_STATE
+[MasterNodeManager] [ZooKeeperEvent]  - ZOO_SESSION_EVENT - ZOO_EXPIRED_SESSION_STATE
+
+--> 增加 NodeMoniterThread
+
+
++ BUG
+synchronizer 同步
+1. clean on exit
+1. clean on start (if last exit was not normal)
+2. ensure consumer watching
+
++ ISSUE
+
+synchronizer 改进
+
+0. 使用 NodeData
+1. producer --> multiple consumers
+2. producer produce multiple products
+3. consumer consume one product each time

@@ -1,0 +1,72 @@
+MasterNodeManager 
+
+Deployment
+==========
+ZookeeperServer
+
+Single Master:
+Topology1: Node1(M,W), Node2(W)
+Topology2: Node1(M), Node2(W), Node3(W)
+
+Multiple Masters:
+...
+
+
+Master node manager
+
+1. detect
+
+1.1
+-> zookeeper on
+-> start master
+-> Exp: waiting worker  -> try failover ?
+-> node join
+-> Exp: all detected
+
+2. failover
+try failover in replica set
+try failover when new replica joined , if failed
+try recover when current replica back, if failed.
+
+2.1
+-> zookeeper on
+-> replica existed (R2N2)
+-> ACTION: node break (R1N2)
+-> Exp: failover success, R1N2 -> R2N2
+
+2.2
+-> zookeeper on
+-> replica not existed
+-> ACTION: node break (R1N2)
+-> Exp: failover fail
+1)
+-> ACTION: node back (R1N2)
+-> Exp: recover success
+2)
+-> ACTION: new replica joins (R2N2/R3N2)
+-> Exp: failover success, -> R2N2
+
+2.3
+multi replica
+...
+
+3. recover  
+Only when node in current replica back
+
+3.1
+-> 2.1.
+-> ACTION: node back (R1N2)
+-> Exp: recover , R2N2 -> R1N2
+
+3.2
+-> 2.2.
+-> ACTION: node back (R1N2)
+-> Exp: recover ,  R1N2
+
+
+4. zookeeper not no? (without this assumption?)
+
+5. In case not all workers started(<STATE_STARTED), how about the failover/recover works in existed workers?
+
+
+

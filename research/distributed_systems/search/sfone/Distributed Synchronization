@@ -1,0 +1,8 @@
+Distributed synchronize
+==========
+
+1. synchronize multiple collections (modules)
+-> Id for each synchronize tasker?
+
+2. integrate with node manager
+-> local file copy; remote file transfer.

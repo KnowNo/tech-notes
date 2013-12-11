@@ -1,0 +1,58 @@
+几个DFS
+ceph
+hdfs
+kfs(kosmosfs)
+nfs
+还有fastdfs，淘宝的tfs等
+GFS的缺点主要是大批量比较好，我们的SCD可能大量小文件
+
+还有
+FUSE 
+上述文件系统的fuse可能有另外组件，或者第三方人员开发
+不是所有DFS都有FUSE支持。 
+ceph可能最先进，但也可能稳定性上有问题	
+
+如果一些DFS非常好，但缺乏FUSE支持，如果支持并不困难，也可以考虑为它写FUSE插件。
+
+
+
+
+/**
+The topology of distributed SF1 service:
+(1) A Mirror is constituted of several SF1 Nodes, it provides full search data and functionality.
+
+(2) Mirrors are replicated, Nodes(Workers) between mirrors should be one-to-one correspondence,
+    i.e., "/Mirror1/Node1" and "/Mirror1/Node1" should carry the same search data.
+    So that, if "/Mirror1/Node2" broken down, Masters in Mirror1 will know that it can switch to
+    worker on "/Mirror2/Node2."
+
+(3) Each node is a SF1 process that can be identified by mirrorId and nodeId (Ids are 1, 2, 3...),
+    every node can work as Master or Worker (configurable).
+
+(4) Every Master in all mirriors provides full search functionality in the same manner, they are exposed
+    to higher-level applications as replicated SF1 servers.
+
+Using ZooKeeper for distributed coordination, the associated data structure is defined as below:
+/
+|
+SF1Root
+|--- Topology                #
+     |--- Mirror1
+          |--- Node1
+               |--- Master
+               |--- Worker
+          |--- Node2
+               |--- Worker
+     |--- Mirror2
+          |--- Node1
+               |--- Master
+               |--- Worker
+          |--- Node2
+               |--- Master
+               |--- Worker
+|--- Service                 # SF1 Servers
+     |--- Server00000000     # ---->  "/Topology/Mirror1/Node1/Master"
+     |--- Server00000001
+     |--- Server00000002
+**/
+
