@@ -50,18 +50,6 @@ sudo /etc/init.d/networking restart
 查看hbase 日志：logs/hbase-zhongxia-master-zhongxia-desktop.log
 WARN org.apache.hadoop.hbase.regionserver.wal.HLogSplitter: Could not open hdfs://localhost:9000/hbase/.logs/localhost,60020,1373855014318-splitting/localhost%3A60020.1373899576361 for reading. File is empty
 
-。。。。
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,0 +1,17 @@
+
+
+9.1.2. When Should I Use HBase?
+
+HBase isn't suitable for every problem.
+
+First, make sure you have enough data. If you have hundreds of millions or billions of rows, then HBase is a good candidate. If you only have a few thousand/million rows, then using a traditional RDBMS might be a better choice due to the fact that all of your data might wind up on a single node...
+
+首先，要有足够的数据。如果你有上亿或十亿行数据，hbase是个很好的候选。如果你只有几百万行数据，用传统REDMS是个好的选择，因为所有数据可以存在一个两个节点。
+
+Second, make sure you can live without all the extra features that an RDBMS provides (e.g., typed columns, secondary indexes, transactions, advanced query languages, etc.) 
+
+其次，确保你可以不依赖RDBMS提供的feature，（如可类型化的列，...，高级查询等）
+
+Third, make sure you have enough hardware. Even HDFS doesn't do well with anything less than 5 DataNodes (due to things such as HDFS block replication which has a default of 3), plus a NameNode. 
+
+第三，确保你有足够的硬件。即便HDFS在少于5个节点的情况下也不能工作的很好，加上一个namenode。

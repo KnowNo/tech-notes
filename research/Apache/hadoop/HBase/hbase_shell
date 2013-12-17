@@ -1,39 +1,186 @@
 
-GET
-PUT
-SCAN
-DELETE
+$ hbase shell
 
-http://blog.sina.com.cn/s/blog_8026da3a0101e9fo.html
+hbase(main):001:0> help                                          -- 帮助
+
+COMMAND GROUPS:                                                  -- 命令组
+  Group name: general
+  Commands: status, version
+
+  Group name: ddl
+  Commands: alter, create, describe, disable, drop, enable, exists, is_disabled, is_enabled, list
+
+  Group name: dml
+  Commands: count, delete, deleteall, get, get_counter, incr, put, scan, truncate
+
+  Group name: tools
+  Commands: assign, balance_switch, balancer, close_region, compact, flush, major_compact, move, split, unassign, zk_dump
+
+  Group name: replication
+  Commands: add_peer, disable_peer, enable_peer, remove_peer, start_replication, stop_replication
+
+SHELL USAGE:
+
+Quote all names in HBase Shell such as table and column names.  Commas delimit
+command parameters.  Type <RETURN> after entering a command to run it.
+Dictionaries of configuration used in the creation and alteration of tables are
+Ruby Hashes. They look like this:
+
+  {'key1' => 'value1', 'key2' => 'value2', ...}
+
+在Hbase Shell中所有的名字都需要用引号，如表名和列名。逗号分割参数。
+在创建和修改表时，配置列表使用Ruby Hashs.
+
+and are opened and closed with curley-braces.  Key/values are delimited by the
+'=>' character combination.  Usually keys are predefined constants such as
+NAME, VERSIONS, COMPRESSION, etc.  Constants do not need to be quoted.  Type
+'Object.constants' to see a (messy) list of all constants in the environment.
+
+通常keys是预定义的常量，如NAME（cf名）, VERSIONS, COMPRESSION 等。常量不需要用引号。
+查看环境中的所有常量, 输入 Object.constants.
+
+hbase(main):023:0> Object.constants
+
+If you are using binary keys or values and need to enter them in the shell, use
+double-quote'd hexadecimal representation. For example:
+
+  hbase> get 't1', "key\x03\x3f\xcd"
+  hbase> get 't1', "key\003\023\011"
+  hbase> put 't1', "test\xef\xff", 'f1:', "\x01\x33\x40"
+
+The HBase shell is the (J)Ruby IRB with the above HBase-specific commands added.
+For more on the HBase Shell, see http://hbase.apache.org/docs/current/book.html
+
+如果你使用二进制keys或alues，并且需要在shell中输入，使用被双引号引用的16进制表示。
+
+HBase shell 是在(J)Ruby IRB 基础上实现上述命令。
+----------------------------------------------------------------------------------
 
 
-hbase(main):002:0> count 'mso-log2session-domain'
+使用帮助命令：
+help "COMMAND", (e.g. 'help "get"' -- the quotes are necessary)
+help "COMMAND_GROUP", (e.g. 'help "general"')
 
-hbase(main):002:0> scan 'mso-log2session-domain', {COLUMN => 'cf0:c20'}
+COMMAND GROUPS:
+  Group name: general
+  Commands: status, version
 
-hbase(main):009:0> get 'mso-log2session-domain','40:2013-08-12:689:7110:6ovRN1s6f0c88CjO:1:1'
+  Group name: ddl
+  Commands: alter, create, describe, disable, drop, enable, exists, is_disabled, is_enabled, list
 
-hbase(main):002:0> scan 'mso-cs-stats'
-hbase(main):002:0> count 'mso-cs-stats'
-hbase(main):002:0> get 'mso-cs-stats','108:2013-08-01:03AA435F1E73CA40:1'
-hbase(main):002:0> scan 'mso-cs-stats',{COLUMNS => 'cf0:c11'}
+======
+alter 表名，cf名                         -- Alter column family schema; 先disable表
+create 表名，cf名，...，cf名，{Options}
+describe 表名
+disable 表名                             -- 
+drop 表名                                -- 先 'disable 表名'；If table has more than one region: > major_compact ".META."
+enable 表名
+exists 表名 
+is_disabled 表名
+is_enabled 表名
+list 表名                                -- 支持正则式 list 'abc.*'
 
-hbase(main):002:0> scan 'mso-cs-stats', {FILTER => "(SingleColumnValueFilter('cf0', 'c11', <, 'binary:0')"}
 
-hbase(main):002:0> scan 'mso-cs-stats', {FILTER => "PrefixFilter('40:2013-08-12')" }
+  Group name: dml
+  Commands: count, delete, deleteall, get, get_counter, incr, put, scan, truncate
 
-scan 'test_row_key', {
-	COLUMNS => ['cf:AREA_ID','cf:INDEX1'], 
-	FILTER => "
-		(SingleColumnValueFilter('cf', 'TIME_ID', =, 'binary:201206')) 
-		AND 
-		(SingleColumnValueFilter('cf', 'AREA_ID', =, 'binary:730'))" 
-}
-ROW                        COLUMN+CELL
- row_key_1                 column=cf:AREA_ID, timestamp=1363820270491, value=730
- row_key_1                 column=cf:INDEX1, timestamp=1363820270626, value=201206730
- row_key_3                 column=cf:AREA_ID, timestamp=1363820271076, value=730
- row_key_3                 column=cf:INDEX1, timestamp=1363820271110, value=201207730
+======
+count 表名                               -- Count the number of rows in a table.  INTERVAL => 1000 间隔
+delete 表名, 行, 列名                    -- 
+deleteall 表名, 行 [, 列名]              -- Delete all cells in a given row; 不能按cf名删除
+get 表名, 行 [, 列]                      -- 
+get_counter 表名, 行, 列名               -- 作用于 incr 的列，不能作用于 put 的列
+incr 表名, 行, 列名, 1...n               -- 不能作用于 put 的列
+put 表名, 行, 列名, cell值
+scan 表名, [{COLUMNS =>[列], FILTER=>}] 
+truncate 表名                            -- Disables, drops and recreates the specified table. 删除表及数据，创建新表
+
+  Group name: tools
+  Commands: assign, balance_switch, balancer, close_region, compact, flush, major_compact, move, split, unassign, zk_dump
+
+  Group name: replication
+  Commands: add_peer, disable_peer, enable_peer, remove_peer, start_replication, stop_replication
+
+
+常用操作:
+===========
+
+列出表:
+list 
+list 'sup*'
+
+创建表
+create 'supplier','general','location','products'
+
+删除表
+disable 'test' 
+drop 'test'
+
+修改表结构(cf)
+disable 'supplier'
+alter 'supplier', NAME => 'location',  METHOD => 'delete'
+ 等价于
+alter 'supplier', 'delete' => 'location'
+enable 'test'
+
+
+更新(增加)行列单元值
+put 'supplier','user1','general:name','zh ll'
+put 'supplier','user1','general:age','26'
+put 'supplier','user1','general:gender','male'
+put 'supplier','user1','location:province','sh'
+put 'supplier','user2','general:age','28'
+put 'supplier','user2','general:gender','famale'
+put 'supplier','user2','general:name','kk'
+put 'supplier','user3','general:age','29'
+put 'supplier','user3','general:gender','male'
+put 'supplier','user3','general:name','yy'
+
+disable 'supplier'
+alter 'supplier', NAME => 'location'            #增加colum family 需要先修改表结构
+enable 'supplier'
+
+put 'supplier','user1','location:province','sh'
+put 'supplier','user1','location:city','sh'
+put 'supplier','user2','location:province','HN'
+put 'supplier','user2','location:city','zz'
+
+获取行列单元值
+get 'supplier','user1'
+get 'supplier','user1','general:age'
+get 'supplier','user1','general:age','general:gender'
+get 'supplier','user1',['general:age','general:gender']
+get 'supplier','user1',{COLUMN => 'general:age'}
+get 'supplier','user1',{COLUMN => ['general:age', 'general:gender']}
+
+更新COUNTER单元值
+incr 'supplier','user1','general:age2'
+incr 'supplier','user1','general:age2',10
+
+获取COUNTER单元值
+get_counter 'supplier','user1','general:age2'
+
+统计表行数
+count 'supplier'
+count 'supplier', INTERVAL => 100
+
+扫描(过滤)出表的行列值
+scan 'supplier'
+scan 'supplier',{COLUMNS => 'general:age'}
+scan 'supplier',{COLUMNS => 'general:name'}
+scan 'supplier',{COLUMNS => ['general:age','general:age2']}
+
+删除行列单元
+delete 'supplier','user1','location:city'
+
+删除(所有)行列单元
+deleteall 'supplier','user2', 'general:name'
+deleteall 'supplier','user2', 'general'       -- X -- 不能按colum family
+deleteall 'supplier','user2'
+
+
+
+
 
 
 

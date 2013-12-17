@@ -1,0 +1,111 @@
+MySQL 测试工具
+
+Command: sysbench MySQL 性能测试工具
+
+Command: blogbench 测试硬盘的读取性能
+
+Command: Inniostat 查看innodb 搜索引擎的io情况
+MySQL 备份方案
+
+lvm :
+zfs :
+snapshot : 
+mysqldump :
+
+MySQL 恢复方案
+
+mysqlstore : 
+
+MySQL 优化
+
+MySQL Cache/Buffer
+ 
+1. Query_cache : 不超过256M 除非基本静态,innodb无效 : 缓存结果集，极高效。 通过对SQL 语句进行hash 后匹配 SQL 语句， 无新查询
+2. binlog_cache_size : 2M ~ 4M , < 32M : 缓存binlog数据大小，会影响写入操作的性能
+3. table_cache : 1024 : 缓存打开表的信息,MyISAM 会占多数，表多的影响效率
+4. thred_cache : 1024 < max_connections :缓存连接线程,影响连接建立的效率，对短连接影响较大
+5. key_buffer_size ：16M以上越大越好 :缓存MyISAM索引，对MyISAM表性能表影响大
+6. innodb_db_buffer_pool_size :仅对innodb 越大越好  : 对innodb极大的影响,缓存索引极数据
+7. innodb_log_buffer_size :2M ~ 8M , < 32M  : 缓存innodb写入日志，影响写入效率
+8. innodb_max_dirty_pages_pct : < 1G/innodb_db_buffer_pool_size(G)*100 : 设置innodb buffer 中的脏页占比(脏页:代表数据写入内存中，还没有刷进disk中的数据)
+ 
+Connection MySQL连接优化
+1. max_connections :1000~2000 < 10000: 影响能够保持的最大客户端连接数;
+2. max_connect_errors : > 1000 : 某个用户允许最大登录失败次数;
+3. back_log : 100 < os网络层设置 : 影响突发连接暴涨场景，服务器重启瞬间
+4. skip-name-resolved : 建议开启: 取消对客户端的DNS反解 影响连接和授权;
+
+5. interactive_timeout 和wait_timeout : 86400 : 影响空闲连接最大可用空闲时间
+ 
+IO MySQL 写入输出优化
+1. innodb_flush_method : O_DIRECT(linux): innodb 文件打开方式,linux下文件系统影响较大
+2. innodb_flush_log_at_trx_commit : 2:影响innodb 日志事物刷新机制
+3. innodb_file_per_table : 开启: 影响表存储方式,文件过大会影响性能
+4. sync_binlog ：4~8 非常频繁可以适当增大 不建议为0: 影响binlog日志刷新到新的磁盘机制
+
+MySQL 存储引擎选择
+
+MyISAM 不需要事物支持
+并发相对较低
+数据修改相对少
+以读为主
+数据一致性要求低
+ 
+innodb 需要事物支持
+并发较大
+数据变化比较频繁
+数据的一致性要要求比较高
+硬件设备内存较大，远大于索引数据量
+
+使用好MySQL 的几点建议
+
+    要基本了解存储引擎 : MyISAM ,innoDB ,MEMORY的存储格式与工作原理
+    生产环境大对象的DDL
+    生产环境大数据量的DML
+    生产环境要尽量拒绝模糊查询的SELECT 操作， 转为搜索引擎模式
+    MySQL数据库innodb存储引擎的事物隔离级别
+        READ UNCOMMITED
+        READ COMMOITED
+        REPEATABLE READ
+        SERIALIZABLE
+
+MySQL 优化技术 FLASH CACHE
+
+    facebook 的MySQL 数据模块开源项目 使用硬盘的缓存技术 来使mysql 更高效率的读取
+    flash cache 地址 https://github.com/facebook/flashcache
+
+MySQL 数据仓库infobright
+
+    与MySQL 行式数据库不同 infobright 是列式数据仓库 用作数据的存储 不利与数据的查询获取
+    http://www.infobright.com/
+
+MySQL innoSQL 搜索
+
+    基于innodb 与 MyISAM 的性能效率 而开发兼与MyISAM的速度与INNODB 的MVCC 而开发的Mysql 扩展搜索引擎
+    网站地址 http://www.innomysql.org
+
+MySQL 较好的书籍
+
+    怎样成为明星DBA
+    SQL反模式
+    云计算核心技术解析
+    oracle solaris 10 系统管理基础教程
+    MongDB 权威指南
+    Oracle 优化日记
+    Cassandra 权威指南
+    Mysql 必知必会
+    SQL 必知必会
+    深度探索关系型数据库
+    让Oracle 跑的更快2
+    Mysql 技术内幕
+    Haddop 实战
+
+MySQL 较好的网站推荐
+
+    http://www.mysqlops.com
+    http://www.dbanotes.net
+    http://www.mysqlperformanceblog.com/
+    http://isky000.com/
+    http://www.ningoo.net/
+
+

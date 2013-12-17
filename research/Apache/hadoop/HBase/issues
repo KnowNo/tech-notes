@@ -1,0 +1,43 @@
+
+#0 使用本地hbase配置
+$HBASE_HOME/conf/hbase-site.xml 覆盖 log2session/conf/hbase-site.xml
+
+#1 执行bulkload报错
+Exception in thread "main" java.lang.NoClassDefFoundError: org/apache/zookeeper/Watcher
+--->
+解决： 在 $HADOOP_HOME/conf/hadoop-env.sh 中添加：
+export HADOOP_CLASSPATH=/home/zhongxia/software/hbase-0.90.6-cdh3u5/lib/zookeeper-3.3.5-cdh3u5.jar:$HADOOP_CLASSPATH
+
+#2 继续执行bulkload报异常:
+13/08/02 10:54:38 WARN client.HConnectionManager$HConnectionImplementation: Encountered problems when prefetch META table: 
+org.apache.hadoop.hbase.TableNotFoundException: Cannot find row in .META. for table: idigger-log2session-domain, row=idigger-log2session-domain,,99999999999999
+--->
+表不存在，先创建
+
+
+#3 创建hbase table 报错：
+Exception in thread "main" org.apache.hadoop.ipc.RemoteException: org.apache.hadoop.hbase.NotAllMetaRegionsOnlineException: Timed out (10000ms)
+	at org.apache.hadoop.hbase.catalog.CatalogTracker.waitForMeta(CatalogTracker.java:392)
+
+--> 重启Hbase
+
+
+#4 completebulkload 失败
+executing: hadoop jar /opt/hbase/current/hbase-0.90.6-cdh3u5.jar completebulkload bulkload/output_mso_2013-07-01 mso-log2session-domain
+......Failed to bulkload completebulkload, retry in 120s, please wait......
+--->
+修改log2session.py 中变量：
+ HBASE_JAR_PATH = "/opt/hbase/current/hbase-0.90.6-cdh3u5.jar"
+或，将本地HBase安装目录连接到/opt/hbase/current，
+ ln -s /home/zhongxia/software/hbase-0.90.6-cdh3u5 /opt/hbase/current
+
+#4.2 completebulkload 报错
+Exception in thread "main" java.lang.NoClassDefFoundError: com/google/common/collect/Multimap
+	at org.apache.hadoop.hbase.mapreduce.Driver.main(Driver.java:41)
+---> 
+$HADOOP_HOME/conf/hadoop-env.sh:
+export HADOOP_CLASSPATH=/home/zhongxia/software/hbase-0.90.6-cdh3u5/lib/guava-r06.jar:$HADOOP_CLASSPAT
+
+重启hadoop,hbase,joven server
+
+
