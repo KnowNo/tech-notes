@@ -1,0 +1,23 @@
+
+$ hbase
+
+Usage: hbase <command>
+where <command> is one of:
+  shell            run the HBase shell
+  zkcli            run the ZooKeeper shell
+  master           run an HBase HMaster node
+  regionserver     run an HBase HRegionServer node
+  zookeeper        run a Zookeeper server
+  rest             run an HBase REST server
+  thrift           run an HBase Thrift server
+  avro             run an HBase Avro server
+  migrate          upgrade an hbase.rootdir
+  hbck             run the hbase 'fsck' tool
+  classpath        dump hbase CLASSPATH
+ or
+  CLASSNAME        run the class named CLASSNAME
+
+
+$ hbase org.apache.hadoop.hbase.io.hfile.HFile -v -f /hbase/test/679d37942cfa3f867c8f8034e059e55a/cf1/2556370790834349981
+Scanning -> /hbase/test/679d37942cfa3f867c8f8034e059e55a/cf1/2556370790834349981
+Scanned kv count -> 1

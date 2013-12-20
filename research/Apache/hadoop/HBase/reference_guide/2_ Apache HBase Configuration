@@ -1,0 +1,16 @@
+
+
+2.5.2.8. Managed Compactions
+
+A common administrative technique is to manage major compactions manually, rather than letting HBase do it. By default, HConstants.MAJOR_COMPACTION_PERIOD is one day and major compactions may kick in when you least desire it - especially on a busy system. To turn off automatic major compactions set the value to 0.
+
+一个常见的管理技巧是手动操作major compactions，而不是让HBase自动进行。
+默认下HConstants.MAJOR_COMPACTION_PERIOD是一天，并且major compactions可能在你最不需要的时候进行，特别是一个繁忙的系统。
+关闭自动major compactions，可以设置值为0.
+
+It is important to stress that major compactions are absolutely necessary for StoreFile cleanup, the only variant is when they occur. They can be administered through the HBase shell, or via HBaseAdmin.
+
+需要强调的是，major compactions对于StoreFile清理绝对是有必要的，唯一的不同是它们什么进行。
+它们可以通过HBase shell(major_compact命令)或HBaseAdmin（Java API）管理。
+
+For more information about compactions and the compaction file selection process, see Section 9.7.6.5, “Compaction”

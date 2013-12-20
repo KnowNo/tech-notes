@@ -98,9 +98,15 @@ truncate 表名                            -- Disables, drops and recreates the 
   Group name: tools
   Commands: assign, balance_switch, balancer, close_region, compact, flush, major_compact, move, split, unassign, zk_dump
 
+
+major_compact 表名
+
+
   Group name: replication
   Commands: add_peer, disable_peer, enable_peer, remove_peer, start_replication, stop_replication
 
+
+-----------------------------------------------
 
 常用操作:
 ===========
@@ -165,7 +171,7 @@ count 'supplier'
 count 'supplier', INTERVAL => 100
 
 扫描(过滤)出表的行列值
-scan 'supplier'
+scan 'supplier',LIMIT => 1
 scan 'supplier',{COLUMNS => 'general:age'}
 scan 'supplier',{COLUMNS => 'general:name'}
 scan 'supplier',{COLUMNS => ['general:age','general:age2']}

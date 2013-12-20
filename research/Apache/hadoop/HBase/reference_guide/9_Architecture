@@ -1,0 +1,57 @@
+
+9.7.6.5. Compaction  紧凑
+
+There are two types of compactions: minor and major. Minor compactions will usually pick up a couple of the smaller adjacent StoreFiles and rewrite them as one. Minors do not drop deletes or expired cells, only major compactions do this. Sometimes a minor compaction will pick up all the StoreFiles in the Store and in this case it actually promotes itself to being a major compaction. 
+
+有两种类型的紧凑: minor and major.
+Minor compactions 通常取邻近的几个小存储文件，然后将它们重写为一个文件。
+Minors 不删除过期单元，只有 major compactions 才做此删除操作。                       --> TTL 6.7.
+
+After a major compaction runs there will be a single StoreFile per Store, and this will help performance usually. Caution: major compactions rewrite all of the Stores data and on a loaded system, this may not be tenable; major compactions will usually have to be done manually on large systems. See Section 2.5.2.8, “Managed Compactions”.
+
+Compactions will not perform region merges.
+
+major compaction 运行后每个存储只有一个存储文件，有助于提升效率。
+注意: major compaction 重写运行中系统的所有存储数据，这可能不可靠；
+在大型系统中，major compactions通常需要手动执行。  (major_compact命令)               --> 2.5.2.8, “Managed Compactions”.
+
+
+9.7.6.2. StoreFile (HFile)
+
+StoreFiles are where your data lives. 
+
+StoreFiles 是(Hbase)数据存在的地方。
+
+9.7.6.2.1. HFile Format  格式
+
+The hfile file format is based on the SSTable file described in the BigTable [2006] paper and on Hadoop's tfile (The unit test suite and the compression harness were taken directly from tfile). Schubert Zhang's blog post on HFile: A Block-Indexed File Format to Store Sorted Key-Value Pairs makes for a thorough introduction to HBase's hfile. Matteo Bertozzi has also put up a helpful description, HBase I/O: HFile.
+
+hfile基于BigTable [2006]论文描述的SSTable file和Hadoop's tfile（单元测试和压缩直接在tfile上做）。Zhang的博客：A Block-Indexed File Format to Store Sorted Key-Value Pairs 充分介绍了Hbase的hfile.
+
+For more information, see the HFile source code. Also see Appendix E, HFile format version 2 for information about the HFile v2 format that was included in 0.92.
+
+9.7.6.2.2. HFile Tool  工具
+
+To view a textualized version of hfile content, you can do use the org.apache.hadoop.hbase.io.hfile.HFile tool. Type the following to see usage:
+
+$ ${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.io.hfile.HFile  
+
+查看文本化的hfile内容，可以使用org.apache.hadoop.hbase.io.hfile.HFile工具。敲如下命令：
+-------------------------
+$ hbase org.apache.hadoop.hbase.io.hfile.HFile -v -f /hbase/test/679d37942cfa3f867c8f8034e059e55a/cf1/2556370790834349981
+Scanning -> /hbase/test/679d37942cfa3f867c8f8034e059e55a/cf1/2556370790834349981
+Scanned kv count -> 1
+-------------------------
+
+For example, to view the content of the file hdfs://10.81.47.41:8020/hbase/TEST/1418428042/DSMP/4759508618286845475, type the following:
+
+$ ${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.io.hfile.HFile -v -f hdfs://10.81.47.41:8020/hbase/TEST/1418428042/DSMP/4759508618286845475  
+
+If you leave off the option -v to see just a summary on the hfile. See usage for other things to do with the HFile tool.
+
+9.7.6.2.3. StoreFile Directory Structure on HDFS  目录结构
+
+For more information of what StoreFiles look like on HDFS with respect to the directory structure, see Section 13.7.2, “Browsing HDFS for HBase Objects”.
+
+
+

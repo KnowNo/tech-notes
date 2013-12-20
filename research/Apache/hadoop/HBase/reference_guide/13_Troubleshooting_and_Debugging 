@@ -1,0 +1,28 @@
+
+
+
+13.7.2. Browsing HDFS for HBase Objects
+
+Somtimes it will be necessary to explore the HBase objects that exist on HDFS. These objects could include the WALs (Write Ahead Logs), tables, regions, StoreFiles, etc. The easiest way to do this is with the NameNode web application that runs on port 50070. The NameNode web application will provide links to the all the DataNodes in the cluster so that they can be browsed seamlessly.
+
+有时候需要了解存在在HDFS上的HBase对象。这些对象包括WALs(先写日志)，表，区，存储文件等。
+最容易的方法是NameNode的web应用程序运行端口50070，提供了用于查看集群内所有的数据节点的连接。
+
+The HDFS directory structure of HBase tables in the cluster is...
+
+/hbase
+     /<Table>             (Tables in the cluster)
+          /<Region>           (Regions for the table)
+               /<ColumnFamiy>      (ColumnFamilies for the Region for the table)
+                    /<StoreFile>        (StoreFiles for the ColumnFamily for the Regions for the table)
+            
+
+The HDFS directory structure of HBase WAL is..
+
+/hbase
+     /.logs
+          /<RegionServer>    (RegionServers)
+               /<HLog>           (WAL HLog files for the RegionServer)
+            
+
+

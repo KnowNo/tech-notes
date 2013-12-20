@@ -1,0 +1,61 @@
+
+6.7. Time To Live (TTL)
+
+ColumnFamilies can set a TTL length in seconds, and HBase will automatically delete rows once the expiration time is reached. This applies to all versions of a row - even the current one. The TTL time encoded in the HBase for the row is specified in UTC.
+
+ColumnFamilies可以以秒为单位设置TTL长度，Hbase会自动删除过期数据。
+
+--> major compaction -> 9.7.6.5.
+
+------------------------------------------------------------------------
+hbase(main):031:0> scan 'test'                      
+ROW                               COLUMN+CELL                                                                                   
+ row1                             column=cf1:q1, timestamp=1387200977929, value=i'm a value!        # 2013-12-16 21:36:17
+ row1                             column=cf1:q2, timestamp=1387200977934, value=i'm a value2!       # 2013-12-16 21:36:17
+ row1                             column=cf2:moon, timestamp=1387200977936, value=ChangE Yutu                                   
+ row2                             column=cf1:q1, timestamp=1387435990702, value=ttl                                             
+ row3                             column=cf1:q1, timestamp=1387436013370, value=ttl3 
+
+hbase(main):033:0> describe 'test'
+hbase(main):034:0> disable 'test'
+hbase(main):035:0> alter 'test', {NAME => 'cf1',TTL => '86400'}     # 1天
+hbase(main):036:0> enable 'test'
+hbase(main):037:0> describe 'test'                             
+
+hbase(main):038:0> scan 'test'
+ROW                               COLUMN+CELL                                                                                   
+ row1                             column=cf2:moon, timestamp=1387200977936, value=ChangE Yutu     # 2013-12-16 21:36:17
+ row2                             column=cf1:q1, timestamp=1387435990702, value=ttl               # 2013-12-19 14:53:10
+ row3                             column=cf1:q1, timestamp=1387436013370, value=ttl3              # 2013-12-19 14:53:33
+
+hbase(main):039:0> put 'test','row4','cf1:q1','ttl4'
+hbase(main):040:0> scan 'test' 
+ROW                               COLUMN+CELL                                                                                   
+ row1                             column=cf2:moon, timestamp=1387200977936, value=ChangE Yutu                                   
+ row2                             column=cf1:q1, timestamp=1387435990702, value=ttl                                             
+ row3                             column=cf1:q1, timestamp=1387436013370, value=ttl3                                            
+ row4                             column=cf1:q1, timestamp=1387437464709, value=ttl4              # 2013-12-19 15:17:44 当前时间  
+
+hbase(main):034:0> disable 'test'  # cf1 设置为10分钟
+hbase(main):035:0> alter 'test', {NAME => 'cf1',TTL => '600'}, {NAME => 'cf2',TTL => '86400'}, {NAME => 'cf2',TTL => '86400'}   
+hbase(main):036:0> enable 'test'
+
+hbase(main):051:0> scan 'test'     # 15:23 执行                                                               
+ROW                               COLUMN+CELL                                                                                   
+ row4                             column=cf1:q1, timestamp=1387437464709, value=ttl4              # 2013-12-19 15:17:44
+
+hbase(main):056:0> scan 'test'    # 15:25 执行
+ROW                               COLUMN+CELL                                                                                   
+ row4                             column=cf1:q1, timestamp=1387437464709, value=ttl4                                            
+ row5                             column=cf1:q1, timestamp=1387437987844, value=ttl5              # 2013-12-19 15:26:27
+
+hbase(main):057:0> scan 'test'    # 15:28 执行
+ROW                               COLUMN+CELL                                                                                   
+ row5                             column=cf1:q1, timestamp=1387437987844, value=ttl5              # 2013-12-19 15:26:27
+
+                                  # 设为 100天
+hbase(main):035:0> alter 'test', {NAME => 'cf1',TTL => '8640000'}, {NAME => 'cf2',TTL => '8640000'}, {NAME => 'cf3',TTL => '8640000'}
+------------------------------------------------------------------------
+
+
+

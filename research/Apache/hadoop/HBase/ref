@@ -1,0 +1,16 @@
+
+
+
+FAMILIES => [
+{
+NAME => 'cf0', 
+BLOOMFILTER => 'NONE', 
+REPLICATION_SCOPE => '0', 
+COMPRESSION => 'LZO', 
+VERSIONS => '1', 
+TTL => '2147483647',       # Time To Live 秒
+BLOCKSIZE => '65536', 
+IN_MEMORY => 'false', 
+BLOCKCACHE => 'true'
+}
+]
