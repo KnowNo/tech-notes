@@ -1,0 +1,92 @@
+valgrind - callgrind
+
+      callgrind  官方文档
+
+      简单使用流程，以测试DE为例：
+
+     启动：valgrind --tool=callgrind --instr-atstart=no --callgrind-out-file=/tmp/callgrind.out /usr/local/apache2/bin/httpd -X
+     参数说明：--instr-atstart=no 目的是启动时的cache加载时间不进行统计
+     参数说明：输出文件到tmp的目录  (httpd测试要用，因为valgrind程序会从root降为daemon，否则会报如下类似错误：
+    ==22588== Error: can not open cache simulation output file `/backup/de/logs/callgrind.out.22588'
+    等cache加载完毕后，执行以下命令打开统计功能： callgrind_control -i on valgrind_pid
+    DE处理请求完毕后, 关闭callgrind统计功能： callgrind_control -i off valgrind_pid
+    关闭valgrind：  callgrind_control -k valgrind_pid
+    使用kcachegrind工具查看callgrind结果：callgrind.out.valgrind_pid
+    kcachegrind工具，以及sample callgrind.out.valgrind_pid文件见附件
+    kcachegrind.zip
+    callgrind.out.23819
+
+
+ 
+ oprofile
+        此工具对性能测试影响比较小，通过时钟中断的方式，分析程序的性能
+        此工具不需要修改源代码，可以在线上进行数据收集 
+
+        使用简单流程：
+
+     opcontrol --init
+     opcontrol --setup --event=INST_RETIRED:10000:0:0:1 --separate=library,thread --no-vmlinux 
+     opcontrol --start
+     ./a.out  # run program      
+     实时查看a.out的执行状况       opcontrol --dump; opreport -l a.out 
+     opcontrol --shutdown
+    opcontrol --save=detest           #日志存放目录：/var/lib/oprofile/samples/detest
+    opreport -l session:detest --merge tgid > prof.txt
+    opcontrol --reset     # 清除上一次数据：
+
+    10) 查看检测结果：
+
+           opreport : 以镜像(image)的角度显示检测结果，进程、动态库、内核模块属于镜像范畴
+           opreport -l : 以函数的角度显示检测结果
+           opreport -l test : 以函数的角度，针对test进程显示检测结果
+           opannotate -s test : 以代码的角度，针对test进程显示检测结果
+           opannotate -s /lib64/libc-2.4.so : 以代码的角度，针对libc-2.4.so库显示检测结果
+Strace
+
+      查看系统调用
+
+      挂载到某个已启动的进程
+
+            strace -Ff -tt -r -o strace_log -p PID
+
+      程序启动时挂载
+
+           strace -Ff -tt -r -o strace_log  /usr/local/apache2/bin/httpd -X
+VMSTAT
+
+     关于进程、内存、内存分页、堵塞IO、traps及CPU活动的信息
+
+      usage: vmstat [-V] [-n] [delay [count]]
+pstack
+
+    查看进程的stack
+
+    Usage: pstack <process-id>
+SYSSTAT
+
+         sysstat是一个软件包，包含监测系统性能及效率的一组工具，对于我们收集系统性能数据，比如CPU使用率、硬盘和网络吞吐数据
+
+         安装：sudo yum install sysstat
+
+         主要工具：mpstat, iostat, sar
+
+     mpstat：报告与CPU的一些统计信息
+     mpstat -P ALL 1
+
+     iostat  输出CPU和磁盘I/O相关的统计信息. 
+     iostat 1 20
+
+     sar 
+        sar -u 1 5
+        输出CPU使用情况的统计信息，每秒输出一次，一共输出100次
+        sar -b 1 5
+        显示I/O和传送速率的统计信息
+        sar -c
+        每秒钟创建的进程数
+        sar -n DEV 1 5
+        输出网络设备状态的统计信息
+
+        sar -q 1 5
+        输出进程队列长度和平均负载状态统计信息
+
+

@@ -1,0 +1,130 @@
+    去掉LoadModule headers_module modules/mod_headers.so 前面的#
+    LoadModule deflate_module modules/mod_deflate.so
+    LoadModule expires_module modules/mod_expires.so
+
+mod_headers.so 这个模块提供了一些指令用于控制和修改HTTP请求头和应答头。这些头可以被合并、替换、删除。
+
+mod_Deflate.so mod_deflate模块提供了DEFLATE输出过滤器，允许服务器在将输出内容发送到客户端以前进行压缩，以节约带宽。
+
+mod_expires.so
+
+这个模块控制服务器应答时的Expires头内容和Cache-Control头的max-age指令。有效期(expiration date)可以设置为相对于源文件的最后修改时刻或者客户端的访问时刻。
+
+这些HTTP头向客户端表明了文档的有效性和持久性。如果有缓存，文档就可以从缓存(除已经过期)而不是从服务器读取。接着，客户端考察缓存中的副本，看看是否过期或者失效，以决定是否必须从服务器获得更新。
+
+要修改Cache-Control头中max-age(参见RFC 2616 section 14.9)项之外的内容，你还可以使用Header指令。
+
+<IfModule mod_deflate.c>
+    SetOutputFilter DEFLATE    
+
+	#必须的，就像一个开关一样，告诉apache对传输到浏览器的内容进行压缩 
+
+ SetEnvIfNoCase Request_URI .(?:gif|jpe?g|png)$ no-gzip dont-vary
+
+ #设置不对后缀gif，jpg，jpeg，png的图片文件进行压缩  
+
+ SetEnvIfNoCase Request_URI .(?:exe|t?gz|zip|bz2|sit|rar)$ no-gzip dont-vary
+
+ #同上，就是设置不对exe，tgz，gz。。。的文件进行压缩    
+
+        SetEnvIfNoCase Request_URI .(?:pdf|mov|avi|mp3|mp4|rm)$ no-gzip dont-vary
+
+        AddOutputFilterByType DEFLATE text/*
+
+               #设置对文件是文本的内容进行压缩，例如text/html text/css text/plain等
+
+        AddOutputFilterByType DEFLATE application/ms* application/vnd* application/postscript application/javascript application/x-javascript
+
+              #这段代码你只需要了解application/javascript application/x-javascript这段就可以了，这段的意思是对javascript文件进行压缩
+
+        AddOutputFilterByType DEFLATE application/x-httpd-php application/x-httpd-fastphp
+
+               #这段是告诉apache对php类型的文件进行压缩
+
+        BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+                # Netscape 4.x 有一些问题，所以只压缩文件类型是text/html的
+
+        BrowserMatch ^Mozilla/4.0[678] no-gzip
+
+                 # Netscape 4.06-4.08 有更多的问题，所以不开启压缩
+
+        BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+                 # IE浏览器会伪装成 Netscape ，但是事实上它没有问题
+
+        Header append Vary User-Agent env=!dont-vary
+
+                   #确保代理不会发送错误的内容
+
+</IfModule>
+
+ <IfModule mod_expires.c>
+
+      ExpiresActive On
+
+              #激活http缓存，也就是个开关，必须有的一段代码
+
+     ExpiresDefault A604800
+
+             #默认缓存时间为604800秒，也就是7天，A表示以客户端时间为准
+
+     ExpiresByType text/css A3600
+
+             #对css文件缓存3600秒，也就是1小时，A表示以客户端时间为准
+
+    ExpiresByType text/html A3600
+
+              #对html文件缓存3600秒，也就是1小时，A表示以客户端时间为准
+
+     ExpiresByType application/x-javascript A3600
+
+             #对javascript文件缓存3600秒，也就是1小时，A表示以客户端时间为准
+
+     ExpiresByType image/gif "access plus 2 month"
+
+              #对gif图片缓存2个月，以客户端时间为准
+
+     ExpiresByType image/jpeg "access plus 2 month"
+
+              #对jpeg和jpg图片缓存2个月，以客户端时间为准
+
+    ExpiresByType image/png "access plus 2 month"
+
+              #对png图片缓存2个月，以客户端时间为准
+
+     ExpiresByType image/x-icon "access plus 2 month"
+
+               #对浏览器小图标缓存2个月，以客户端时间为准
+
+     ExpiresByType application/x-shockwave-flash A2592000
+
+               #对flash文件缓存2592000秒，也就是1个月，A表示以客户端时间为准
+
+               #特别注意也可以使用 ExpiresByType text/css M3600  这里的M表示以文件最后修改时间为准缓存1小时，例如有些时候，我们的HTML是大批量定时更新的，这个时候就可以用到M
+
+              #Header unset Pragma
+
+              #删除掉http头信息中的Pragma，不懂的可以google一下Pragma，他也是控制浏览器缓存的，不过是用于http1.0标准
+
+              #FileETag None
+
+              #Header unset ETag #这段代码和上面一段的作用是不使用http1.1标准中的ETag属性
+
+     <FilesMatch "\.(js|css|ico|pdf|flv|jpg|jpeg|png|gif|mp3|mp4|swf)$">
+
+             #针对jscssico等后缀的文件进行单独设置
+
+            #Header set Expires "Thu, 15 Apr 2013 20:00:00 GMT"
+
+     Header unset Last-Modified
+
+             #不使用http头信息中的Last-Modified属性，Last-Modified是指文件最后修改时间
+
+     Header append Cache-Control "public"
+
+            #设置为可被任何缓存区缓存
+
+    </FilesMatch>
+
+</IfModule>

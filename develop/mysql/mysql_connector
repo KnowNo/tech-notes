@@ -1,0 +1,25 @@
+mysql connector
+
+ mysql c 链接库;
+
+         http://dev.mysql.com/downloads/connector/c/
+
+linux下载到本地的c链接库：
+
+         mysql-connector-c-6.1.1-linux-glibc2.5-x86_64.tar.gz
+
+例子: 数据库查询
+
+         query.cpp
+
+     解压mysql-connector-c-6.1.1-linux-glibc2.5-x86_64.tar.gz
+     把query.cpp放到mysq-connector解压后的目录
+     可以修改query.cpp对应的dbname，table，并先运行mysql命令往mysql数据库插入几条数据。
+     编译: g++ query.cpp  -Llib -lmysqlclient
+    export LD_LIBRARY_PATH=lib
+    ln -s /var/lib/mysql/mysql.sock /tmp/mysql.sock ; sudo chmod 766 /var/lib/mysql/mysql.sock
+    运行: ./a.out
+
+reference:
+
+          mysql c api 教程

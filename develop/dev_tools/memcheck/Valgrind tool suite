@@ -1,0 +1,39 @@
+
+官方首页：
+
+            http://valgrind.org/
+Memecheck
+
+            内存检测工具，检测可能发生的内存泄漏
+
+            简单使用说明：
+
+                  valgrind  --log-file=/tmp/valgrind.log.%p --trace-children=yes  --leak-check=full --error-limit=no  /usr/local/apache2/bin/httpd  -X 
+Callgrind
+
+             提供函数的调用图，发现热点函数，模块。
+
+             简单使用说明，见性能检测wiki
+
+ 
+Massif
+
+            heap profiler工具，能够提供heap内存的snapshot
+
+            简单使用说明：
+
+            启动
+
+                valgrind  --tool=massif --threshold=0.1 --massif-out-file=/tmp/massif.out.%p /usr/local/apache2/bin/httpd -k start
+
+            查看结果
+
+                ms_print /tmp/massif.out.%p
+DRD
+
+          多线程检测工具，能够发现系统使用的锁，以及可能的死锁检测
+
+          简单使用说明
+
+                  valgrind --tool=drd --exclusive-threshold=1 --shared-threshold=1 --error-limit=no /usr/local/apache2/bin/httpd -X
+

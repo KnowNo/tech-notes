@@ -1,0 +1,286 @@
+目录
+
+1. 概述
+2. 同步机制的实现原理
+2.1 四种同步机制：
+2.2 Futex  (fast userspace mutex):
+2.2.1 futex - 内部实现都需要依赖的用户态锁
+2.2.2 获得锁，并同时判断出现锁竞争与否的例子:
+2.2.3 sys_futex系统调用提供的两个基本操作：
+2.3 Mutex (互斥锁)
+2.3.1 以一个假想的场景来描述内部futex的状态变化：
+2.3.2 init  初始化:
+2.3.3 A, B, C 并发lock操作：
+2.3.4 A 执行unlock，唤醒B
+2.3.5 被唤醒的B和新到达的D.lock 竞争：
+2.4 semaphore （信号量）
+2.4.1 sem_init:
+2.4.2 sem_post:
+2.4.3 sem_wait:
+2.5 Conditional variable (条件变量）
+2.5.1 pthread_cond_wait(cond, mutex) 需要传入互斥锁的原因：
+2.5.2 主要内部变量：
+2.5.3 init()
+2.5.4 wait（）
+2.5.5 signal()
+2.5.6 broadcast()
+2.6 rwlock (读写锁)
+2.6.1 主要内部变量:
+2.6.2 init()
+2.6.3 rdlock()
+2.6.4 wrlock()
+2.6.5 unlock()
+概述
+
+主要以c伪代码描述glibc 2.17 pthread 同步机制的实现原理。
+同步机制的实现原理
+
+ 
+四种同步机制：
+
+             mutex (互斥锁)
+             semaphore （信号量）
+    conditional variable (条件变量)  
+             rwlock（读写锁）
+
+Futex  http://en.wikipedia.org/wiki/Futex (fast userspace mutex):  
+futex - 内部实现都需要依赖的用户态锁
+
+Futex以一个int类型表示，比如 unsigned int __futex。
+Futex 加锁过程：会简单判断有没出现锁竞争，如果出现才会调用sys_futex来处理。
+获得锁，并同时判断出现锁竞争与否的例子:
+
+futex -> %eax                 // 读取futex
+%ecx = %eax + 1           // futex + 1
+cmpxchg %ecx  futex     // cmpxchg 是原子操作，隐含有第三个操作符%eax，
+// 同时会根据比// 较结果会把 ZF标志位置为1或0
+jnz                                    //   根据ZF标志位进行跳转
+            futex实现用到的cmpxchg逻辑:
+if (%eax == futex)
+{
+// futex的值没有被别人改变，那么意味着没有出现锁竞争
+futex = %ecx
+ZF标志位至1
+}
+else
+{
+// futex 值有变化，说明出现了锁竞争
+ZF = 0
+}
+
+ 因为在实际应用中，大多数锁的lock操作都不会出现竞争，所以无需系统调用，这样就能提高性能。
+  sys_futex系统调用提供的两个基本操作： 
+
+wait（futex，val)  -  如果futex == val,  则挂起当前进程，加入等待唤醒队列
+wake(futex,  val)  -  从队列中唤醒val  个 进程。
+Mutex (互斥锁)
+
+mutex是futex_lock的封装，只是支持很多特性，比如可重入。
+以一个假想的场景来描述内部futex的状态变化：
+
+A, B, C 同时执行lock竞争锁 （假设A lock成功），A unlock 唤醒 一个线程（B) 时,  B 和新来的D.lock再次同时竞争锁。
+unlock, lock操作的部分原子汇编代码以c的伪代码表示，比如cmpxchg
+init  初始化:
+
+int futex = 0;  // 0 - 初始化状态，1 - 有进程获得锁  2 - 存在锁竞争
+A, B, C 并发lock操作：
+
+// 原子操作: 小括号内的多步操作
+// A, B, C 三个线程并发执行 lock，每个线程代码处于的状态
+if ((futex == 0 ? futex = 1 : 0))
+{
+// A 获得锁，设futex = 1
+}
+else
+{
+// futex_wait (futex, n): if futex == n, suspend
+if (futex = 2)
+futex_wait(futex, 2); // C 挂起
+while ((prev_futex = futex; futex = 2; prev_futex) != 0)
+{
+futex_wait(futex, 2); // B 挂起，设futex = 2
+}
+}
+A 执行unlock，唤醒B
+
+//
+unlock:
+if ((prev_futex = futex; futex = 0; prev_futex) > 1)
+{
+wake(futex, 1); // 唤醒一个进程，假设为B
+}
+被唤醒的B和新到达的D.lock 竞争：
+
+
+如果B能够先把futex从0设为2, 则B获得锁，D进入挂起状
+if (futex = 2)
+futex_wait(futex, 2); // D 挂起
+如果D能够先把futex从0设为1，则D获得锁，B再次执行的时候把futex设为2，B再次挂起。
+while ((prev_futex = futex; futex = 2; prev_futex) != 0)
+{
+futex_wait(futex, 2); // B 挂起，设futex = 2
+}
+semaphore （信号量）
+sem_init:
+
+value = 信号量个数
+nrwaiter = 0 //挂起的进程数
+sem_post:
+
+value += 1; // 实际实现方式：原子操作
+if (nwaiters > 0)
+{
+futex_wake(value, 1);
+}
+sem_wait:
+
+if ((value--) > 0) // 实际实现方式：原子操作
+return 0
+++nwaiters;
+while(1)
+{
+futex_wait(value);
+if (value-- > 0) // 实际实现方式：原子操作
+{
+break;
+}
+)
+--nwaiters // 实际实现方式：原子操作
+ Conditional variable (条件变量）
+
+ 
+pthread_cond_wait(cond, mutex) 需要传入互斥锁的原因：
+
+mutex能让依赖条件的判断 和 条件变量的wait操作成为一个原子操作。
+A 线程：
+if (x == 3）
+cond_wait(cond)
+B线程：
+x = 4;
+cond_sigal(cond);
+
+如果没有mutex的保护，执行顺序可能变成：
+x = 4; // B
+if (x == 3) // A
+cond_sigal(cond); // B
+cond_wait(cond) // A 将永远没人唤醒
+主要内部变量：
+
+unsigned int __futex;// futex锁，每次wait或 signal操作 +1
+_extension_ unsigned long long int __total_seq;// 每次wait操作 +1
+_extension_ unsigned long long int __wakeup_seq;// 每次signal操作 +1
+_extension_ unsigned long long int __woken_seq;// 每次waken 被唤醒时 +1
+unsigned int __broadcast_seq;// 每次broadcast + 1
+// conditional variable 处于唤醒状态时
+__wakeup_seq = __total_seq;
+__woken_seq = __total_seq;
+__futex = __total_seq * 2;
+init()
+
+__total_seq = __wakeup_seq = __woken_seq = __futex = __broadcast_seq = 0
+wait（）
+
+++__futex
+++__total_seq
+val = seq = __wakeup_seq;
+bc_seq = __broadcast_seq
+do {
+futex_wait(futex);
+if (bc_seq != __broadcast_seq)//检测是否是broadcast操作唤醒
+go bc_out;
+val = __wakeup_seq//检测是否是signal操作唤醒
+}
+while(var != seq || __woken_seq == val)
+
+++__woken_seq;
+bc_out:
+signal()
+
+if (__total_seq > __wakeup_seq)
+{
+++__wakeup_seq;
+++__futex;
+futex_wake(__futex, 1);
+}
+broadcast()
+
+if (__total_seq > __wakeup_seq)
+{
+__wakeup_seq = __total_seq;
+__woken_seq = __total_seq;
+__futex = __total_seq * 2;
+++__broadcast_seq//设置broadcast_seq标志
+}
+futex_wake(__futex, INT_MAX);
+rwlock (读写锁)
+主要内部变量:
+
+unsigned int __nr_readers;// 表示读锁的个数
+int __writer;// __writer = THREAD_GETMEM (THREAD_SELF, tid);
+unsigned int __nr_readers_queued;// 等待加锁的读锁个数
+unsigned int __nr_writers_queued;// 等待加锁的写锁个数
+
+__readers_wakeup// 读锁的futex，
+__writers_wakeup// 写锁的futex
+init()
+
+__nr_readers = 0
+__writer = 0
+__nr_readers_queued = 0
+__nr_writers_queued = 0
+rdlock()
+
+while(1)
+{
+/* 没有已lock成功的写锁 */
+if (__writer == 0
+/* 没有写锁在排队，或者读锁优先（即使有写锁等待，读锁也会继续lock成功）
+&& (!__nr_writers_queued || PTHREAD_RWLOCK_PREFER_READER_P(rwlock))
+{
+break;
+}
+++__nr_readers_queued;
+futex_wait(__readers_wakeup)// 挂起在读锁的futex
+--__nr_readers_queued;
+}
+wrlock()
+
+while(1)
+{
+// 如果没有lock成功的读锁和写锁
+if (_writer == 0 && __nr_readers == 0)
+{
+/* Mark self as writer. */
+__writer = THREAD_GETMEM (THREAD_SELF, tid);
+break;
+}
+++__nr_writers_queued;
+futex_wait(__writer_wakeup);// 挂起在写锁的futex
+--__nr_writers_queued;
+}
+unlock()
+
+if (__writer)
+{
+__writer = 0; // 写锁，置为0
+}
+else
+{
+-nr_readers; // 读锁，减
+}
+
+if (__nr_readers == 0) // 没有lock成功的读锁和写锁
+{
+/* 写锁和读锁都在等待时，写锁优先 */
+if (_nr_writers_queued) // 有写锁在等待
+{
+++__writer_wakeup;
+futex_wake(__writer_wakeup, 1); // 唤醒一个写锁
+}
+}
+else if (__nr_readers_queued)//有读锁在等待
+{
+++__readers_wakeup;
+futex_wake(__readers_wakeup, INT_MAX) // 唤醒所有读锁
+}
+}

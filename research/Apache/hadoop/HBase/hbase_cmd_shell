@@ -99,7 +99,7 @@ truncate 表名                            -- Disables, drops and recreates the 
   Commands: assign, balance_switch, balancer, close_region, compact, flush, major_compact, move, split, unassign, zk_dump
 
 
-major_compact 表名
+major_compact 表名                       -- 合并region下零散文件，执行物理删除(TTL)
 
 
   Group name: replication
