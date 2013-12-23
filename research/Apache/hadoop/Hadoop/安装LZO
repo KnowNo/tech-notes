@@ -1,0 +1,80 @@
+安装lzo支持压缩文件读写
+
+1. 编译安装lzo库
+下载lzo http://www.oberhumer.com/opensource/lzo/
+
+./configure --enable-shared
+make
+sudo make install
+
+库文件默认安装到/usr/local/lib目录下
+拷贝/usr/local/lib目录下得lzo库到/usr/lib【/usr/lib64】根据系统决
+cp /usr/local/lib/liblzo2.* /usr/lib
+cp /usr/local/lib/liblzo2.* /usr/lib64 （注意各个datanode节点的linux版本会不同,uname -a )
+
+2. 编译安装hadoop lzo库
+https://github.com/kevinweil/hadoop-lzo/downloads上下载最新版本源码
+目前为kevinweil-hadoop-lzo-4c5a227.tar.gz
+tar -zxvf kevinweil-hadoop-lzo-2ad6654.tar.gz
+cd kevinweil-hadoop-lzo-2ad6654
+export JAVA_HOME=/usr/java/jdk1.6.0_22
+export CFLAGS=-m32
+export CXXFLAGS=-m32
+ant compile-native
+or
+export JAVA_HOME=/usr/java/jdk1.6.0_22
+export CFLAGS=-m64
+export CXXFLAGS=-m64
+ant compile-native tar
+问题：如出现权限问题，可修改以下文件具有可执行
+chmod 755 /tmp/kevinweil-hadoop-lzo-4c5a227/kevinweil-hadoop-lzo-4c5a227/src/get_build_revision.sh
+
+ant tar
+将hadoop-lzo-0.4.15.tar.gz复制到需要的目录，解压
+建立link hadoop-lzo指向hadoop-lzo-0.4.15
+
+3. 添加配置属性
+
+.bashrc:
+
+export JAVA_LIBRARY_PATH=/home/cloud/hadoop-lzo/lib/native/Linux-amd64-64
+
+ 
+
+hadoop-env.sh:
+
+export HADOOP_LZO_HOME=/home/cloud/hadoop-lzo
+
+export HADOOP_CLASSPATH=${HADOOP_LZO_HOME}/hadoop-lzo-0.4.15.jar:$HADOOP_CLASSPATH
+export JAVA_LIBRARY_PATH=${HADOOP_LZO_HOME}/lib/native/Linux-amd64-64:${JAVA_LIBRARY_PATH}
+
+core-site.xml:
+<property>
+<name>io.compression.codecs</name> <value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,com.hadoop.compression.lzo.LzoCodec,com.hadoop.compression.lzo.LzopCodec,org.apache.hadoop.io.compress.BZip2Codec</value>
+</property>
+<property>
+<name>io.compression.codec.lzo.class</name>
+<value>com.hadoop.compression.lzo.LzoCodec</value>
+</property>
+
+mapred-site.xml:
+<property>
+<name>mapred.compress.map.output</name>
+<value>true</value>
+</property>
+<property>
+<name>mapred.map.output.compression.codec</name>
+<value>com.hadoop.compression.lzo.LzoCodec</value>
+</property>
+<property>
+<name>mapred.child.env</name>
+<value>JAVA_LIBRARY_PATH=/usr/local/hadoop/lib/native/Linux-amd64-64 or (Linux-i386-32)</value>
+</property>
+
+重启hadoop集群
+
+4.其他开发环境的支持
+
+console: export LD_LIBRARY_PATH=$JAVA_LIBRARY_PATH:$LD_LIBRARY_PATH
+
+eclipse: dbug configuration -> arguments -> vm arguments 添加 -Djava.library.path=/home/cloud/hadoop-lzo/lib/native/Linux-amd64-64

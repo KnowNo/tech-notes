@@ -1,0 +1,61 @@
+1. thrift安装
+
+    1.1 安装libevent 2.0.18
+
+          download --> 解压 --> ./configure --prefix=/usr --> make --> sudo make install
+
+          位于 /usr/lib 下。
+
+          libevent : 异步事件处理函数库，可以设定某些事件发生时所执行的函数。
+
+     1.2 安装boost 1.48.0
+
+           pre:
+
+                  安装 ICU:  sudo apt-get install libicu-dev
+
+                  ICU ： A C++ and C library that provides robust and full-featured Unicode and locale support.
+
+           download --> 解压 --> ./bootstrap.sh --prefix=/usr/local
+
+                                           --> sudo ./bjam install
+
+                                           --> sudo /sbin/ldconfig 
+
+            boost：提供源代码的C++标准库，相当于STL的延续和扩充。
+
+      1.3 安装python-dev
+
+            sudo apt-get install python-dev . 
+
+            否则会在thrfit make阶段报错：Python.h: No such file or directory
+
+             python-dev是一个开发套件，供其他程序调用。
+
+      1.4 安装bison
+
+            sudo apt-get install bison
+
+            否则会在thrift make阶段报错: yacc: command not found
+
+            bison ： GNU Project parser generator (yacc replacement)
+
+      1.5 安装flex
+
+            sudo apt-get install flex
+
+            否则会在thrift make阶段报错: flex: command not found
+
+            flex ： The fast lexical analyser generator
+
+      1.6 安装thrift
+
+             --> ./configure --without-php --without-php_extension \
+
+                                   --wiithout-ruby --with-boost=/usr/local
+
+            --> make
+
+            --> sudo make install
+
+            安装完成，which thrift查看安装路径

@@ -1,0 +1,114 @@
+Basic Hadoop/Zookeeper/HBase Setup
+
+    Zookeeper: ZooKeeper is a relatively lightweight process but more latency sensitive than the HBase Master. ZooKeeper serves everything out of memory, but it persists its data onto the disk as well
+
+        In production, recommend running three zookeeper nodes (must be odd number to vote for a majority)
+
+        Note that clocks on all ZooKeeper nodes must be synchronized. You can use Network Time Protocol (NTP) to have the clocks synchronized
+        zookeeper should have its own disk to write logs
+        remove zookeeper node from the regionserver list
+        reduce the number of mapper and reducer capacity on zookeeper node
+        If allow, collocate zookeeper and hbase master on dedicated machines
+        set swappiness to 0 for zookeeper node
+    OS configuration
+
+        changes the hadoop user's open file limit to 65535. Also changes the hbase user's max processes number to 32000. With this change of the kernel setting, HBase can keep enough files open at the same time and also run smoothly.
+
+            root# vi /etc/security/limits.conf
+            userID soft/hard nofile 65535
+            userID soft/hard nproc 32000
+            use ulimit -n and ulimit -u to check if the changes has been made
+
+        Swapping on HBase RegionServers is lethal and will degrade performance drastically, if not entirely kill the RegionServer process because of ZooKeeper timeouts
+
+        $ sysctl -w vm.swappiness=0 (default value is 60, range is from 0 to 100, the higher the value, the more aggressive the swapping)
+    HBase Master nodes
+        The HBase Master doesn’t do much heavy-duty work, but it’s wise to keep it on independent hardware if possible
+        4 cores, 8–16 GB RAM, and 2 disks are more than enough for the HBase Master nodes
+        HBase master and zookeeper nodes can be collocated on the same machine.
+    HBase RegionServer and Hadoop DataNode
+        8–12 cores, 24–32 GB RAM, 12x 1 TB disks is a good place to start
+        All region servers are configured in the $HBASE_HOME/conf/regionservers file
+        linking hdfs-site.xml under the $HBASE_HOME/conf directory, HBase will use all the client configurations you made for your HDFS in hdfs-site.xml
+
+Basic Hadoop/Zookeeper/HBase Configuration
+
+    HDFS (hdfs-site.xml)
+        dfs.support.append = true (The dfs.support.append property determines whether HDFS should support the append (sync) feature or not. The default value is false. It must be set to true, or you may lose data if the region server crashes)
+        dfs.datanode.max.xcievers = 4096 (have DataNode keep more threads open, to handle more concurrent requests)
+    Zookeeper
+        increase zookeeper's heap memory size so that it doesn't swap
+            in $ZK_HOME/conf/java.env: export JAVA_OPTS="-Xms1000m -Xmx1000m"
+        Increase ZooKeeper's maximum client connection number to handle more concurrent requests
+            echo "maxClientCnxns=60" >> $ZK_HOME/conf/zoo.cfg
+    HBase
+        Increase HBase's heap memory size to run HBase smoothly
+            $HBASE_HOME/conf/hbase-env.sh: export HBASE_HEAPSIZE=8000
+            Another way is that we can set a different heap size for HBase master and HBase regionServer
+                export HBASE_MASTER_OPTS="-Xmx2g"
+                export HBASE_REGIONSERVER_OPTS="-Xmx8g -Xms8g -Xmn128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode" -XX:CMSInitiatingOccupancyFraction=70
+        hbase.regionserver.lease.period = 600000，hbase.rpc.timeout should greater or equal than hbase.regionserver.lease.period
+
+Basic Hadoop/Zookeeper/HBase Monitoring/Operation
+
+    Use hbase hbck to check the consistency of current HBase cluster in every couple hours, send warning email if any inconsistency found
+        use hbase hbck - fix/repair to fix inconsistency
+        the reason cause incosistency including unassigned regions, multi-assigned regions, multi-assigned key/value pairs, region-in-transition (which is a false alarm)
+    Use hbase shell status to check the HBase cluster healthy status, send warning email if any regionserver is dead
+        one of the rootcause is that the machine got rebooted, but HBase is NOT restarted.
+    Use ganlia to monitor HBase/Hadoop cluster metrics
+        collect some daily, weekly report for tunning cluster performance
+    Tunning region number per regionServer vs. regionSize
+    HBase table backup policy
+    HBase table data expiration policy
+
+HBase performance tuning
+
+    Column family tuning
+        Block size to improve seek performance
+            For sequence-read application, should increase block size to reduce disk I/O by increase the number of data fetched each time
+            For random-read application, should decrease block size to reduce the in-block seek time
+
+            This is the parameter you set as a part of the column-family configuration for a given table, default value is 64KB
+        hbase.client.scanner.caching
+            default value is 1, when we changed scan caching to 100, This means the region server will transfer 100 rows at a time to the client to be processed. For some situations, such as running MapReduce to read data from HBase, setting this value to a bigger one makes the scan process much more efficient than the default. However, a higher caching value requires more memory to cache the rows for both the client and region server
+            On the other side, It also has the risk that the client may time out before it completes processing the date set and calls next() on the scanner. If the client process is fast, set caching higher. Otherwise, you will need to set it lower.
+
+            you can also specify a per-scan basis caching rows by using the HBase client Scan API as scan.setCaching(1000)
+        BlockCache
+            For sequence-read application, blockCache won't help much. 
+                You can disable the blockCache as a part of column-family configuration for a give table
+                You can also disable the blockCache for a particular scan to be cached by setting scan.setCacheBlocks(false)
+            For random-read application, blockCache size should be increase, use hfile.block.cache.size to tune the maximum percentage of heap that the block cache can use
+            Do not turn off block cache (You'd do it by setting hbase.block.cache.size to zero). Currently we do not do well if you do this because the regionserver will spend all its time loading hfile indices over and over again. If your working set it such that block cache does you no good, at least size the block cache such that hfile indices will stay up in the cache (you can get a rough idea on the size you need by surveying regionserver UIs; you'll see index block size accounted near the top of the webpage).
+        Bloom filters: HBase supports Bloom Filter to improve the overall throughput of the cluster. A HBase Bloom Filter is a space-efficient mechanism to test whether a StoreFile contains a specific row or row-col cell, there are two case where bloom filters will help
+            A single column family has multiple storefiles and some row keys are located in a few storefiles. Bloom Filter can help to skip reading unnecessary storefiles if client only wants the specific cell of the row which locates in a single storefile
+            If a rowkey is greater than the start index of a few storefiles, Bloom Filter can tell which storefile does contain the wanted rowkey, therefore saving disk i/o on reading unnecessary storefile.
+            The overhead is that every entry in Bloom Filter uses about one byte storage. Therefore, Bloom Filter only works for large cell column families. For example, if the average cell size is 1kB, the row level bloom filter will take 1 byte, therefore, the overhead is about 0.1%
+            Here we just to start with row-level bloom filter
+        Compression
+            Compression reduces the number of bytes written to/read from HDFS and save disk usage, but requires higher CPU utilization
+            Currently support gzip, lzo, and snappy, lzo and snappy has similar performance, both has fast data decompression vs. gzip, but lower compression ratio vs gzip. We decided to use lzo here
+        Cell version: hbase supports up to 3 cell version by default, set to 1 to so it doesn't hold multiple versions for the cell if you care about only one version
+    HBase cluster level tuning for read performance
+        Region size and region count per RegionServer
+            A lower number of regions is preferred, generally in the range of 20 to low-hundreds per RegionServer. Usually right around 100 regions per RegionServer has yielded the best results. Adjust the regionsize as appropriate to achieve this number
+            For the 0.90.x codebase, the upper-bound of regionsize is about 4GB, with a default of 256MB. For 0.92.x codebase, due to the HFile v2 change much larger regionsizes can be supported (e.g., 20GB).
+        Region Balance:
+            Region balance helps to smooth number of regions in each regionServer, therefore reduce the number of requests to hot regionServers
+            It is recommended to do a major compaction once in a while to help improve the data locality
+        Compaction
+            minor-compaction:
+            Major-compaction: For certain situations, or when triggered by a configured interval (once a day by default), major compaction runs automatically. Major compaction will drop the deleted or expired cells and rewrite all the StoreFiles in the Store into a single StoreFile; this usually improves the performance. However, as major compaction rewrites all of the Stores' data, lots of disk I/O and network traffic might occur during the process. This is not acceptable on a heavy load system.
+                If major_compaction eats a lot of system resource, increase the major compaction intervals to once a week by setting hbase.hregion.majorcompaction, default value is 86400000 in milliseconds
+    Hadoop cluster level tuning for read performance
+        mapred.map.tasks.speculative.execution and mapred.reduce.tasks.speculative.execution
+            Speculative Execution of MapReduce tasks is on by default. It is generally advisable to turn off speculative execution for MapReduce jobs that use HBase as a source. This can either be done on a per-Job basis through properties, on on the entire cluster. Especially for longer running jobs, speculative execution will create duplicate map-tasks which will double-write your data to HBase; this is probably not what you want.
+        Push data-filtering criteria down to the server. This saves network I/O by limiting the data transferred over the network. But data is still read off the disk into the RegionServers, and filters are applied at the RegionServers.
+    HBase cluster level tuning for write performance： the basic concept is to avoid minor compaction, memStore flush, region split
+        hbase.hregion.max.filesize
+
+        hbase.hregion.memstore.flush.size
+
+        hbase.regionserver.global.memstore.lowerLimit and hbase.regionserver.global.memstore.upperLimit
+        Garbage collection tuning
