@@ -185,7 +185,20 @@ deleteall 'supplier','user2', 'general'       -- X -- 不能按colum family
 deleteall 'supplier','user2'
 
 
+------- 管理命令
 
+设置TTL，并执行 major_compact
+
+count 'supplier'
+disable 'supplier'
+alter 'supplier', {NAME => 'cf0',TTL => '8640000'}, {NAME => 'cf1',TTL => '8640000'}, {NAME => 'cf2',TTL => '8640000'}
+enable 'supplier'
+# 先enable，才能执行
+major_compact 'supplier'
+------
+hadoop fs -ls /hbase/supplier/*/cf0 | sort -k6 > supplier_cf0s
+查看各文件时间，观察总时长
+------
 
 
 
