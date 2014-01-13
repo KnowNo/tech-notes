@@ -1,0 +1,14 @@
+
+# reduce函数没有执行，直接输出map结果
+
+reduce函数为: public void reduce(Text key, Iterator<ProtobufWritable<Audience> > values, Context context)
+
+这里Iterator错了，0.20.2改成了Iterable，而Iterator还是0.19的写法。
+即，未override基类的reduce函数，相当于没有实现reduce，而实现了一个同名函数。
+
+加@Override, 函数会报错。 
+--->
+正确写法： public void reduce(Text key, Iterable<ProtobufWritable<Audience> > values, Context context)
+
+
+
