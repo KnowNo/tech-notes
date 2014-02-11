@@ -1,0 +1,28 @@
+来自: 元创 (深圳)
+2008-09-23创建   2009-05-18更新 
+
+现在我推荐你从Django 1.0 template development入门。
+　　
+　　-----------
+　　在采用Django1.0的书出来以前，我对所有学习Django的同学提三个忠告：
+　　一、 勤查官方文档，我们知道现在的书中都有些东西过时了。
+　　二、 Google一下别人是怎么做的。比如布置apache/mod_python非google不能搞掂。
+　　三、 逐步学会看源代码。因为官方文档可能也太简单，或太抽象，或不严谨。这还会提高你的编码水平。在python中查一个import的东西是非常容易的，如果别的地方没有，你可以看看__init__.py。
+　　
+　　在采用Django1.0的书出来以前，学习Django的正确途径是：
+　　一、 在官网上学会安装、抄写和运行“你的第一个django应用”。
+　　二、 如果你的毅力等级为四星以上，进入第四步。
+　　三、 学习《Teaching Yourself Django 24 Hours》或《Learning Website Development with Django》。你不会不写代码试一试吧。请记住忠句一。
+　　四、 读读《The Definitive Guide to Django》。记住忠句一、二。
+　　五、 读读《Practical Django Projects》。
+　　六、 读读《Next-Generation Web Frameworks in Python》，这本书只有43页。如果你觉得Django的template不爽，你可以到pylons中找一个你喜欢的。
+　　七、 再读读《The Definitive Guide to Django》，记住忠告三。
+　　八、 现在你不需要书了，两个网址你应该经常光顾：官网（多关注community）和http://www.djangosnippets.org/。
+　　
+　　注意，第一步必不可少。否则不work的代码会使你与django无缘。
+　　
+　　是的，我基本上忽略了《Professional Python Frameworks》，你也可以忽略。
+　　
+　　还有一点要说明，我假设你安装的是django1.0。如果你在现在安装的是django0.96或更早版，并开始准备学习django，我基本忽略了你。 
+
+
