@@ -1,0 +1,69 @@
+
+2014-01-08
+
+1. 下载最新版代码包 (unix-like用户从代码安装更好，容易安装并且可定制)
+httpd-2.4.7.tar.bz2
+解压: httpd-2.4.7
+
+2. 需要APR and APR-Util (Apache portable Run-time libraries,Apache可移植运行库)
+
+从http://apr.apache.org/compiling_unix.html 下载最新版：apr-1.5.0.tar.bz2  apr-util-1.5.3.tar.bz
+解压并去掉目录版本号，放到 httpd-2.4.7/srclib/下: apr, apr-util
+
+use ./configure's --with-included-apr option.
+
+3. PCRE(Perl Compatible Regular Expressions) Perl库兼容的正规表达式库
+
+Download the source code from http://www.pcre.org: 
+pcre-8.34.tar.bz2
+
+If your build system can't find the pcre-config script installed by the PCRE build, point to it using the --with-pcre parameter.
+
+4. 编译、安装
+./configure --with-included-apr
+make
+make install
+
+5. 测试
+$ ./bin/apachectl -k start
+/usr/local/apache2/bin/httpd: error while loading shared libraries: libpcre.so.1: cannot open shared object file: No such file or directory
+
+$ sudo find / -name libpcre.so.1
+/home/zhongxia/software/apache/pcre-8.34/.libs/libpcre.so.1
+/usr/local/lib/libpcre.so.1
+
+
+6. 重新编译、安装
+$ cd pcre-8.34
+
+sudo make uninstal
+./configure --prefix=/usr/local/pcre
+make
+make install
+
+cd httpd-2.4.7
+
+./configure --with-apr=./srclib/apr/ --with-apr-util=./srclib/apr-util/ --with-pcre=/usr/local/pcre
+make
+make install
+
+7. 测试
+
+$ sudo ./bin/apachectl -k start
+[sudo] password for zhongxia: 
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppress this message
+
+http://localhost/
+http://127.0.1.1/
+------------------
+It works!
+------------------
+
+/usr/local/apache2/htdocs/index.html
+
+
+$sudo ./bin/apachectl -k stop
+
+
+
+

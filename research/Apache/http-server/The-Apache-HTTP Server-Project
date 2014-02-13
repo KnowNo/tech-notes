@@ -1,0 +1,13 @@
+
+The Number One HTTP Server On The Internet
+
+The Apache HTTP Server Project is an effort to develop and maintain an open-source HTTP server for modern operating systems including UNIX and Windows NT. The goal of this project is to provide a secure, efficient and extensible server that provides HTTP services in sync with the current HTTP standards.
+
+Apache httpd has been the most popular web server on the Internet since April 1996, and celebrated its 17th birthday as a project this February(2013).
+
+The Apache HTTP Server ("httpd") is a project of The Apache Software Foundation.
+
+
+What is the Apache HTTP Server Project?
+
+The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server. The project is jointly managed by a group of volunteers located around the world, using the Internet and the Web to communicate, plan, and develop the server and its related documentation. This project is part of the Apache Software Foundation. In addition, hundreds of users have contributed ideas, code, and documentation to the project. This file is intended to briefly describe the history of the Apache HTTP Server and recognize the many contributors.

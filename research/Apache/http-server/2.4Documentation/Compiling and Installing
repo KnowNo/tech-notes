@@ -1,0 +1,119 @@
+
+http://httpd.apache.org/docs/2.4/install.html#download
+
+Compiling and Installing
+
+
+Apache httpd uses libtool and autoconf to create a build environment that looks like many other Open Source projects.
+
+If you are upgrading from one minor version to the next (for example, 2.2.50 to 2.2.51), please skip down to the upgrading section.
+
+-----------------------------------------------------------------------
+Download 	$ lynx http://httpd.apache.org/download.cgi
+Extract 	$ gzip -d httpd-NN.tar.gz
+		$ tar xvf httpd-NN.tar
+		$ cd httpd-NN
+Configure 	$ ./configure --prefix=PREFIX
+Compile 	$ make
+Install 	$ make install
+Customize 	$ vi PREFIX/conf/httpd.conf
+Test 	$ PREFIX/bin/apachectl -k start
+-----------------------------------------------------------------------
+
+If PREFIX is not specified, it defaults to /usr/local/apache2.
+
+
+==Requirements==
+
+The following requirements exist for building Apache httpd:
+
+APR and APR-Util (Apache portable Run-time libraries,Apache可移植运行库)
+    download the latest versions of both APR and APR-Util from Apache APR, unpack them into 
+    ./srclib/apr and ./srclib/apr-util  (apache/httpd-NN/srclib)
+    be sure the directory names do not have version numbers; use ./configure's --with-included-apr option
+
+Perl-Compatible Regular Expressions Library (PCRE)
+
+Disk Space
+    at least 50 MB of temporary free disk space available. After installation the server occupies approximately 10 MB of disk space.
+
+ANSI-C Compiler and Build System
+
+Accurate time keeping
+    Elements of the HTTP protocol are expressed as the time of day
+
+Perl 5 [OPTIONAL]
+
+==Download==
+
+Most users of Apache on unix-like systems will be better off downloading and compiling a source version. 
+
+The build process (described below) is easy, and it allows you to customize your server to suit your needs. 
+In addition, binary releases are often not up to date with the latest source releases
+
+it is important to verify that you have a complete and unmodified version of the Apache HTTP Server.
+
+
+==Extract==
+
+$ gzip -d httpd-NN.tar.gz
+$ tar xvf httpd-NN.tar 
+
+
+==Configuring the source tree==
+
+need to have autoconf and libtool installed and will need to run buildconf before proceeding with the next steps.
+
+To configure the source tree using all the default options, simply type ./configure.
+
+The most important option is the location --prefix where Apache is to be installed later
+By default, make install will install all the files in /usr/local/apache2/bin, /usr/local/apache2/lib etc. 
+You can specify an installation prefix other than /usr/local/apache2 using --prefix, for instance --prefix=$HOME.
+
+Also at this point, you can specify which features you want included in Apache by enabling and disabling modules. 
+指定Apache支持的功能和包括的模块。 --enable-module  --disable-module option
+Be careful when using these options, since configure cannot warn you if the module you specify does not exist; it will simply ignore the option.
+注意，如果模块不存在，编译时不会提示，而是忽略此选项。
+The Apache HTTP Server is a modular program where the administrator can choose the functionality to include in the server by selecting a set of modules. Modules will be compiled as Dynamic Shared Objects (DSOs) that exist separately from the main httpd binary file.
+http://httpd.apache.org/docs/2.4/dso.html
+独立的动态模块 DSOs
+You can also choose to compile modules statically by using the option --enable-module=static.
+也可以静态编译
+
+$ ./configure --with-included-apr
+
+==Build==
+$ make
+
+==Install==
+$ make install
+
+==Customize== 定制
+$ vi PREFIX/conf/httpd.conf   (/usr/local/apache2/conf/httpd.conf)
+
+Have a look at the Apache manual under PREFIX/docs/manual/
+or consult http://httpd.apache.org/docs/2.4/ for this manual and a complete reference of available configuration directives.
+
+http://httpd.apache.org/docs/2.4/configuring.html
+http://httpd.apache.org/docs/2.4/mod/directives.html
+
+==Test== 测试
+$ PREFIX/bin/apachectl -k start
+
+You should then be able to request your first document via the URL 
+http://localhost/
+The web page you see is located under the DocumentRoot, which will usually be 
+PREFIX/htdocs/
+
+$ PREFIX/bin/apachectl -k stop
+
+==Upgrading== #TODO
+
+$ ./config.nice
+$ make
+$ make install
+$ PREFIX/bin/apachectl -k graceful-stop
+$ PREFIX/bin/apachectl -k start
+
+
+

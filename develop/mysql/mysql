@@ -12,6 +12,7 @@ mysql-admin GUI管理工具
 MySql + ruby
 -----
 1－mysql server
+sudo apt-get install mysql-client
 sudo apt-get install mysql-server
 
 2－mysql ruby相关开发包
