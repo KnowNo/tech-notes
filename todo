@@ -1,13 +1,9 @@
-SQL    
 
-Junit
-Maven
-
-proto
-thrift
-
-Java
+Advertising monitoring/advertiser/publisher
 
 hadoop/mapreduce/hbase/hive/pig/sqoop
 
-Advertising monitoring
+Java/Junit/Maven
+
+proto/thrift
+
