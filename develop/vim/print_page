@@ -1,0 +1,44 @@
+tag命令用法：
+Ctrl＋］  跳到当前光标下单词的标签
+Ctrl＋O  返回上一个标签
+Ctrl＋T  返回上一个标签
+:tag TagName 跳到TagName标签
+以上命令是在当前窗口显示标签，当前窗口的文件替代为包标签的文件，当前窗口光标跳到标签位置。如果不希望在当前窗口显示标签，可以使用以下命令：
+:stag TagName 新窗口显示TagName标签，光标跳到标签处
+Ctrl＋W + ］  新窗口显示当前光标下单词的标签，光标跳到标签处
+当一个标签有多个匹配项时（函数 (或类中的方法) 被多次定义），":tags" 命令会跳转到第一处。如果在当前文件中存在匹配，那它将会被首先使用。
+可以用这些命令在各匹配的标签间移动：
+:tfirst    到第一个匹配
+:[count]tprevious 向前 [count] 个匹配
+:[count]tnext  向后 [count] 个匹配
+:tlast    到最后一个匹配
+或者使用以下命令选择要跳转到哪一个
+:tselect TagName
+输入以上命令后，vim会为你展示一个选择列表。然后你可以输入要跳转到的匹配代号 (在第一列)。其它列的信息可以让你知道标签在何处被定义过。
+以下命令将在预览窗口显示标签
+:ptag TagName 预览窗口显示TagName标签，光标跳到标签处
+Ctrl＋W + }  预览窗口显示当前光标下单词的标签，光标跳到标签处
+:pclose   关闭预览窗口
+:pedit file.h 在预览窗口中编辑文件file.h（在编辑头文件时很有用）
+:psearch atoi 查找当前文件和任何包含文件中的单词并在预览窗口中显示匹配，在使用没有标签文件的库函数时十分有用。 
+
+当自动补全下拉窗口弹出后，一些可用的快捷键:
+Ctrl+P  向前切换成员
+Ctrl+N  向后切换成员
+Ctrl+E  表示退出下拉窗口, 并退回到原来录入的文字
+Ctrl+Y  表示退出下拉窗口, 并接受当前选项
+其他补全方式:
+Ctrl+X Ctrl+L 整行补全
+Ctrl+X Ctrl+N  根据当前文件里关键字补全
+Ctrl+X Ctrl+K  根据字典补全
+Ctrl+X Ctrl+T  根据同义词字典补全
+Ctrl+X Ctrl+I  根据头文件内关键字补全
+Ctrl+X Ctrl+]  根据标签补全
+Ctrl+X Ctrl+F  补全文件名
+Ctrl+X Ctrl+D  补全宏定义
+Ctrl+X Ctrl+V  补全vim命令
+Ctrl+X Ctrl+U  用户自定义补全方式
+Ctrl+X Ctrl+S  拼写建议
+帮助文档
+:help omnicppcomplete
+

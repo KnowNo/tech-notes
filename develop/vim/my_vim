@@ -1,0 +1,88 @@
+
+
+参考: 一步步将vim改造成C/C++开发环境(IDE)  
+
+
+1、安装Vim和Vim基本插件
+
+~$ sudo apt-get install vim vim-scripts vim-doc
+
+其中vim-scripts是vim的一些基本插件，包括语法高亮的支持、缩进等等。
+
+2、Vim配置文件
+
+Vim强大的功能，其来源基本上就两个地方：Vim插件以及Vim配置文件。
+
+系统配置 /usr/share/vim/和/etc/vim/  ---- 不修改
+用户配置 /home/user/.vimrc
+
+----------
+报错:
+line    3:
+E492: Not an editor command:      debian.vim
+
+-> 注释掉:  -> 有什么问题？
+" debian.vim  
+
+
+3、ctags安装与配置
+ctags可以建立源码树的标签索引（标签就是一个标识符被定义的地方，如函数定义），使程序员在编程时能迅速定位函数、变量、宏定义等位置去查看原形。
+
+$ sudo apt-get install ctags
+
+/usr/include/x86_64-linux-gnu$ sudo ctags -R *
+/usr/include/c++$ sudo ctags -R *
+
+.vimrc文件的最后添加如下内容：
+    "--ctags setting--
+    " 按下F5重新生成tag文件，并更新taglist
+    map <F5> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+    imap <F5> <ESC>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+    set tags=tags
+    set tags+=./tags "add current directory's generated tags file
+    set tags+=/usr/include/x86_64-linux-gnu/tags "add new tags file
+    set tags+=/usr/include/c++/tags
+
+
+4、管理vim插件——vim-addons
+通过vim-addons，我们可以管理vim插件。我们在sudo apt-get install vim vim-scripts vim-doc时，一般会自动安装上vim-addons。
+sudo apt-get install vim-addon-manager手动安装。
+
+$ vim-addons status
+
+# Name                     User Status  System Status 
+align                       removed       removed       
+alternate                   removed       removed       
+bufexplorer                 removed       removed       
+calendar                    removed       removed
+
+$ cd
+$ mkdir .vim   " /home/user/.vim
+$ cd .vim
+$ mkdir plugin
+$ mkdir doc  
+
+vim-addons install xxxx
+
+
+5、vim自动补全——OmniCppComplete
+
+$ vim-addons install omnicppcomplete 
+$ ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
+
+/usr/include/c++$ sudo ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
+/usr/include/x86_64-linux-gnu$ sudo ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
+
+按下Ctrl+X Ctrl+O
+
+
+6、提示函数原型echofunc
+echofunc可以在命令行中提示当前输入函数的原型。
+
+
+
+
+
+
+
+
