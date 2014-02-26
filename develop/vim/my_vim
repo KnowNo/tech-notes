@@ -79,6 +79,71 @@ $ ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
 6、提示函数原型echofunc
 echofunc可以在命令行中提示当前输入函数的原型。
 
+$ ctags -R --fields=+lS
+
+
+7、标签浏览器Taglist
+
+$ vim-addons install taglist
+
+命令":Tlist"打开/关闭taglist窗口
+
+:help taglist.txt
+
+
+8、文件浏览器和缓冲区管理器WinManager
+
+Taglist插件本身就提供了对WinManager的支持，这里，用WinManager来管理文件浏览器netrw和标签浏览器Taglist。
+
+netrw是标准的vim插件, 已经随vim一起安装进系统里
+~$ vim-addons install winmanager 
+
+
+9、buffer管理器MiniBufferExplorer
+MiniBufferExplorer用于浏览和管理buffer，如果只打开一个文件，是不会显示在屏幕上的，而打开多个文件之后，会自动出现在屏幕上。
+
+"缓冲区" 是一块内存区域，里面存储着正在编辑的文件。
+"窗口" 被用来查看缓冲区里的内容。
+"屏幕" Vim 所用的整个工作区域，可以是一个终端模拟窗口，也被叫做 "Vim 窗口"。
+
+$ vim-addons install minibufexplorer 
+
+
+10、代码折叠fold
+
+折叠用于把缓冲区内某一范围内的文本行显示为屏幕上的一行。
+
+11*、项目目录数管理器Project
+Project插件是用来显示项目的目录树的，这个目录树是默认保存在~/.vimprojects文件中。
+
+$ vim-addons install project 
+
+
+12、quickfix命令集
+通过quickfix命令集，你可在 Vim 内编译程序并直接跳转到出错位置进行修正。你可以接着重新编译并做修正，直到不再出错为止。
+
+
+13*、Cscope
+Cscope是一个类似于ctags的工具，不过其功能比ctags强大很多。
+
+~$ sudo apt-get install cscope
+
+用法：
+<1>、为源码建立一个cscope数据库
+~ $ cscope -Rbq
+~ $ ls cscope.*
+cscope.in.out  cscope.out  cscope.po.out
+<2>、用vim打开某个源码文件，末行模式下，输入“:cs add cscope.out"（该命令已被我们映射为快捷键F4），添加cscope数据库到vim。因为我们已将vim配置为启动时，自动添加当前目录下的cscope数据库，所以你再添加该cscope数据库时，vim会提示“重复cscope数据库 未被加入“
+<3>、完成前两步后，现在就可以用“cs find c”等Cscope查找命令查找关键字了。我们已在.vimrc中将“cs find c”等Cscope查找命令映射为<C-_>c等快捷键（按法是先按Ctrl+Shift+-, 然后很快按下c）
+
+
+
+
+
+
+
+
+
 
 
 
