@@ -1,0 +1,29 @@
+
+Vim初探（五）——打造Python IDE
+
+１.文法高亮
+
+下载python.vim 
+: Enhanced version of the python syntax highlighting script
+http://www.vim.org/scripts/script.php?script_id=790
+
+放到 <Vim安装目录>/<$VIMRUNTIME>/syntax/下          ----------     /usr/share/vim/vim73/syntax
+
+
+为了能让Vim识别Python文法需要在vimrc中添加：
+
+set filetype=python
+au BufNewFile,BufRead *.py,*.pyw setf python
+
+2.缩进
+
+　　在vimrc中添加如下缩进相关的代码：
+
+set autoindent " same level indent
+set smartindent " next level indent
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+
+
