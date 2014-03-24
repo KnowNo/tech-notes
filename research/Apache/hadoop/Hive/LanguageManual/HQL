@@ -1,0 +1,153 @@
+
+===The Hive Shell===
+
+HiveQL is Hive’s query language, a dialect of SQL.
+
+Like SQL, HiveQL is generally case insensitive (except for string comparisons).
+
+The -f option runs the commands in the specified file;
+% hive -f script.q
+
+The -e option to specify the commands inline;
+% hive -e 'SELECT * FROM dummy'
+
+Hive will print information to standard error, You can suppress these messages using 
+the -S option at launch time, which has the effect of only showing the output result for queries
+% hive -S -e 'SELECT * FROM dummy'
+
+
+----HQL----
+
+COUNT() 需要和 Group By 一起使用
+distinct必须放在开头, 也不一定;
+group by 必须放在 order by 和 limit之前;
+
+
+======== Select Syntax ========
+
+SELECT [ALL | DISTINCT] select_expr, select_expr, ...
+FROM table_reference
+[WHERE where_condition]
+[GROUP BY col_list]
+[CLUSTER BY col_list
+  | [DISTRIBUTE BY col_list] [SORT BY col_list]
+]
+[LIMIT number]
+
+
+==== ALL and DISTINCT Clauses
+
+是否输出冗余行，默认为ALL.
+
+==== Partition Based Queries
+
+SELECT 查询通常扫描全表，但由 PARTITIONED BY 创建的表，可以只扫描分区部分。 
+
+==== HAVING Clause
+
+SELECT col1 FROM t1 GROUP BY col1 HAVING SUM(col2) > 10
+
+==== LIMIT Clause
+
+SELECT * FROM t1 LIMIT 5;                            ---- Limit 返回的行是随机选择的
+
+- TOP K Query :
+
+SET mapred.reduce.tasks = 1                          
+SELECT * FROM sales SORT BY amount DESC LIMIT 5      ------ (sort by）
+
+or
+
+SELECT * FROM sales ORDER BY amount DESC LIMIT 5     ------ (oder by)
+
+
+==== REGEX Column Specification
+
+SELECT `(ds|hr)?+.+` FROM sales                      ---- Java 正则式
+
+Try http://www.fileformat.info/tool/regex.htm for testing purposes.
+
+==== Group By 
+
+SELECT expression (, expression)* FROM src
+  GROUP BY groupByExpression (, groupByExpression)*
+ 
+Group by 下可以做不同的聚合，但是，不同的 DISTINCT 只能作用于同一列。（底层实现可能只做一次扫描）
+
+允许：
+SELECT pv_users.gender, count(DISTINCT pv_users.userid), count(*), sum(DISTINCT pv_users.userid)
+FROM pv_users
+GROUP BY pv_users.gender;
+
+不允许：
+INSERT OVERWRITE TABLE pv_gender_agg
+SELECT pv_users.gender, count(DISTINCT pv_users.userid), count(DISTINCT pv_users.ip)
+FROM pv_users
+GROUP BY pv_users.gender;
+
+Group by 的高级特性：
+- Multi-Group-By Inserts
+- Map-side Aggregation for Group By
+  This usually provides better efficiency, but may require more memory to run successfully.
+  set hive.map.aggr=true;
+  SELECT COUNT(*) FROM table2;
+- Grouping Sets, Cubes, Rollups, and the GROUPING__ID Function
+
+
+==== SORT BY, ORDER BY, CLUSTER BY, DISTRIBUTE BY
+
+- Order By
+
+SELECT expression (',' expression)* FROM src 
+  ORDER BY colName ( ASC | DESC )? (',' colName ( ASC | DESC )?)*
+
+限制:
+strict mode (i.e., hive.mapred.mode=strict), 需要追加 "limit" 语句;
+nonstrict mode (set hive.mapred.mode=nonstrict), "limit" 不是必须的;
+因为需要一个（单独）的reducer对最终结果排序，如果不限制，如果结果太多，执行时间会很长。
+
+- Sort By 
+ 
+SELECT expression (',' expression)* FROM src 
+   SORT BY colName ( ASC | DESC )? (',' colName ( ASC | DESC )?)*
+
+对进入reducer前的rows排序; 
+Hive supports SORT BY which sorts the data per reducer.
+
+与order by的区别:
+ order by 能够保证所有结果的排序；
+ sort by 只能保证一个reducer内部的排序，reducer多余一个时，只是部分排序的结果；
+
+每个reducer按指定维度排序:
+SELECT key, value FROM src SORT BY key ASC, value DESC
+
+Setting Types for Sort By:
+After a transform, variable types are generally considered to be strings, 
+meaning that numeric data will be sorted lexicographically.
+
+FROM (FROM src
+            SELECT TRANSFORM(value)
+            USING 'mapper'
+            AS value, count) mapped
+SELECT cast(value as double) AS value, cast(count as int) AS count
+SORT BY value, count
+
+- Cluster By and Distribute By
+
+Distribute By 用于分发数据行到不同reducer, 具有相同列值的数据行，将被分发到同一个reducer.
+
+Distribute By 不保证相同列值的行，在相邻的位置，而
+Cluster By 则保证相同列值的行，在相邻位置。
+
+Cluster By is a short-cut for both Distribute By and Sort By. 
+(Cluster By = Distribute By + Sort By)
+
+
+==== Hive Joins
+
+
+
+
+
+
+

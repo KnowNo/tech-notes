@@ -102,3 +102,54 @@ Client does not support authentication protocol requested by server; consider up
 mysql> update mysql.user set password=old_password('izene123') where host='localhost' and user='root';
 mysql> FLUSH PRIVILEGES;
 
+-- Q
+忘记root密码
+-- A
+1) /etc/mysql/my.cnf
+在[mysqld]的段中加上一句：skip-grant-tables 
+2) 重启mysql
+sudo service mysql restart
+3) 进入mysql, 设置root密码
+
+mysql> USE mysql; 
+
+mysql> select Host,User,Password from user;
++------------------+------------------+-------------------------------------------+
+| Host             | User             | Password                                  |
++------------------+------------------+-------------------------------------------+
+| localhost        | root             | *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |
+| zhongxia-desktop | root             | *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |
+| 127.0.0.1        | root             | *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |
+| ::1              | root             | *6BB4837EB74329105EE4568DDA7DC67ED2CA2AD9 |
+| localhost        |                  |                                           |
+| zhongxia-desktop |                  |                                           |
+| localhost        | debian-sys-maint | *0E6EB50328B5DFCA5C3324071134BE75C3CC7FDE |
++------------------+------------------+-------------------------------------------+
+
+mysql> UPDATE user SET Password = password ( 'root123' ) WHERE User = 'root' ; 
+Query OK, 4 rows affected (0.01 sec)
+Rows matched: 4  Changed: 4  Warnings: 0
+
+mysql> select Host,User,Password from user;
++------------------+------------------+-------------------------------------------+
+| Host             | User             | Password                                  |
++------------------+------------------+-------------------------------------------+
+| localhost        | root             | *FAAFFE644E901CFAFAEC7562415E5FAEC243B8B2 | --- 加密的密码
+| zhongxia-desktop | root             | *FAAFFE644E901CFAFAEC7562415E5FAEC243B8B2 |
+| 127.0.0.1        | root             | *FAAFFE644E901CFAFAEC7562415E5FAEC243B8B2 |
+| ::1              | root             | *FAAFFE644E901CFAFAEC7562415E5FAEC243B8B2 |
+| localhost        |                  |                                           |
+| zhongxia-desktop |                  |                                           |
+| localhost        | debian-sys-maint | *0E6EB50328B5DFCA5C3324071134BE75C3CC7FDE |
++------------------+------------------+-------------------------------------------+
+
+创建新密码
+insert into mysql.user(Host,User,Password) values("localhost","APP",password("mine"));
+
+4) 将刚才在[mysqld]的段中加上的skip-grant-tables删除 
+5) 重启mysql
+sudo service mysql restart
+
+
+
+

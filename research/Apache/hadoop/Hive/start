@@ -1,11 +1,47 @@
 
+http://hive.apache.org/index.html
+
 https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 
-HIVE_HOME
-PATH=PATH:$HIVE_HOME/bin
+==安装
+
+----从安装包：
+1) 解压
+2) 设置 HIVE_HOME
+3) export PATH=PATH:$HIVE_HOME/bin
+
+----从source：
+1) 需要编译 
+
+==设置
 
 hadoop fs -mkdir /tmp
 hadoop fs -chmod g+w /tmp
-hadoop fs -ls /user/hive/warehouse
+hadoop fs -ls /user/hive/warehouse            ---- (aka,also know as hive.metastore.warehouse.dir)
 hadoop fs -chmod g+w /user/hive/warehouse
+
+
+==Error Logs
+
+/tmp/<user.name>/hive.log
+
+==DDL Hive Data Definition Language.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

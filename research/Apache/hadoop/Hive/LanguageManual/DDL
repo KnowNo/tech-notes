@@ -1,0 +1,85 @@
+
+
+
+Hive Data Definition Language
+
+---- DDL ------  
+
+Overview
+
+HiveQL DDL statements are documented here, including:
+
+    CREATE DATABASE/SCHEMA, TABLE, VIEW, FUNCTION, INDEX
+    DROP DATABASE/SCHEMA, TABLE, VIEW, INDEX
+    TRUNCATE TABLE
+    ALTER DATABASE/SCHEMA, TABLE, VIEW
+    MSCK REPAIR TABLE (or ALTER TABLE RECOVER PARTITIONS)
+    SHOW DATABASES/SCHEMAS, TABLES, TBLPROPERTIES, PARTITIONS, FUNCTIONS, INDEX[ES], COLUMNS, CREATE TABLE
+    DESCRIBE DATABASE, table_name, view_name
+
+PARTITION statements are usually options of TABLE statements, except for SHOW PARTITIONS.
+
+    Create/Drop/Grant/Revoke Roles and Privileges   -- 授权
+-----------------
+
+
+- Create/Drop/Alter Database
+
+- Create/Drop/Truncate Table
+
+CREATE [EXTERNAL] TABLE [IF NOT EXISTS] [db_name.]table_name
+
+CREATE [EXTERNAL] TABLE [IF NOT EXISTS] [db_name.]table_name
+  LIKE existing_table_or_view_name
+  [LOCATION hdfs_path]
+
+data_type
+  : primitive_type
+  | array_type
+  | map_type
+  | struct_type
+  | union_type (Note: Only available starting with Hive 0.7.0)
+ 
+primitive_type
+  : TINYINT
+  | SMALLINT
+  | INT
+  | BIGINT
+  | BOOLEAN
+  | FLOAT
+  | DOUBLE
+  | STRING
+  | BINARY (Note: Only available starting with Hive 0.8.0)
+  | TIMESTAMP (Note: Only available starting with Hive 0.8.0)
+  | DECIMAL (Note: Only available starting with Hive 0.11.0)
+  | DECIMAL(precision, scale) (Note: Only available starting with Hive 0.13.0)
+  | VARCHAR (Note: Only available starting with Hive 0.12.0)
+  | CHAR (Note: Only available starting with Hive 0.13.0)
+
+External Tables  创建外部表
+  The EXTERNAL keyword lets you create a table and provide a LOCATION so that Hive does not use a default location for this table.
+  data in the table is NOT deleted from the file system.
+
+Create Table Like  通过拷贝其他表定义来创建表
+  The LIKE form of CREATE TABLE allows you to copy an existing table definition exactly (without copying its data). 
+
+
+Hive Data Definition Language.
+
+- Alter Table
+
+Rename Table   
+  ALTER TABLE table_name RENAME TO new_table_name
+
+Alter Table Properties
+  ALTER TABLE table_name SET TBLPROPERTIES table_properties
+ 
+  table_properties:
+    : (property_name = property_value, property_name = property_value, ... )
+
+Alter Table Comment
+
+
+
+
+
