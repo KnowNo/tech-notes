@@ -1,0 +1,13 @@
+
+$ python
+
+-- 安装Django
+
+tar xzvf Django-1.6.2.tar.gz
+cd Django-1.6.2
+sudo python setup.py install
+
+-- 验证
+
+$ python -c "import django; print(django.get_version())"
+

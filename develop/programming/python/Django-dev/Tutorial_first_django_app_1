@@ -1,0 +1,67 @@
+
+== part 1
+
+-- Creating a project    创建项目
+$ django-admin.py startproject mysite
+
+mysite/
+    manage.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+        wsgi.py
+
+-- The development server 开发用服务器
+$ python manage.py runserver
+
+http://127.0.0.1:8000/ 
+
+-- Database setup         数据库建立
+mysite/settings.py
+  DATABASES
+  TIME_ZONE
+  INSTALLED_APPS
+    $ python manage.py syncdb  -- only create tables for apps in INSTALLED_APPS.
+
+-- Creating models        创建模块
+$ python manage.py startapp polls
+
+polls/
+    __init__.py
+    admin.py
+    models.py
+    tests.py
+    views.py
+
+-- Activating models     使模块生效
+* django创建model数据库schema
+* django创建model的python数据库访问API
+
+mysite/settings.py
+  INSTALLED_APPS = (
+    ...,
+    'polls',         ----> 包含模块
+  )
+
+$ python manage.py sql polls  # 不做实际操作，只是输出命令到屏幕
+$ python manage.py syncdb     # 在数据库创建模块对应的表
+
+-- Playing with the API    试用API
+
+$ python manage.py shell
+>>>from polls.models import Poll, Choice
+>>>Poll.objects.all()
+>>>from django.utils import timezone
+>>>p = Poll(question="What's new?", pub_date=timezone.now())
+>>>p.save()
+>>>p.id
+1
+>>> p.question
+"What's new?"
+>>> p.pub_date
+datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
+
+
+
+
