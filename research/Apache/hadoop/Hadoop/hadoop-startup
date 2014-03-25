@@ -3,6 +3,9 @@ http://hadoop.apache.org/common/docs/stable/
 + Getting Started (Single Node Setup , Cluster Setup)
 + HDFS
 
+$ sudo apt-get install ssh
+$ sudo apt-get install rsync
+
 
 设置hadoop命令环境变量：
 .bashrc

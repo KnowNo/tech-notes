@@ -22,7 +22,7 @@
     </property>
     <property>  
         <name>mapred.child.env</name>  
-        <value>JAVA_LIBRARY_PATH=/home/zhongxia/software/hadoop-0.20.2-cdh3u5/lib/native/Linux-amd64-64</value>  
+		<value>JAVA_LIBRARY_PATH=/home/zhongxia/software/hadoop/hadoop-0.20.2-cdh3u5/lib/native/Linux-amd64-64</value>  
     </property>
     <property>     
         <name>mapreduce.map.output.compress.codec</name>      
