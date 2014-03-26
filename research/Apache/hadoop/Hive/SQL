@@ -1,0 +1,36 @@
+
+sql="mysql --default-character-set=utf8 -h localhost -u ifc_cs --password=JxY4%H5jByPt%3CQ#ZzWY CreativeServer"
+
+table_prop="temp_item_property"
+
+table_ms="temp_material_selection"
+
+
+$sql -e "DROP TABLE IF EXISTS ${table_prop};"
+$sql -e "CREATE TABLE IF NOT EXISTS ${table_prop} (
+  ItemType varchar(100) NOT NULL COMMENT 'Item类型（如MID,ADID,GET等等）',
+  MaterialGroupID int(11) DEFAULT NULL,
+  ItemID varchar(100) NOT NULL COMMENT '解析后的ID值',
+  PropertyName varchar(100) NOT NULL COMMENT '属性名称',
+  PropertyValue varchar(1000) NOT NULL COMMENT '属性取值',
+  ExtraInfo varchar(255) NOT NULL COMMENT '其他参数（用于选择过滤',
+  LastUpdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY ItemID_index (ItemID),
+  KEY MaterialGroupID (MaterialGroupID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+"
+
+$sql -e "DROP TABLE IF EXISTS ${table_ms};"
+$sql -e "CREATE TABLE IF NOT EXISTS ${table_ms} (
+  MaterialGroupID int(11) NOT NULL COMMENT '物料组ID',
+  Category varchar(100) NOT NULL COMMENT '物料ID或品类ID',
+  Region varchar(1000) NOT NULL COMMENT '地域',
+  MID varchar(100) NOT NULL COMMENT '物料ID',
+  SelectionType varchar(20) NOT NULL COMMENT 'mapping类型',
+  Weight double NOT NULL COMMENT '选择权重',
+  LastUpdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY Category_index (MaterialGroupID, Category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+"
+
+

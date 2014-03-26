@@ -1,22 +1,41 @@
-===The Hive Shell===
 
-HiveQL is Hive’s query language, a dialect of SQL.
+# -- Hive metastore三种配置方式 
 
-Like SQL, HiveQL is generally case insensitive (except for string comparisons).
+http://blog.csdn.net/reesun/article/details/8556078
+https://cwiki.apache.org/confluence/display/Hive/AdminManual+MetastoreAdmin
 
-The -f option runs the commands in the specified file;
-% hive -f script.q
-The -e option to specify the commands inline;
-% hive -e 'SELECT * FROM dummy'
-Hive will print information to standard error, You can suppress these messages using 
-the -S option at launch time, which has the effect of only showing the output result for queries
-% hive -S -e 'SELECT * FROM dummy'
+一、本地derby (默认)
+二、本地mysql
+lib/mysql-connector-java-5.1.25-bin.jar
 
+$ mysql -uroot -pmysql
 
-HQL
+mysql> CREATE USER 'hive'@'localhost' IDENTIFIED BY 'hive'; 
+mysql> GRANT ALL PRIVILEGES ON hive_remote.* TO 'hive'@'localhost' IDENTIFIED BY 'hive' WITH GRANT OPTION; 
+mysql> flush privileges;
 
-COUNT() 需要和 Group By 一起使用
+# mysql> insert into mysql.user(Host,User,Password) values("localhost","hive",password("hive"));
 
-
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <!--value>jdbc:derby:;databaseName=metastore_db;create=true</value-->
+  <value>jdbc:mysql://localhost/hive_remote?createDatabaseIfNotExist=true</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionDriverName</name>
+  <!--value>org.apache.derby.jdbc.EmbeddedDriver</value-->
+  <value>com.mysql.jdbc.Driver</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionUserName</name>
+  <!--value>APP</value-->
+  <value>hive</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionPassword</name>
+  <!--value>mine</value-->
+  <value>hive</value>
+</property>
+三、远端mysql
 
 

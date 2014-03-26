@@ -1,2 +1,0 @@
-distinct必须放在开头;
-group by 必须放在 order by 和 limit之前;

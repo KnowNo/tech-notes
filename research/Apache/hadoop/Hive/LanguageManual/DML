@@ -1,0 +1,31 @@
+
+
+Hive Data Manipulation Language
+
+------ DML ---------
+
+There are two primary ways of modifying data in Hive:
+    LOAD
+    INSERT
+
+- Loading files into tables
+
+LOAD DATA [LOCAL] INPATH 'filepath' [OVERWRITE] INTO TABLE tablename [PARTITION (partcol1=val1, partcol2=val2 ...)]
+
+
+- Inserting data into Hive Tables from queries
+
+Standard syntax:
+INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;
+INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;
+
+
+- Writing data into the filesystem from queries
+
+Standard syntax:
+INSERT OVERWRITE [LOCAL] DIRECTORY directory1
+  [ROW FORMAT row_format] [STORED AS file_format] (Note: Only available starting with Hive 0.11.0)
+  SELECT ... FROM ...
+
+
+
