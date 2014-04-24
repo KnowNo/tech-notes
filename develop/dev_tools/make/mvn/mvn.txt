@@ -1,0 +1,5 @@
+
+
+mvn archetype:create -DgroupId=com.mycompany.app -DartifactId=spring_test -DarchetypeArtifactId=maven-archetype-quickstart 
+
+mvn archetype:create -DgroupId=com.allyes.cs_cache -DartifactId=cs_cache -DarchetypeArtifactId=maven-archetype-quickstart
