@@ -1,0 +1,68 @@
+
+1. Apache Lucene Core
+
+Apache Lucene 是一个高性能、功能全面的搜索引擎库，完全由Java编写。这是一项几乎适合所有需要全文检索的应用程序的技术，尤其是跨平台应用。
+
+2. Lucene Features 特性(功能)
+
+通过简单的API提供强大的功能。
+
+可扩展，高性能索引
+. 在现代硬件索引速度超过 150G/hour 
+. 较小RAM需求 -- 仅1MB堆内存(heap)
+. 增量索引和批量索引一样快
+. 索引的大小约被索引文本的20%-30%
+
+强大，准确和高效的搜索算法
+. 排序的搜索 -- 最好的结果先返回
+. 多种有效的查询类型：短语查询(phrase queries), 通配符查询(wildcard), 邻近查询(proximity), 范围查询(range) 和更多。
+. 分域的搜索(如 标题，作者，内容)
+. 按任意域排序
+. 多索引搜索及合并的结果
+. 灵活的分面，高亮，joins和结果聚合(grouping)
+. 快速，高内存使用效率(memory-efficient)和容忍错误(typo-tolerant)的建议器
+. 可插入的排序模型，包括向量空间模型和Okapi BM25
+. 可配置的存储引擎(codecs)
+
+跨平台解决方案
+. 在Apache License下，Lucene作为开源软件在商业和开源程序中都可以使用。
+. 100%纯Java实现
+. 其他语言可用的实现，是索引通用的。
+
+3. Lucene release下载
+
+当开发者们认为有充分的修改，改进和bug修复足以保证一个release时，就会创建一个官方的release. 由于Lucene开发的自愿自然性质，release的发布并没有预先的计划。
+
+最近release版本的二进制和源代码，可以在Apache镜像获取。(http://www.apache.org/dyn/closer.cgi/lucene/java)
+
+所有过去历史版本的存档在Apache archives. (http://archive.apache.org/dist/lucene/java/)
+
+lucene-VERSION.zip 或 .tar.gz包含lucene-core jar文件，html文档，一个演示程序(demo, "Getting Started")和各种包含贡献代码的jar文件。
+lucene-VERSION-src.zip 或 .tar.gz包含对应版本的全部源代码。
+
+4. 系统需求 (System Requirements)
+
+- 4.7.2
+Apache Lucene 运行于Java 6或更高的版本。当使用Java 7时，确保至少安装Update 1！
+所有Java版本强烈建议不使用实验性的 -xx JVM选项。也推荐总是使用最近更新的Java VM版本，因为bugs可能影响Lucene.
+已知的JVM bugs可在这里找到 http://wiki.apache.org/lucene-java/JavaBugs.
+
+CPU, 磁盘和内存的需求基于实现Lucene的各种需求(文档大小，文档数量和命中结果的数量是举出的几个例子(to name a few))
+
+从源代码编译Apache Lucene，参考发布的代码目录下的BUILD.txt文件。
+
+
+5. Lucene Tutorials 指南
+
+演示和文档 (待续)
+
+- Lucene 4.7.2 Demo
+
+- Java Docs 4.7.2
+
+
+
+
+
+
+

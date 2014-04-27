@@ -1,0 +1,7 @@
+
+Apache Lucene (TM) 项目开发开源搜索软件，包括：
+
+. Lucene Core, 旗舰子项目，提供基于Java的索引和搜索技术，以及拼写检查(spellchecking)，命中高亮(hit highlighting)和高级分析/分词(analysis/tokenization)功能等。
+. Solr (TM) 是一个基于Lucene Core构建的高性能搜索服务器，包含XML/HTTP和JSON/Python/Ruby应用编程接口(APIs)，命中高亮(hit highlighting)，分面搜索(faceted search)，缓存(caching)，复制(replication)和一个web管理接口。
+. Open Relevance Project 是一个子项目，目的是收集和发布免费材料用于相关性和性能测试。
+. PyLucene 是Lucene Core项目的Python移植版。

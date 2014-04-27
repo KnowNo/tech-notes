@@ -1,0 +1,10 @@
+
+Lucene各版本的演示程序(demo)副本，包含在相应的release文档中。
+
+当前最新版Lucene 4.7.2 Demo
+
+下载二进制发布文件和代码：
+lucene-4.7.2.tgz
+lucene-4.7.2-src.tgz
+
+
