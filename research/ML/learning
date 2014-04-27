@@ -1,0 +1,117 @@
+
+
+-------------------------------
+
+purlin 数据挖掘者 (简介：博士生，香港科技大学 数据挖掘 机器学习 推荐系统 社交网络分析 )
+
+基础篇：
+
+1. 读书《Introduction to Data Mining》，这本书很浅显易懂，没有复杂高深的公式，很合适入门的人。另外可以用这本书做参考《Data Mining : Concepts and Techniques》。第二本比较厚，也多了一些数据仓库方面的知识。如果对算法比较喜欢，可以再阅读《Introduction to Machine Learning》。
+
+2. 实现经典算法。有几个部分：
+a. 关联规则挖掘 (Apriori, FPTree, etc.)
+b. 分类 (C4.5, KNN, Logistic Regression, SVM, etc.)
+c. 聚类 (Kmeans, DBScan, Spectral Clustering, etc.)
+d. 降维 (PCA, LDA, etc.)
+e. 推荐系统 (基于内容的推荐，协同过滤，如矩阵分解等)
+然后在公开数据集上测试，看实现的效果。可以在下面的网站找到大量的公开数据集：http://archive.ics.uci.edu/ml/
+
+3. 熟悉几个开源的工具: Weka (用于上手); LibSVM, scikit-learn, Shogun
+
+4. 到 https://www.kaggle.com/ 上参加几个101的比赛，学会如何将一个问题抽象成模型，并从原始数据中构建有效的特征 (Feature Engineering).
+
+到这一步的话基本几个国内的大公司都会给你面试的机会。
+
+进阶篇：
+
+1. 读书，下面几部都是大部头，但学完进步非常大。
+a.《Pattern Recognition and Machine Learning》
+b.《The Elements of Statistical Learning》
+c.《Machine Learning: A Probabilistic Perspective》
+第一本比较偏Bayesian；第二本比较偏Frequentist；第三本在两者之间，但我觉得跟第一本差不多，不过加了不少新内容。当然除了这几本大而全的，还有很多介绍不同领域的书，例如《Boosting Foundations and Algorithms》，《Probabilistic Graphical Models Principles and Techniques》；以及理论一些的《Foundations of Machine Learning》，《Optimization for Machine Learning》等等。这些书的课后习题也非常有用，做了才会在自己写Paper的时候推公式。
+
+2. 读论文。包括几个相关会议：KDD，ICML，NIPS，IJCAI，AAAI，WWW，SIGIR，ICDM；以及几个相关的期刊：TKDD，TKDE，JMLR，PAMI等。跟踪新技术跟新的热点问题。当然，如果做相关research，这一步是必须的。例如我们组的风格就是上半年读Paper，暑假找问题，秋天做实验，春节左右写/投论文。
+
+3. 跟踪热点问题。例如最近几年的Recommendation System，Social Network，Behavior Targeting等等，很多公司的业务都会涉及这些方面。以及一些热点技术，例如现在很火的Deep Learning。
+
+4. 学习大规模并行计算的技术，例如MapReduce、MPI，GPU Computing。基本每个大公司都会用到这些技术，因为现实的数据量非常大，基本都是在计算集群上实现的。
+
+5. 参加实际的数据挖掘的竞赛，例如KDDCUP，或 https://www.kaggle.com/ 上面的竞赛。这个过程会训练你如何在一个短的时间内解决一个实际的问题，并熟悉整个数据挖掘项目的全过程。
+
+6. 参与一个开源项目，如上面提到的Shogun或scikit-learn还有Apache的Mahout，或为一些流行算法提供更加有效快速的实现，例如实现一个Map/Reduce平台下的SVM。这也是锻炼Coding的能力。
+
+到这一步国内的大公司基本是想哪去哪，而且待遇也不差；如果英语好，去US那边的公司难度也不大了。 
+
+---------------------
+
+1bitbp 
+
+一，可以先找一些数据挖掘方面优秀教材来看，把一些基础且重要的东西理解清楚。R/matlab/SAS之类是都是一些工具，虽然学会使用工具挺重要，但关键还是工具后面的思想。关于自学，不知lz是否看过下面的帖子。其中，我挺赞同帖子中pongba的‘只看好书’的看法。
+http://www.guokr.com/question/132920/?bsh_bid=98365272
+
+二，个人觉得非常重要的一点，尽量参与一些真实的实践项目，从实际项目／问题出发学得更快，也学得更好！数据挖掘是个很宽泛的概念，涉及面很广，不同应用领域的数据挖掘也不一样。从一些项目作为切入点，你可以了解到哪些知识是最欠缺的，哪些最需要学的，然后再逐渐扩充相关的知识。
+
+
+------------------------------
+
+zxtf 模式识别硕士 
+
+数据挖掘这个东西，要看你追求的是什么？
+注意到你是想自学？那一帮情况下，就可以理解为不是奔科研去的，看起来应该是追求实用。
+
+那么作为一个带了N年数据分析团队，算是有点经验的人，建议你找点实际的项目去做。
+
+首先是要弄明白你想挖点什么出来？如果你说不知道，抱歉，你可能还是在追科研的路。
+
+实际的项目中：
+
+    首先就是要明确你希望挖的东西能产生什么业务价值，而非用什么挖掘算法，那是手段，可以在后面再关注；要能够具体描绘你的挖掘目标、价值，以及挖掘成果的预期展现形式，说服力如何，等等；
+    其次，和相关的小伙伴讨论，为了挖出你想要的成果，需要利用到哪些数据？这些数据中，哪些是已经有的，哪些还得想办法去收集？其中是否有些数据根本是不可能收集到的？这些收集不到的数据对于你想挖的成果会有什么影响？如果是致命影响，直接导致你的挖掘成果缺乏说服力，那就此歇菜，另找其他方向吧。反之，则安排计划和资源，把能收集到的数据尽快收集起来；
+    再次，根据收集到的数据的特点和收集过程的质量情况，清洗收集到的数据；
+    根据挖掘目标的情况和收集到的数据的特点，制定挖掘规划，选择合适的挖掘算法；
+    然后，就开始挖吧；
+    第一轮挖完，看看成果如何？有道理吗？有说服力吗？大多数情况，你会发现，哦，晕，忘了应该把这几个因素考虑进去了，还应该加进去这几方面的数据才能看出来。好，继续转向第2步，继续收集数据、清洗、调算法/参数，挖出来后再评估，一般情况得这么循环N个回合；
+    马马虎虎出来个差不多靠谱、勉强能自圆其说的初胚，这个成果看上去像那么回事儿了。
+    总结一个说法（分析成果）出来，为了你的说法，把数据再针对性地洗上几遍，给出一个更加干净的分析成果，这个版本基本上有说服力了。
+    讲究一点的，再画个信息图什么的，图文并茂，就可以初步交作业了；
+    在真实的项目中，还有一步，就是选取重要的评估视角和指标，根据具体的业务特点，把你的分析过程做成每周/每日/每小时都能给个角度固定的分析报告的服务。
+    再往前一步，如果你对这块业务真的很熟的话，还可以针对不同类型的分析结果，能给出相应的建议应对措施（Action），这样这此挖掘的业务价值就真正明确了。你做的活儿也没有停留在“活儿”这个份儿上，而是决策支持这个级别上了。
+
+--------------------------------------
+
+一、目前国内的数据挖掘人员工作领域大致可分为三类。
+
+    1）数据分析师：在拥有行业数据的电商、金融、电信、咨询等行业里做业务咨询，商务智能，出分析报告。
+    2）数据挖掘工程师：在多媒体、电商、搜索、社交等大数据相关行业里做机器学习算法实现和分析。
+    3）科学研究方向：在高校、科研单位、企业研究院等高大上科研机构研究新算法效率改进及未来应用。
+
+
+二、说说各工作领域需要掌握的技能。
+(1).数据分析师
+
+    需要有深厚的数理统计基础，但是对程序开发能力不做要求。
+    需要熟练使用主流的数据挖掘（或统计分析）工具如Business Analytics and Business Intelligence Software（SAS）、SPSS、EXCEL等。
+    需要对与所在行业有关的一切核心数据有深入的理解，以及一定的数据敏感性培养。
+    经典图书推荐：《概率论与数理统计》、《统计学》推荐David Freedman版、《业务建模与数据挖掘》、《数据挖掘导论》、《SAS编程与数据挖掘商业案例》、《Clementine数据挖掘方法及应用 》、《Excel 2007 VBA参考大全》、《IBM SPSS Statistics 19 Statistical Procedures Companion》等。
+
+(2).数据挖掘工程师
+
+    需要理解主流机器学习算法的原理和应用。
+    需要熟悉至少一门编程语言如（Python、C、C++、Java、Delphi等）。
+    需要理解数据库原理，能够熟练操作至少一种数据库（Mysql、SQL、DB2、Oracle等），能够明白MapReduce的原理操作以及熟练使用Hadoop系列工具更好。
+    经典图书推荐：《数据挖掘概念与技术》、《机器学习实战》、《人工智能及其应用》、《数据库系统概论》、《算法导论》、《Web数据挖掘》、《 Python标准库》、《thinking in Java》、《Thinking in C++》、《数据结构》等。
+
+(3).科学研究方向
+
+    需要深入学习数据挖掘的理论基础，包括关联规则挖掘 （Apriori和FPTree）、分类算法（C4.5、KNN、Logistic Regression、SVM等) 、聚类算法 （Kmeans、Spectral Clustering）。目标可以先吃透数据挖掘10大算法各自的使用情况和优缺点。
+
+    相对SAS、SPSS来说R语言更适合科研人员The R Project for Statistical Computing，因为R软件是完全免费的，而且开放的社区环境提供多种附加工具包支持，更适合进行统计计算分析研究。虽然目前在国内流行度不高，但是强烈推荐。
+    可以尝试改进一些主流算法使其更加快速高效，例如实现Hadoop平台下的SVM云算法调用平台--web 工程调用hadoop集群。
+    需要广而深的阅读世界著名会议论文跟踪热点技术。如KDD，ICML，IJCAI，Association for the Advancement of Artificial Intelligence，ICDM 等等；还有数据挖掘相关领域期刊：ACM Transactions on Knowledge Discovery from Data，IEEE Transactions on Knowledge and Data Engineering，Journal of Machine Learning Research Homepage，IEEE Xplore: Pattern Analysis and Machine Intelligence, IEEE Transactions on等。
+    可以尝试参加数据挖掘比赛培养全方面解决实际问题的能力。如Sig KDD ，Kaggle: Go from Big Data to Big Analytics等。
+    可以尝试为一些开源项目贡献自己的代码，比如Apache Mahout: Scalable machine learning and data mining ,myrrix等（具体可以在SourceForge或GitHub.上发现更多好玩的项目）。
+    经典图书推荐：《机器学习》 《模式分类》《统计学习理论的本质》《统计学习方法》《数据挖掘实用机器学习技术》《R语言实践》，英文素质是科研人才必备的《Machine Learning: A Probabilistic Perspective》《Scaling up Machine Learning : Parallel and Distributed Approaches》《Data Mining Using SAS Enterprise Miner : A Case Study Approach》《Python for Data Analysis》等。
+
+-------------------------------
+
+	
