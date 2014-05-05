@@ -42,7 +42,7 @@ lucene-VERSION-src.zip 或 .tar.gz包含对应版本的全部源代码。
 
 4. 系统需求 (System Requirements)
 
-- 4.7.2
+- 4.7.2 (最后一个与Java 6兼容的版本)
 Apache Lucene 运行于Java 6或更高的版本。当使用Java 7时，确保至少安装Update 1！
 所有Java版本强烈建议不使用实验性的 -xx JVM选项。也推荐总是使用最近更新的Java VM版本，因为bugs可能影响Lucene.
 已知的JVM bugs可在这里找到 http://wiki.apache.org/lucene-java/JavaBugs.
@@ -51,6 +51,7 @@ CPU, 磁盘和内存的需求基于实现Lucene的各种需求(文档大小，�
 
 从源代码编译Apache Lucene，参考发布的代码目录下的BUILD.txt文件。
 
+- 4.8.0 (最低要求Java 7)
 
 5. Lucene Tutorials 指南
 

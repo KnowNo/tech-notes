@@ -1,10 +1,188 @@
 
 Lucene各版本的演示程序(demo)副本，包含在相应的release文档中。
 
-当前最新版Lucene 4.7.2 Demo
 
-下载二进制发布文件和代码：
+Lucene 4.7.2 demo API 
+=====================
+
+
+Packages：
+org.apache.lucene.demo 	 		用于索引和搜索的演示应用程序
+org.apache.lucene.demo.facet 		分面搜索示例代码
+org.apache.lucene.demo.xmlparser 	用于XML查询解析的演示servlet
+
+
+演示模块提供了简单的示例代码以展示Lucene的特性。
+
+Apache Lucene - 构建并安装基本的演示程序
+
+- 关于此文档
+此文档的目的是作为一个“上手开始”的文档，指导如何使用和运行Lucene演示程序。引导你进行一些基本的安装和配置。
+
+- 关于演示程序
+Lucene命令行演示代码，包括一个演示Lucene各种功能和如何将Lucene加入你自己的应用的应用程序。
+
+- 设置你的CLASSPATH
+首先，下载最新的Lucene发布版本，然后在你的工作目录解压。
+
+你需要4个JARs: the Lucene JAR, the queryparser JAR(查询解析), the common analysis JAR(通用分析), and the Lucene demo JAR(演示).
+你应该可以在解压包得到的目录下的core/目录中看到Lucene JAR文件，它应该被命名为如lucene-core-{version}.jar. 同样，你应该可以分别在queryparser/, analysis/common/ 和 demo/ 目录下看到 lucene-queryparser-{version}.jar, lucene-analyzers-common-{version}.jar 和 lucene-demo-{version}.jar 这些文件。
+
+将这4个文件都加入到你的Java CLASSPATH.
+
+-------------------------------------------------------------------
+这里下载二进制发布文件和代码：
 lucene-4.7.2.tgz
 lucene-4.7.2-src.tgz
+
+解压二进制包，可以看到下列文件：
+lucene-4.7.2/core/lucene-core-4.7.2.jar
+lucene-4.7.2/queryparser/lucene-queryparser-4.7.2.jar
+lucene-4.7.2/analysis/common/lucene-analyzers-common-4.7.2.jar
+lucene-4.7.2/demo/lucene-demo-4.7.2.jar
+
+将这些jar文件的路径至CLASSPATH变量，如:
+export LUCENE_HOME={path-to-lucene}
+export CLASSPATH="$CLASSPATH:$LUCENE_HOME/core/lucene-core-4.7.2.jar:$LUCENE_HOME/queryparser/lucene-queryparser-4.7.2.jar:$LUCENE_HOME/analysis/common/lucene-analyzers-common-4.7.2.jar:$LUCENE_HOME/demo/lucene-demo-4.7.2.jar"
+-------------------------------------------------------------------
+
+- 索引文件
+已经到这里，你可能迫不及待想要尝试了。让我们建立一个索引吧！假定你正确的设置了你的CLASSPATH, 只要敲下:
+$ java org.apache.lucene.demo.IndexFiles -docs {path-to-lucene}/src
+
+这将产生一个名为index的子目录，它包含了对所有Lucene源代码的一个索引。
+
+检索索引 输入命令：
+$ java org.apache.lucene.demo.SearchFiles
+
+你将被提示输入一个查询，随便输入一串字母或造一个词(例如: "supercalifragilisticexpialidocious"), 你将看到在lucene源码里没有匹配的结果。现在尝试输入词"string"，这将返回一大批文档。结果将在显示每10条结果记录时进行分页，并询问你是否需要更多结果。
+
+-------------------------------------------------------------------
+解压源代码包，并对根目录建索引：
+$ java org.apache.lucene.demo.IndexFiles -docs {path-to-lucene-src}/lucene-4.7.2
+
+搜索：(命令行演示程序)
+$ java org.apache.lucene.demo.SearchFiles
+Enter query: 
+supercalifragilisticexpialidocious    // <-- 输入搜索词
+Searching for: supercalifragilisticexpialidocious
+0 total matching documents
+Enter query: 
+string                               // <-- 输入搜索词
+Searching for: string   
+2189 total matching documents
+1. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/cz/TestCzechStemmer.java
+2. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/bg/TestBulgarianStemmer.java
+3. lucene-4.7.2/analysis/common/src/java/org/apache/lucene/analysis/util/AbstractAnalysisFactory.java
+4. lucene-4.7.2/queryparser/src/java/org/apache/lucene/queryparser/flexible/core/messages/QueryParserMessages.java
+5. lucene-4.7.2/benchmark/src/java/org/apache/lucene/benchmark/byTask/utils/Format.java
+6. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/fa/TestPersianAnalyzer.java
+7. lucene-4.7.2/queries/src/java/org/apache/lucene/queries/function/valuesource/LiteralValueSource.java
+8. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/pattern/TestPatternCaptureGroupTokenFilter.java
+9. lucene-4.7.2/core/src/test/org/apache/lucene/util/TestFilterIterator.java
+10. lucene-4.7.2/analysis/kuromoji/src/test/org/apache/lucene/analysis/ja/TestJapaneseIterationMarkCharFilterFactory.java
+Press (n)ext page, (q)uit or enter number to jump to a page.
+n                                   // <-- 查看下一页
+11. lucene-4.7.2/analysis/uima/src/java/org/apache/lucene/analysis/uima/UIMATypeAwareAnalyzer.java
+12. lucene-4.7.2/benchmark/src/java/org/apache/lucene/benchmark/byTask/feeds/DocData.java
+13. lucene-4.7.2/analysis/phonetic/src/test/org/apache/lucene/analysis/phonetic/TestPhoneticFilterFactory.java
+14. lucene-4.7.2/analysis/kuromoji/src/java/org/apache/lucene/analysis/ja/util/CSVUtil.java
+15. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/util/TestCharArraySet.java
+16. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/core/TestClassicAnalyzer.java
+17. lucene-4.7.2/analysis/common/src/test/org/apache/lucene/analysis/core/TestUAX29URLEmailAnalyzer.java
+18. lucene-4.7.2/analysis/common/src/java/org/apache/lucene/analysis/synonym/SlowSynonymFilterFactory.java
+19. lucene-4.7.2/analysis/icu/src/test/org/apache/lucene/analysis/icu/TestICUTransformFilterFactory.java
+20. lucene-4.7.2/benchmark/src/java/org/apache/lucene/benchmark/byTask/utils/Config.java
+Press (p)revious page, (n)ext page, (q)uit or enter number to jump to a page.
+-------------------------------------------------------------------
+
+- 关于代码
+在这一节，我们过一下Lucene命令行演示程序背后的代码：在哪里能找到它们，它们的各部分和功能。这一节意在想要了解如何在自己的程序中使用Lucene的Java开发者。
+
+- 代码位置
+    IndexFiles.java: 创建Lucene索引的代码. http://lucene.apache.org/core/4_7_2/demo/src-html/org/apache/lucene/demo/IndexFiles.html
+    SearchFiles.java: 搜索Lucene索引的代码. http://lucene.apache.org/core/4_7_2/demo/src-html/org/apache/lucene/demo/SearchFiles.html
+
+-------------------------------------------------------------------
+解压代码包，demo代码目录：
+lucene-4.7.2/demo/src/
+-------------------------------------------------------------------
+
+- IndexFiles
+
+如前面讨论的，IndexFiles类创建一个Lucene索引。让我们来看一下它是如何做的。
+
+main()函数解析命令行参数，然后为实例化IndexWriter做准备：打开目录，实例化StandardAnalyzer和IndexWriterConfig.
+
+命令行参数-index的值，是用于存储索引信息的文件目录名称。如果调用时-index值传入的是相对路径，或没有给出-index参数，默认的相对路径“index”将被使用，index路径将被作为子目录在当前工作目录中创建(如果不存在)。在某些平台下，index路径可能会在不同的路径下创建（如用户的home目录）。
+
+命令行参数-docs的值，是包含待索引文件的目录的位置。
+
+命令行参数-update，告诉IndexFiles不要删除已经存在的索引。当它没有给出时，IndexFiles在索引文档前会首先清除之前的索引。
+
+Lucene Directory类被IndexWriter使用来存储索引信息。除了FSDirectory实现外，还有若干其他的Directory子类，可以写到RAM，数据库等。
+
+Lucene Analyzer类处理用于将文档截成标记(tokens)，也称为词语(terms), 并且可以选择性的在这些tokens上作些操作，如大写转小写，同义词插入，过滤掉不想要的tokens等。我们使用的Analyzer是StandardAnalyzer, 它生成tokens所使用的断词规则来自在"Unicode Standard Annex #29 (http://unicode.org/reports/tr29/)"中描述的Unicode文本切分算法；它将tokens转换为小写；并过滤掉停用词(stopwords)。停用词是常见的语言用词如冠词(a,an,the等)和其他可能没有什么搜索价值的tokens. 值得注意的是不同语言有不同规则，对每种语言你应该使用合适的分析器(Analyzer)。Lucene目前为一些不同语言提供了分析器(见javadocs 在lucene/analysis/common/src/java/org/apache/lucene/analysis/下, http://lucene.apache.org/core/4_7_2/analyzers-common/overview-summary.html).
+
+IndexWriterConfig对象持有IndexWriter的所有配置。例如，这里我们基于-update命令行参数来设置OpenMode.
+
+往下看文件，在IndexWriter被实例化后，你可以看到indexDocs()的代码。这个递归函数遍历目录并创建Document对象，Document是一个数据对象，表示了文件的文本内容和它的创建时间和位置。这些对象被添加到IndexWriter。如果给出了-update命令行参数，IndexWriterConfig的OpenMode将被设置为追加(OpenMode.CREATE_OR_APPEND), IndexWriter将不会将文档对象加到索引，而是在索引中更新它们：尝试查找已经索引过的有相同标识(identifier, 在我们的用例下，文件路径作为标识)的文档；如果存在则从索引中将它删除；然后添加新的文档到索引中。
+
+- Searching Files
+
+SearchFiles类相当简单。它基本上与IndexSearcher, StandardAnalyzer(同样在IndexFiles中使用)和QueryParser协作。QueryParser使用analyzer创建，用来解析查询文本，与解析文档的方式相同：查找词边界，大小写转换，并且移除无用词如'a','an'和'the'. Query对象包含QueryParser出来的结果，并被传到searcher. 注意到编程上也可以不使用QueryParser而创建一个Query对象，但QueryParser可以按Lucene查询语法解析查询文本到对应的Query对象。
+
+SearchFiles使用IndexSearcher.search(query,n)方法返回最大命中的n个文档，结果按页显示，按打分(如相关度，relevance)排序。
+
+-------------------------------------------------------------------
+查询解析语法(Query Parser Syntax)
+http://lucene.apache.org/core/4_7_2/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description
+-------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
