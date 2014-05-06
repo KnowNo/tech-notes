@@ -16,13 +16,13 @@ org.apache.lucene.demo.xmlparser 	用于XML查询解析的演示servlet
 
 Apache Lucene - 构建并安装基本的演示程序
 
-- 关于此文档
+1. 关于此文档
 此文档的目的是作为一个“上手开始”的文档，指导如何使用和运行Lucene演示程序。引导你进行一些基本的安装和配置。
 
-- 关于演示程序
+2. 关于演示程序
 Lucene命令行演示代码，包括一个演示Lucene各种功能和如何将Lucene加入你自己的应用的应用程序。
 
-- 设置你的CLASSPATH
+3. 设置你的CLASSPATH
 首先，下载最新的Lucene发布版本，然后在你的工作目录解压。
 
 你需要4个JARs: the Lucene JAR, the queryparser JAR(查询解析), the common analysis JAR(通用分析), and the Lucene demo JAR(演示).
@@ -46,7 +46,7 @@ export LUCENE_HOME={path-to-lucene}
 export CLASSPATH="$CLASSPATH:$LUCENE_HOME/core/lucene-core-4.7.2.jar:$LUCENE_HOME/queryparser/lucene-queryparser-4.7.2.jar:$LUCENE_HOME/analysis/common/lucene-analyzers-common-4.7.2.jar:$LUCENE_HOME/demo/lucene-demo-4.7.2.jar"
 -------------------------------------------------------------------
 
-- 索引文件
+4. 索引文件
 已经到这里，你可能迫不及待想要尝试了。让我们建立一个索引吧！假定你正确的设置了你的CLASSPATH, 只要敲下:
 $ java org.apache.lucene.demo.IndexFiles -docs {path-to-lucene}/src
 
@@ -96,10 +96,10 @@ n                                   // <-- 查看下一页
 Press (p)revious page, (n)ext page, (q)uit or enter number to jump to a page.
 -------------------------------------------------------------------
 
-- 关于代码
+5. 关于代码
 在这一节，我们过一下Lucene命令行演示程序背后的代码：在哪里能找到它们，它们的各部分和功能。这一节意在想要了解如何在自己的程序中使用Lucene的Java开发者。
 
-- 代码位置
+6. 代码位置
     IndexFiles.java: 创建Lucene索引的代码. http://lucene.apache.org/core/4_7_2/demo/src-html/org/apache/lucene/demo/IndexFiles.html
     SearchFiles.java: 搜索Lucene索引的代码. http://lucene.apache.org/core/4_7_2/demo/src-html/org/apache/lucene/demo/SearchFiles.html
 
@@ -108,7 +108,7 @@ Press (p)revious page, (n)ext page, (q)uit or enter number to jump to a page.
 lucene-4.7.2/demo/src/
 -------------------------------------------------------------------
 
-- IndexFiles
+7. IndexFiles
 
 如前面讨论的，IndexFiles类创建一个Lucene索引。让我们来看一下它是如何做的。
 
@@ -128,7 +128,7 @@ IndexWriterConfig对象持有IndexWriter的所有配置。例如，这里我们�
 
 往下看文件，在IndexWriter被实例化后，你可以看到indexDocs()的代码。这个递归函数遍历目录并创建Document对象，Document是一个数据对象，表示了文件的文本内容和它的创建时间和位置。这些对象被添加到IndexWriter。如果给出了-update命令行参数，IndexWriterConfig的OpenMode将被设置为追加(OpenMode.CREATE_OR_APPEND), IndexWriter将不会将文档对象加到索引，而是在索引中更新它们：尝试查找已经索引过的有相同标识(identifier, 在我们的用例下，文件路径作为标识)的文档；如果存在则从索引中将它删除；然后添加新的文档到索引中。
 
-- Searching Files
+7. Searching Files
 
 SearchFiles类相当简单。它基本上与IndexSearcher, StandardAnalyzer(同样在IndexFiles中使用)和QueryParser协作。QueryParser使用analyzer创建，用来解析查询文本，与解析文档的方式相同：查找词边界，大小写转换，并且移除无用词如'a','an'和'the'. Query对象包含QueryParser出来的结果，并被传到searcher. 注意到编程上也可以不使用QueryParser而创建一个Query对象，但QueryParser可以按Lucene查询语法解析查询文本到对应的Query对象。
 

@@ -1,0 +1,187 @@
+
+Lucene查询解析器语法
+
+关于包 org.apache.lucene.queryparser.classic 的描述
+
+一个简单的使用JavaCC实现的查询解析器。
+注意，因为JavaCC定义了很多没有必要成为public的public类，方法和值域，这使文档变得有些杂乱。Sorry. 
+注意，因为JavaCC定义了一个名为Token的类，org.apache.lucene.analysis.Token类必须总是以全饰名称在这个包的代码中使用。
+注意，org.apache.lucene.queryparser.flexible.standard 有一个匹配其语法的可代替的查询解析器，但对于如何创建一个Query而言，它更加的模块化，能进行大量定制化。
+
+
+Query Parser Syntax (4.7.2)
+====================
+
+http://lucene.apache.org/core/4_7_2/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package_description
+
+1. 概述
+
+虽然Lucene支持通过API创建你自己的查询，但也通过查询解析器(Query Parser)提供了丰富的查询语言，一个使用JavaCC的语法分析程序(lexer)可以将字符串解析为Lucene查询(对象)。
+
+通常来说，query parser的语法会随着版本的发布而修改。这里描述的是当前发布版本(4.7.2)的语法。如果你正在使用不同版本的Lucene，请查阅随相应版本发布的docs/queryparsersyntax.html副本.
+
+在选择使用所提供的Query Parser前，请作如下考虑：
+(1) 如果你要用程序生成查询字符串，然后用query parser解析，那么你应该认真考虑直接使用query API来创建你的查询。换句话说，query parser是为人自然输入文本设计的，而非为程序生成的文本设计。
+(2) 未被截断的域最好直接加到query中，而不是通过query parser. 如果一个域的值是通过程序生成的，那么这个域的查询语句也应该如此。query paser使用的分析器(Analyzer)是设计用来转化由人输入的文本到词语(Terms)的。程序生成的值，像日期，关键词等，应该一致由程序生成。
+(3) 在一个查询式中，域是通常文本的应该使用query parser. 所有其他，如日期范围，关键词等，最好直接通过API加入查询。一个域有有限个值，可以由一个下拉菜单指定，不应该加入查询字符串并被进一步分割，可以作为一个词查询(TermQuery)语句加入。
+
+2. 词/语句 (Terms)
+
+一个查询被分割为词和操作符。有两种类型的词：独立词和短语。（#这里是就英语来说的）
+一个独立词是一个单独的单词，如"test"或"hello".
+一个短语是一组由双引号扩起来的单词，如"hello dolly".
+多个词(Terms)可以由布尔操作符组合在一起，组成更复杂的查询(见下文)。
+
+注意，创建索引的分析器(Analyzer)，将被用在查询字符串的词(Terms)和短语上。所以选择一个不抵触查询字符串使用的词(Terms)的分析器很重要。
+
+3. 域 (Fields)
+
+Lucene支持分域的数据。搜索时可以指定一个域，或使用默认的域。域名和默认域在实现中是可以指定的。
+你可以搜索任何域，通过敲入域名后跟随冒号":", 然后输入你想查询的词句。
+
+作为一个例子，我们假定一个Lucene索引包含两个域，标题(title)和文本(text)，并且文本是默认域。如果你想找到以"The Right Way"为标题，文本内容包含"don't go this way"的文档，你可以这样输入：
+
+title:"The Right Way" AND text:go
+或
+title:"The Right Way" AND go
+
+因为text是默认域，域标识名不是必须的。
+注意，域名只对出现在其后的词有效，所以查询 
+title:The Right Way
+将在title域中查找"The", 而在默认域(这里是text)中查找"Right"和"Way".
+
+
+3. 词修饰器 (Term Modifiers)
+
+Lucene支持修饰查询词，以提供一系列的搜索选项。
+
+3.1 通配符搜索 (Wildcard Searches)
+
+Lucene支持在单个查询词内(不是在短语内)的单个或多个字符的通配符搜索。
+单个字符匹配使用 "?" 符号。
+多个字符匹配使用 "*" 符号。
+
+单个字符的通配符搜索，查找那些只有那一个字符被替代的匹配词。例如，搜索"text"或"test", 你可以使用搜索: te?t
+
+多个字符的通配符搜索，查找零个或多个字符被替代的词。例如，搜索"test", "tests", "tester", 你可以使用搜索: test*
+也可以在词中间使用，如果 te*t
+
+注意，"?"或"*"不能作为搜索的第一个字符！
+
+3.2 正则式搜索 (Regular Expression Searches)
+
+Lucene支持匹配两个正斜杠"/"之间的模式，进行正则式搜索。语法可能在版本间有修改，但目前支持的语法文档在RegExp类(org.apache.lucene.util.automaton.RegExp). 例如，查找包含"moat"和"boat"的文档: /[mb]oat/
+
+------------------------------------------------------
+org.apache.lucene.util.automaton.RegExp:
+http://lucene.apache.org/core/4_7_2/core/org/apache/lucene/util/automaton/RegExp.html?is-external=true
+--------------------------------------------------------
+
+3.3 模糊搜索 (Fuzzy Searches)
+
+Lucene支持基于Damerau-Levenshtein距离算法的模糊搜索。做模糊搜索可以在单词后加上波浪号"~". 例如，搜索一个拼写与"roam"相近的词，使用模糊搜索：
+roam~
+将搜索找到像foam和roams的词。
+
+一个额外的(可选)参数可指定允许的最大编辑次数。值在0到2之间，例如：
+roam~1
+如果此参数没有给出，默认值是2次编辑距离。
+之前，这里可以使用浮点数。但这个语法被考虑放弃，并将在Lucene5.0版本中移除。
+
+3.4 邻近搜索 (Proximity Searches)
+
+Lucene支持查找指定距离之内的词。做邻近搜索，可以在短语后使用波浪号"~", 例如搜索在10个单词内出现"apache"和"jakarta"的文档，使用搜索：
+"jakarta apache"~10
+
+3.5 范围搜索 (Range Searches)
+
+范围查询允许匹配域值在指定的上下界之间的文档。范围查询可以包含或排除上下边界。排序按字典序排列。
+
+mod_date:[20020101 TO 20030101]
+这将查找mod_date域值在20020101和20030101之间(包含边界)的文档。注意范围查询不仅仅限于日期字段，也可以在非日期域上使用范围查询：
+title:{Aida TO Carmen}
+这将查找title在Aida和Carmen(不包含边界)的文档。
+
+方括号表示包含边界值，花括号表示不包含。
+
+3.6 增强搜索词 (Boosting a Term)
+
+Lucene基于查找词提供文档匹配相关度程度。增强某个搜索词(的相关度)使用补字号, "^", 并在搜索词的最后跟随一个增强因子(一个数字)，增强因子越高，这个词的相关性就越强。
+
+增加搜索让你可以通过增强文档的词(的相关度)来控制文档的的相关度。 例如，你在搜索:
+jakarta apache
+并且你想要词"jakarta"的相关度更高，则在词的后面使用^符号并跟随增强因子来增强它(的相关度). 你将输入:
+jakarta^4 apache
+这将使得包含jakarta词的文档变得更相关。你也可以增强短语，像在这个例子中：
+"jakrata apache"^4 "Apache Lucene"
+
+默认情况下，增强因子是1. 虽然增强因子必须是正数，但它可以小于1 (如 0.2).
+ 
+
+4. 布尔操作 (Boolean Operators)
+
+布尔操作允许通过逻辑操作来组合词。Lucene支持 AND, "+", OR, NOT 和 "-" 作为布尔操作符。(注意，必须全是大写)
+
+4.1 OR
+
+OR操作符是默认的连接符。意味着如果在两个词之间如果没有布尔操作，OR操作符将被使用。OR操作连接两个词并且查找包含任意一个词的文档。等价于集合的并操作。符号"||"可以用来代替"OR"这个词。
+
+搜索包含"jakarta apache"或"jakarta"的文档，使用查询:
+"jakarta apache" jakarta
+或
+"jakarta apache" OR jakarta
+
+4.2 AND
+
+AND操作匹配两个词同时在文本中存在的文档。等价于集合的交集。符号"&&"可以用来代替"AND"这个词。
+
+搜索包含"jakarta apache"和"jakarta"的文档，使用查询:
+"jakarta apache" AND jakarta
+
+4.3 +
+
+"+"或着说 包含操作符要求"+"后跟随的词必须在文档的域中出现。
+搜索必须包含"jakarta",并且可能包含"lucene"的文档，使用查询:
++jakarta lucene
+
+4.4 NOT
+
+NOT操作符排除包含NOT后的词的文档。等价于集合的非。符号"|"可以用来代替"NOT"这个词。
+
+搜索包含"jakarta apache"但不包含"Apache Lucene"的文档，使用查询：
+"jakarta apache" NOT "Apache Lucene"
+
+注意，NOT操作符不能使用在单个词前面(没有意义)。例如，下面的搜索将没有返回结果：
+NOT "jakarta apache"
+
+4.5 -
+
+"-" 或者说排除操作符排除包含"-"后的词的文档。
+
+搜索包含"jakarta apache"但不包含"Apache Lucene"的文档，使用查询：
+"jakarta apache" -"Apache Lucene"
+
+5. 分组 (Grouping)
+
+Lucene支持使用圆括号组织语句来构成子查询。如果你想控制一个查询的布尔逻辑，这非常有用。
+
+搜索包含"jakarta"或"apache", 和"website", 使用查询：
+(jakarta OR apache) AND website
+这消除了歧义，并且确保website必须存在，而且jakarta或apache之一可能存在。
+
+6. 域内分组 (Field Grouping)
+
+Lucene支持对某个单独的域使用圆括号来组织多个(查询)语句。
+
+搜索标题中同时包含词"return"和短语"pink panther"的文档，使用查询：
+
+title:(+return +"pink panther")
+
+7. 跳过特殊字符 (Escaping Special Characters)
+
+Lucene支持跳过构成查询语法的特殊字符。当前的特殊字符列表为：
++ - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+
+为了忽略这些字符，可在这些字符前使用"\". 例如，搜索 (1+1):2, 使用查询：
+\(1\+1\)\:2
+
