@@ -1,0 +1,8 @@
+
+
+hadoop dfsadmin -safemode leave
+
+  enter - 进入安全模式
+  leave - 强制NameNode离开安全模式
+  get -   返回安全模式是否开启的信息
+  wait - 等待，一直到安全模式结束。

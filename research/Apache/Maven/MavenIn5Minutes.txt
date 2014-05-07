@@ -1,0 +1,164 @@
+
+5分钟学习Maven
+
+1. 先决条件
+
+会安装软件。
+
+2. 安装
+
+略。
+
+mvn --version
+
+3. 创建一个项目 
+
+创建一个目录，并执行shell命令:
+
+$ mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+
+如果你是刚刚安装Maven, 第一次执行可能要花点时间。这是因为Maven需要下载最近的工具(插件jars和其他文件)到你的本地目录。你也可能要执行数次才能成功。这是因为在下载完成前远程服务器可能会连接超时。
+
+你将注意到创建了一个与artifactId同名的目录，进入目录。
+cd my-app
+
+这个目录下，你将看到标准项目结构:
+my-app
+├── pom.xml
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── mycompany
+    │               └── app
+    │                   └── App.java
+    └── test
+        └── java
+            └── com
+                └── mycompany
+                    └── app
+                        └── AppTest.java
+
+src/main/java目录包含项目源代码，src/test/java目录包含测试代码，pom.xml文件是项目的项目对象模型(Project Object Model, or POM).
+
+----------------------------------------------------------------------------------------
+Introduction to the Standard Directory Layout
+---------------------------------------------
+
+src/main/java 	Application/Library sources
+src/main/resources 	Application/Library resources
+src/main/filters 	Resource filter files
+src/main/config 	Configuration files
+src/main/scripts 	Application/Library scripts
+src/main/webapp 	Web application sources
+src/test/java 	Test sources
+src/test/resources 	Test resources
+src/test/filters 	Test resource filter files
+src/it 	Integration Tests (primarily for plugins)
+src/assembly 	Assembly descriptors
+src/site 	Site
+LICENSE.txt 	Project's license
+NOTICE.txt 	Notices and attributions required by libraries that the project depends on
+README.txt 	Project's readme
+----------------------------------------------------------------------------------------
+
+3.1 POM
+
+pom.xm文件是Maven项目的核心配置，它是一个包含了所需信息的配置文件，可以按你想要的方式构建项目。POM是巨大的并且可能被它的复杂性吓到，但是没有必去要理解它全部的复杂功能，只需要能有效的使用他即可。这个项目的POM是:
+----------------------------------------------------------------------------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>my-app</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+----------------------------------------------------------------------------
+
+3.2 刚刚做了什么
+
+你执行了Maven目标(goal) archetype:generate, 并且为目标传入了一些参数。前缀archetype是一个包含这个目标的插件。如果你熟悉ant，你可能会假想这类似于一个task. 这个目标(goal)创建了一个基于archetype的简单项目。现在足以来说明，一个插件是一个包含若干通用目标的集合。例如，插件jboss-maven-plugin, 的目的是“处理各种jboss项目”.
+
+3.3 构建项目
+
+$ mvn package
+
+命令行将输出各种行为，并以下面的内容结束：
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.751s
+[INFO] Finished at: Wed May 07 15:51:09 CST 2014
+[INFO] Final Memory: 14M/209M
+[INFO] ------------------------------------------------------------------------
+
+不同于第一个命令(archetype:generate)你可能注意到第二个命令只有一个单词 - package. 这不是一个目标(goal), 而是一个阶段(phase). 
+一个阶段是构建周期(一个有序的阶段序列)的一个步骤。当给出一个阶段(phase)时，Maven将执行直到给定阶段的所有阶段任务。
+例如，我们执行编译(compile)阶段，实际执行的阶段包括:
+    1.validate
+    2.generate-sources
+    3.process-sources
+    4.generate-resources
+    5.process-resources
+    6.compile
+
+你可以用下面的命令来测试刚打包的JAR:
+
+$ java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
+Hello World!
+
+4. 运行Maven工具
+
+4.1 Maven阶段
+
+虽然难以涵盖完整的列表，这些是默认生命周期中最常被执行的阶段：
+    validate: 确认项目正确并且所有必须的信息可用。
+    compile: 编译项目源代码。
+    test: 用一个合适的单元测试框架测试编译过的代码。这些测试不应该要求代码被打包或部署。
+    package: 以可发布的格式(如JAR)打包编译过的代码。
+    integration-test: 如果需要的话处理并部署包到一个集成测试可以运行的环境。
+    verify: 运行检查以确认包有效并符合质量标准。
+    install: 安装包到本地仓库，为了在其他项目中像本地依赖一样使用。
+    deploy: 在集成或发布环境完成, 复制最终的包到远程仓库以与其他开发者或项目共享。
+
+在上面的默认列表之外，有两个其他的Maven生命周期。它们是：
+    clean: 清除之前构建时创建的文件。
+    site: 为项目生成site文档。
+
+事实上，阶段(phases)被映射为潜在的目标(goals)。每个阶段执行的特定目标，取决于项目打包的类型。
+例如，如果个项目类型是JAR, 打包时执行jar:jar, 如果项目类型是WAR, 则执行war:war.
+
+一个有趣的现象是，阶段(phases)和目标(goals)可以并列依次执行:
+mvn clean dependency:copy-dependencies package
+
+4.2 生成Site文档
+
+$ mvn site
+
+基于项目的pom信息生成site，可以在target/site下看到文档。
+
+5. 结论
+
+这是一个截取出来的快速指南。更详细的信息参考，
+Maven Getting Started Guide (http://maven.apache.org/guides/getting-started/index.html)
+
+
+
+
+
+
+
+
+
