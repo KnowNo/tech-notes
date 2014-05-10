@@ -1,0 +1,90 @@
+
+http://www.amazon.com/Learning-Website-Development-Django-applications/dp/1847193358
+
+
+Most Helpful Customer Reviews
+
+------------------------------- 25 of 25 people found the following review helpful
+
+Great book, even after Django 1.0
+By Joe on November 26, 2008
+
+This book will basically guide you along the development of a web application that allows users to submit and share bookmarks. Unlike the online Django documentation, where snippets of code are presented to illustrate usage of particular features, this book takes you from start to finish of a complete web application. As other reviews point out, the book covers many popular features found in modern sites, including ajax, tags, pagination and rss.
+
+The book is written based on Django 0.96 and there are a few places where the code breaks under Django 1.0. However, I didn't find debugging the code a big deal. As a matter of fact, it was a great opportunity for me to use the online Django documentation. You will eventually need to use Django's documentation anyway when you start writing your own apps.
+
+If you don't want to debug, here are the code changes that you will need to make for the code to work with Django 1.0:
+
+maxlength --> max_length @pp. 33, 68
+
+form.has_errors --> form.errors @pp. 46, 52
+
+clean_data --> cleaned_data @pp. 59, 60, 65, 73, 130
+
+comment_form --> render_comment_form @pp. 144
+
+don't create form.html @pp. 145
+
+don't create posted.html @pp. 146
+
+chapter 8: - many changes. To get admin working:
+in settings.py add:
+'django.contrib.admin'
+in urls.py add:
+from django.contrib import admin
+admin.autodiscover()
+(r'^comments/', include('django.contrib.comments.urls'))
+
+This is a great book for getting started with Django. You will leave this book with a good idea of how to create very rich Django applications. 
+
+----------------------------------
+
+Get up and running quickly
+By James Stewart on May 16, 2008
+
+Reviewing The Definitive Guide to Django: Web Development Done Right a few months ago I noted that the key place that book lacked was in examples. As befits the work of the creators of a framework, it did very well at explaining the underlying philosophies and working through all manner of implementation details, but it wasn't the book for those who just want to dive in and build something. If that's how you like to use technical books, then Learning Website Development With Django may be more what you're looking for.
+
+Following the iterative development of a delicious/digg hybrid social bookmarking application, Ayman Hourieh's book moves quickly through a range of Django features, from setting up your initial models, and using the built in user and admin sections, to supporting AJAX with jQuery, speeding up your app with caching and (briefly) writing automated tests. The pace is fairly measured and Ayman Hourieh does a good job of explaining what's going on at each step. An experienced web developer should find most of the information they need to get up and running with django, ready to get to work on their own apps.
+
+Perhaps appropriately, where this book is lacking is in explaining how the different parts of the framework fit together. There's plenty you can pick up by inference, but there are no detailed explanations of, say, the routing system that maps URLs to code. This book's weaknesses are the former volumes strengths, and while you'll find much repeated between them a combination of the two is likely to be a good way to get a fully rounded sense of what django is and how you can use it.
+
+Disclaimer: I was sent a copy of this book for review by the publisher.
+
+------------------------------------
+
+A great introduction to developing Django applications
+By Scott Newman on May 12, 2008
+Format: Paperback
+Learning Website Development with Django by Ayman Hourieh is a great introduction to application development with the Django web development framework.
+
+The author covers a wide range of topics, leading you through installation of the framework and its basic usage. The pace of the book is brisk but not too fast, though you might want to have at least some experience with Python beforehand. (Which is fair, since Django is a Python framework!)
+
+I really liked that the book has a running application that is being built as the chapters progress so you get an idea of how each concept presented fits into the overall structure of the application. It helps provide a context for why you are learning each chapter.
+
+This book is not a reference, nor does it seem to be designed to be. (And it doesn't need to be; Django's documentation is some of the best I've ever seen in an open-source project) If you are just staring to work with Django, buy this book and Jacob and Adrian's 'The Definitive Guide to Django', which is also excellent.
+
+If you already know or have worked with Django a little, you'll want to take a look at these sections that stood out above the rest:
+
+User Registration and Management
+
+Good coverage of the auth framework plus a very strong example of user registration; this topic comes up all the time in forums and blog comments. He shows how to do an "invite a friend" email registration system, complete with challenge verification.
+
+Enhancing the User Interface with Ajax
+
+The author presents the Ajax examples with jQuery and it's very approachable even if you haven't worked with that software. The chapter is meaty and thorough with examples of how to use jQuery's features such as event handling, DOM maninpulation, and accessing properties and attributes. He also provides examples of how to implement in-place editing, live search, and auto-complete.
+
+Commenting
+
+Good coverage of the comments framework; this is another area that isn't well-documented in the Django docs. (It's still evolving, so not a lot of time has been spent documenting it)
+
+Internationalization (i18n)
+
+Though not a long chapter, it's great to see coverage of the i18n system with a full example of how to set it up and deploy it.
+
+Unit Testing
+
+I enjoyed this section for two reasons: 1) The two examples provided were tests for the running app that is being built as the book progresses, so you understand the "why" behind the tests, and 2) It's great to see an author present unit testing as an important step for application development.
+
+It's good to see this information in one place; you'd have to scour a lot of blog posts and code snippets to find all this material.
+
+

@@ -1,0 +1,24 @@
+
+
+== Ch2
+
+p19
+DATABASE_NAME = 'bookmarksdb'
+-->
+'NAME': os.path.join(BASE_DIR, 'bookmarksdb.sqlite3')
+
+== Ch3
+
+p30 
+INSTALLED_APPS = (
+    'django_bookmarks.bookmarks',
+)
+-->
+INSTALLED_APPS = (
+    'bookmarks',
+)
+
+p33
+maxlength=200 --> max_length=200
+
+== Ch4
