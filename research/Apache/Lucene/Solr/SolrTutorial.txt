@@ -1,0 +1,332 @@
+
+Solr指南
+
+* 版本: solr-4.7.2
+
+1. 概览
+
+此文档通过使用一个示例模式(schema)和一些样本数据，涵盖了运行Solr的基本内容。
+
+2. 基本需求
+
+跟随这份指南，你将需要...
+(1) Java 1.6或更高. 你能从一些地方获取包括Oracle, Open JDK, 或IBM.
+	。在命令行运行java -version应该可以得到一个以1.6开头的版本号
+	。Gnu的GCJ不被支持并且不能同Solr一起工作
+(2) 一个Solr发布版本
+
+3. 着手开始
+
+从解压Solr release包开始，并且切换工作目录到"example"目录(注意，基目录可能随下载的版本不同而变化)。例如，在UNIX, Cygwin或MacOS中使用shell:
+
+$ tar zxf solr-4.7.2.tar (或 unzip -q solr-4.7.2.zip)
+$ cd solr-4.7.2/example/
+
+Solr可以在你选择的Java Servlet容器中运行，但是为了简化这个指南，示例索引包含一个小的Jetty安装。
+启动Jetty及Solr WAR，和用例配置，只要运行start.jar ...
+
+example$ java -jar start.jar
+2012-06-06 15:25:59.815:INFO:oejs.Server:jetty-8.1.2.v20120308
+2012-06-06 15:25:59.834:INFO:oejdp.ScanningAppProvider:Deployment monitor .../solr/example/webapps at interval 0
+2012-06-06 15:25:59.839:INFO:oejd.DeploymentManager:Deployable added: .../solr/example/webapps/solr.war
+...
+Jun 6, 2012 3:26:03 PM org.apache.solr.core.SolrCore registerSearcher
+INFO: [collection1] Registered new searcher Searcher@7527e2ee main{StandardDirectoryReader(segments_1:1)}
+
+这将在8983端口启动Jetty应用服务器，并且使用你的终端来显示来自Solr的日志信息。
+你通过浏览器加载http://localhost:8983/solr/可以看到Solr正在运行。这是管理Solr的主要起点。
+
+4. 索引数据
+
+你的Solr服务器已启动并运行，但还没包含任何数据。你可以修改Solr索引，通过发送(POSTing)命令到Solr以添加(或更新)文档，删除文档，并且提交被挂起(pending)的添加和删除。这些命令可以是多种格式(XML, JSON, CSV, or javabin)。
+
+exampledocs目录包含的样例文件展示了Solr接收的命令类型，和一个Java工具用于从命令行发送(posting)它们。(有一个post.sh shell脚本也是可用的，但是这个指南中我们将使用跨平台的Java客户端。运行java -jar post.jar -h 来查看它的各个选项)
+
+来尝试一下，打开一个新的终端窗口，进入exampledocs目录，并且在目录下的一些XML文件上运行"java -jar post.jar".
+
+example/exampledocs$ java -jar post.jar solr.xml monitor.xml
+SimplePostTool version 1.5
+Posting files to base url http://localhost:8983/solr/update using content-type application/xml..
+POSTing file solr.xml
+POSTing file monitor.xml
+2 files indexed.
+COMMITting Solr index changes to http://localhost:8983/solr/update..
+Time spent: 0:00:00.942
+
+你现在在Solr中索引了两个文档，并且提交了这些改变。你现在可以搜索"solr"了，在管理界面打开"Query"标签页，并且在"q"文本框中输入"solr"。点击"Execute Query"按钮，会显示包含一个结果的页面。
+
+http://localhost:8983/solr/collection1/select?q=solr&wt=xml&indent=trueexample/exampledocs$ java -jar post.jar *.xml
+
+--------------------------------------------------------------------------------
+在界面左侧打开查询标签页：Core Admin -> core selector：collection1 -> Query
+--------------------------------------------------------------------------------
+
+你可以索引所有样例数据，使用下面的命令(假定你的命令行shell支持*.xml标记)：
+
+example/exampledocs$ java -jar post.jar *.xml
+
+...并且你现在可以使用Solr查询语法(Lucene查询语法的一个子集)来搜索所有的东西了。
+
+(以下是查询语句)
+video                     (http://localhost:8983/solr/#/collection1/query?q=video)
+name:video                (http://localhost:8983/solr/#/collection1/query?q=name:video)
++video +price:[* TO 400]  (http://localhost:8983/solr/#/collection1/query?q=%2Bvideo%20%2Bprice%3A[*%20TO%20400])
+
+有许多其他方式可以将你的数据导入到Solr...可以
+。从数据库导入记录，使用数据导入处理器(Data Import Handler, DIH)
+。加载一个CSV文件(逗号分隔的值)，包括那些从Excel或MySQL导出的文件
+。发送JSON文档
+。索引二进制文档，如Word和PDF，使用Solr Cell(ExtractingRequestHandler)
+。使用用于Java的SolrJ或其他Solr客户端程序式地创建文档并发送到Solr.
+
+--------------------------------------------------------------------------------
+关于索引方式的wiki文档链接：
+http://wiki.apache.org/solr/DataImportHandler
+http://wiki.apache.org/solr/UpdateCSV
+http://wiki.apache.org/solr/UpdateJSON
+http://wiki.apache.org/solr/ExtractingRequestHandler
+http://wiki.apache.org/solr/Solrj
+--------------------------------------------------------------------------------
+
+5. 更新数据
+
+你可能已经注意到，虽然文件solr.xm现在已经被两次发送到服务器，但你搜索"solr"时仍只能得到一个结果。这是因为样例schema.xml(example/solr/schema.xml)指定了一个"uniqueKey"域名为"id". 无论何时你发送命令到Solr添加具有相同uniqueKey的已经存在的文档，它都会自动为你替换它，你可以通过在统计页面的"CORE"/searcher段查看numDocs和maxDoc的值来确认。
+
+http://localhost:8983/solr/#/collection1/plugins/core?entry=searcher
+--------------------------------------------------------------------------------
+Core Admin -> core selector：collection1 -> Plugins/Stats -> CORE -> searcher
+--------------------------------------------------------------------------------
+
+numDocs代表索引中可以被搜索的文档数目(并且将比被索引的文件数大，因为有些文件包含不止一个<doc>). maxDoc的值可能(比numDocs)更大，因为maxDoc计数包含了逻辑上被删除，但还未被从索引中移除的文档。只要你愿意你可以一遍又一遍的重复发送样例XML文件，而且numDocs将不会增加，因为新的文件将不断地替换旧的。
+
+随意编辑存在的XML文件以改变部分数据，并且重新运行java -jar post.jar命令，你将看到你的修改被反映在接下来的搜索中。
+
+5.1 删除数据
+
+你可以删除数据，通过向更新URL发送删除命令，并且指定文档的唯一键(unique key)域，或一个匹配多个文档的查询(谨慎使用！). 因为这些命令比较小，你将在命令的右侧指定，而不是引用一个XML文件。
+
+使用下面的命令来删除一个指定文档
+
+example/exampledocs$ java -Ddata=args -Dcommit=false -jar post.jar "<delete><id>SP2514N</id></delete>"
+SimplePostTool version 1.5
+POSTing args to http://localhost:8983/solr/update..
+Time spent: 0:00:00.025
+
+因为我们指定了"commit=false"(未提交)，一个查询为id:SP2514N的搜索将仍可以找到这个已被删除文档。因为用例配置使用了Solr的"autoCommit"功能，Solr会自动保持这个改变到索引，但它不会影响搜索结果，除非一个"openSearcher"提交(commit)被显示的执行了。
+--------------------------------------------------------------------------------
+http://localhost:8983/solr/#/collection1/query?q=id:SP2514N
+--------------------------------------------------------------------------------
+
+使用updateHandler的统计界面，你能看到这个删除传递到磁盘，通过观察到deleteById的值降到0，伴随cumulative_deletesById和autocommit的值的增加。
+--------------------------------------------------------------------------------
+http://localhost:8983/solr/#/collection1/plugins/updatehandler?entry=updateHandler
+--------------------------------------------------------------------------------
+
+这里是一个通过查询删除(delete-by-query)的例子，用来删除name中包含DDR的文档：
+
+example/exampledocs$ java -Dcommit=false -Ddata=args -jar post.jar "<delete><query>name:DDR</query></delete>"
+SimplePostTool version 1.5
+POSTing args to http://localhost:8983/solr/update..
+Time spent: 0:00:00.038
+
+你通过发送一个显示的提交(commit)命令到Solr，可以强制打开一个新的searcher来反映这些改变。
+
+example/exampledocs$ java -jar post.jar -
+SimplePostTool version 1.5
+COMMITting Solr index changes to http://localhost:8983/solr/update..
+Time spent: 0:00:00.025
+
+现在重新执行之前的搜索(q=id:SP2514N)，并且确认没有找到匹配的文档。你也可以重新访问统计页面，并观察updateHandler的提交数目和searcher的numDocs的改变。
+
+打开一个新的searcher的提交可能是昂贵的操作，所以最好批量对一个索引作出多个改变，并且在最后发送一个提交(commit)命令。也有一个optimize命令跟commit做同样的事情，而且还会强制所有索引片段合并到一个单一片段 -- 这可能非常消耗资源(resource intensive)，但对于提高搜索速度来说是值得的，如果你的索引频繁改变。
+
+所有的更新命令可以使用XML或JSON来指定.
+
+为继续这个指南，重新添加exampledocs下面所有你可能已经删除了的文档，执行：
+
+example/exampledocs$ java -jar post.jar *.xml
+
+6. 查询数据
+
+搜索通过HTTP GET使用select URL和q参数中的查询字符串来完成。你可以传入大量可选的请求参数(request parameters)到请求处理器来控制返回的信息。例如，你可以使用"fl"参数来控制返回哪些域，和相关度(relevancy)分数是否被返回:
+
+    q=video&fl=name,id (只返回name和id域)
+    q=video&fl=name,id,score (也返回相关度分数)
+    q=video&fl=*,score (返回所有域，和相关度分数)
+    q=video&sort=price desc&fl=name,id,price (增加排序定义：按价格降序排列)
+    q=video&wt=json (以JSON格式返回响应)
+
+--------------------------------------------------------------------------------
+request parameters, http://wiki.apache.org/solr/SearchHandler
+
+http://localhost:8983/solr/collection1/select/?indent=on&q=video&fl=name,id
+...
+--------------------------------------------------------------------------------
+
+Web管理界面提供的查询表单(query form)允许设置各种请求参数，而且在测试或调试查询的时候很有用。
+--------------------------------------------------------------------------------
+http://localhost:8983/solr/#/collection1/query
+--------------------------------------------------------------------------------
+
+6.1 排序
+
+Solr提供了一个简单的方法来在一个或多个索引域上排序。用"sort"参数来指定"域 排序方向"对，如果有多于一个排序域，使用逗号分隔:
+
+    q=video&sort=price desc
+    q=video&sort=price asc
+    q=video&sort=inStock asc, price desc
+
+"score"也可以作为一个排序域名：
+
+    q=video&sort=score desc
+    q=video&sort=inStock asc, score desc
+
+复杂函数也可以用来排序结果：
+
+    q=video&sort=div(popularity,add(price,1)) desc
+
+如果sort没有被指定，默认为"score desc"来返回有最高相关度的匹配。
+
+7. 高亮
+
+命中高亮(hit highlighting)返回每个返回文档的相关片段，并且在这些内容中加亮来自查询的词。
+
+下面的例子搜索video card并且请求在name,features域上加亮。这使得一个加亮文本段被添加到结果，并且加亮词被<em>(emphasis)标签包围。
+
+...&q=video card&fl=name,id&hl=true&hl.fl=name,features
+
+更多关于控制高亮的请求参数可以在这里找到。
+--------------------------------------------------------------------------------
+http://wiki.apache.org/solr/HighlightingParameters
+--------------------------------------------------------------------------------
+
+8. 分面搜索
+
+分面搜索取一个查询的匹配文档，并且为各种属性或分类生成计数。通常提供了链接让用户可以向下挖掘"drill down"，或基于返回的分类优化他们的搜索结果。
+
+下面的例子，搜索所有的文档(*:*)并且要求对分类(cat)域计数。
+
+...&q=*:*&facet=true&facet.field=cat
+
+注意到，虽然只有前10个文档在结果列表中被返回，分面计数是对匹配查询的完整文档集生成的。
+
+我们可以同时有不同的分面。下面的例子，增加了一个在布尔类型域inStock上的分面。
+
+...&q=*:*&facet=true&facet.field=cat&facet.field=inStock
+
+Solr也可以为任意的查询生成计数。下面的例子查询ipod并且显示低于和高于100的价格，通过使用price域上的范围查询。
+
+...&q=ipod&facet=true&facet.query=price:[0 TO 100]&facet.query=price:[100 TO *]
+
+--------------------------------------------------------------------------------
+返回结果:
+  "facet_counts":{
+    "facet_queries":{
+      "price:[0 TO 100]":2,
+      "price:[100 TO *]":1},
+     }
+   ...
+   }
+--------------------------------------------------------------------------------
+
+Solr甚至可以按数值范围分面(包括日期)。这个例子对2004到2010之间每年的生产日期(manufacturedate_dt域)请求计数。
+
+...&q=*:*&facet=true&facet.range=manufacturedate_dt&facet.range.start=2004-01-01T00:00:00Z&facet.range.end=2010-01-01T00:00:00Z&facet.range.gap=+1YEAR 
+
+更多关于分面搜索的信息可以在分面概述(faceting overview)和分面参数(faceting parameters)页面(wiki)找到。
+--------------------------------------------------------------------------------
+faceting overview    :   http://wiki.apache.org/solr/SolrFacetingOverview
+faceting parameters  :   http://wiki.apache.org/solr/SimpleFacetParameters
+--------------------------------------------------------------------------------
+
+9. 搜索界面
+
+Solr包含一个用快速模板(velocity templating)构建的示例搜索界面，演示了很多功能，包括搜索，分面，高亮，自动补全，和地理位置搜索。
+--------------------------------------------------------------------------------
+https://wiki.apache.org/solr/VelocityResponseWriter
+--------------------------------------------------------------------------------
+
+在此尝试它 http://localhost:8983/solr/collection1/browse
+
+10. 文本分析
+
+文本域典型地索引是通过将文本切分为词，并且应用各种转换如小写化，移除复数，或词干化来增加相关性。同样的文本转换通常被应用到任何查询以匹配被索引的文本。
+
+模式(schema)定义了索引中的域，以及对其应用什么类型的分析。你的集合当前使用的模式可以直接通过管理界面的模式标签页(Schema tab)来查看，或使用模式浏览器(Schema Browser tab)动态导出。
+
+--------------------------------------------------------------------------------
+http://wiki.apache.org/solr/SchemaXml
+http://localhost:8983/solr/#/collection1/files?file=schema.xml
+http://localhost:8983/solr/#/collection1/schema-browser
+--------------------------------------------------------------------------------
+
+如果你知道你的文本内容是英语，正如这个指南的所用文档的情况，你想要应用英语特定的词干化和停用词移除，以及分割复合词，你可以使用text_en_splitting域类型(filedType)来代替。去solr/example/solr/collection1/conf目录编辑schema.xml, 为text和features域使用text_en_splitting域类型(filedType)，像这样：
+
+   <field name="features" type="text_en_splitting" indexed="true" stored="true" multiValued="true"/>
+   ...
+   <field name="text" type="text_en_splitting" indexed="true" stored="false" multiValued="true"/>
+
+做好这些修改后停止并重启Solr，然后使用java -jar post.jar *.xml重新发送这些用例文档。现在像下面列出的查询将演示英语相关的转化：
+    使用WordDelimiterFilter和LowerCaseFilter, 一个对power-shot的搜索能匹配PowerShot, 并且adata能匹配A-DATA.
+    使用PorterStemFilter的词干化功能，搜索features:recharging可以匹配Rechargeable.
+    使用 SynonymFilter，搜索"1 gigabyte"能匹配1GB，并且常见的误拼的pixima能匹配Pixma.
+
+分析组件的完全描述，关于可用的Analyzers, Tokenizers, and TokenFilters，在这里：
+http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters
+
+10.1 分析调试
+
+有一个方便的分析页面(Analysis tab)，你能看到一个域或域值的文本值是如何被切分成词的，包括索引和查询时的分析链。这个页面显示了它们通过序列中的各filter后的结果片段。
+--------------------------------------------------------------------------------
+http://localhost:8983/solr/#/collection1/analysis
+--------------------------------------------------------------------------------
+
+http://localhost:8983/solr/#/collection1/analysis?analysis.fieldvalue=Canon+Power-Shot+SD500&analysis.query=&analysis.fieldtype=text_en_splitting&verbose_output=0
+这个url显示了使用text_en_splitting类型从"Canon Power-Shot SD500"创建的分词片段。表的每一段显示了经过分析器的下一个TokenFilter后的结果片段。注意powershot和power, shot是如何都被索引的，使用有相同"位置"("position")的分片。（对比之前使用text_general域类型生成的结果）
+
+移动鼠标到左边的分析器序列的标签上，会显示分析器组件的全名。轮选"Verbose Output"框将显示/隐藏详细的分片属性。
+
+当索引和查询值都提供了，两张表将并列显示各结果序列。索引序列结果中与查询序列最终结果中相同的词，将被加亮。
+
+其他有趣的例子：
+    使用text_en域类型，英语词干化和停用词。
+    使用text_cjk域类型，半角片假名(Half-width katakana)的bi-graming规范化
+    使用text_ja域类型，日语语法分解和词性过滤
+    使用text_ar域类型，阿拉伯语(Arabic)的停用词，规范化，和词干分析
+
+--------------------------------------------------------------------------------
+English stemming and stop-words:
+http://localhost:8983/solr/#/collection1/analysis?analysis.fieldvalue=A+new+nation%2C+conceived+in+liberty+and+dedicated+to+the+proposition+that+all+men+are+created+equal.%0A&analysis.query=liberties+and+equality&analysis.fieldtype=text_en&verbose_output=0
+Half-width katakana normalization with bi-graming:
+http://localhost:8983/solr/#/collection1/analysis?analysis.fieldtype=text_cjk&analysis.fieldvalue=%EF%BD%B6%EF%BE%80%EF%BD%B6%EF%BE%85&analysis.query=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&verbose_output=1
+Japanese morphological decomposition with part-of-speech filtering:
+http://localhost:8983/solr/#/collection1/analysis?analysis.fieldtype=text_ja&analysis.fieldvalue=%E7%A7%81%E3%81%AF%E5%88%B6%E9%99%90%E3%82%B9%E3%83%94%E3%83%BC%E3%83%89%E3%82%92%E8%B6%85%E3%81%88%E3%82%8B%E3%80%82&verbose_output=1
+Arabic stop-words, normalization, and stemming:
+http://localhost:8983/solr/#/collection1/analysis?analysis.fieldtype=text_ar&analysis.fieldvalue=%D9%84%D8%A7+%D8%A3%D8%AA%D9%83%D9%84%D9%85+%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9&verbose_output=1
+--------------------------------------------------------------------------------
+
+11. 总结
+
+恭喜！你已成功地运行了一个小的Solr实例，添加了一些文档，并且对索引和模式做了些改变。你学习了关于查询，文本分析，和Solr管理界面。你已经准备好开始在你自己的项目中使用Solr了！
+按下面的步骤继续：
+。订阅Solr的mailing lists!
+。拷贝一份Solr example目录作为你的项目的模板
+。在solr/collection1/conf/中定制模式和其他配置，以满足你的需求
+
+Solr还有大量其他这里没有触及的功能，包括分布式搜索(distributed search)以处理巨大的文档集合，函数查询，数值域统计，和搜索结果聚合。探索Solr Wiki以找到关于Solr的诸多功能的更多细节。
+
+--------------------------------------------------------------------------------
+http://wiki.apache.org/solr/DistributedSearch
+http://wiki.apache.org/solr/FunctionQuery
+http://wiki.apache.org/solr/StatsComponent
+http://wiki.apache.org/solr/ClusteringComponent
+http://lucene.apache.org/solr/features.html
+--------------------------------------------------------------------------------
+
+Have Fun, 我们将在Solr的mailing lists上看到你！
+
+
+
+
+
+
