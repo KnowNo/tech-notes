@@ -1,0 +1,130 @@
+
+简介
+
+Apache Nutch是一个用Java写的开源网络爬虫。通过使用它，我们可以以自动的方式查找网页超链接，减少很多维护的工作，例如检查坏链接，和创建所有访问过页面的一份拷贝以用于搜索，这是Apache Solr参与进来的地方。Solr是一个开源的全文搜索框架，使用Solr我们可以搜索Nutch访问过的页面。幸运的是，Nutch和Solr之间的整合相当直观，如下面的说明。
+
+Apache Nutch支持直接使用Solr, 极大地简化了Nutch-Solr整合。它也移除了遗留的用Apache Tomcat来运行旧的Nutch Web应用的依赖，和用Apache Lucene来索引的依赖。只要在这里下载二进制发布文件(http://mirror.esocc.com/apache/nutch/)。
+
+
+步骤
+
+这份指南表述了Nutch 1.x(当前版本是1.7)的安装和使用。如果编译和建立Nutch 2.x和Hbase，见Nutch2Tutorial.
+
+1. 从二进制发布版本建立Nutch
+
+。下载一个二进制包(apache-nutch-1.X-bin.zip)
+。解压你的二进制Nutch包，应该会有一个apache-nutch-1.X目录
+。cd apache-nutch-1.X
+
+从现在起，我们使用${NUTCH_RUNTIME_HOME}来引用当前目录(apache-nutch-1.X)
+
+1.1 从源代码发布版本建立
+
+高级用户可能也使用源代码发布：
+。下载一个源代码包(apache-nutch-1.X-src.zip)
+。解压
+。cd apache-nutch-1.X
+。在目录中运行ant (参看 http://wiki.apache.org/nutch/RunNutchInEclipse)
+。现在有一个目录runtime/local，包含了一个可用的Nutch安装。
+
+当使用源代码发布的时候，${NUTCH_RUNTIME_HOME}引用apache-nutch-1.X/runtime/local/. 注意到，
+。配置文件应可以在apache-nutch-1.X/runtime/local/conf/修改
+。ant clean将移除这个目录(保留修改过的配置文件)
+
+2. 检验你的Nutch安装
+
+运行 "bin/nutch" - 如果你看到类似下面的内容，你能确认一个正确的安装。
+--------------------------------------------------------------------------------
+Usage: nutch COMMAND where command is one of:
+crawl             one-step crawler for intranets (DEPRECATED)
+readdb            read / dump crawl db
+mergedb           merge crawldb-s, with optional filtering
+readlinkdb        read / dump link db
+inject            inject new urls into the database
+generate          generate new segments to fetch from crawl db
+freegen           generate new segments to fetch from text files
+fetch             fetch a segment's pages
+--------------------------------------------------------------------------------
+
+一些故障排除的贴士：
+
+。如果你看到"Permission denied"(权限拒绝)运行下面的命令
+chmod +x bin/nutch
+
+。设置JAVA_HOME如果还没设置。在Mac上，你可以运行下面的命令或加到~/.bashrc:
+export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home
+在Debian或Ununtu，你可以运行下面的命令或加到~/.bashrc:
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+
+3. 爬取你的第一个网站
+。在conf/nutch-site.xml的http.agent.name属性值中添加你的代理名，例如：
+<property>
+ <name>http.agent.name</name>
+ <value>My Nutch Spider</value>
+</property>
+
+。mkdir -p urls
+。cd urls
+。touch seed.txt 以在urls/下创建一个文本文件seed.txt，包含下面的内容(每行一个URL，表示你想要Nutch抓取的各网站)
+http://nutch.apache.org/
+
+。编辑conf/regex-urlfilter.txt文件，并替换
+--------------------------------------------------------------------------------
+# accept anything else
++.
+--------------------------------------------------------------------------------
+为一个正则表达式，匹配你想抓取的主域。例如，你想限制爬取nutch.apache.org域，应该如此：
+--------------------------------------------------------------------------------
++^http://([a-z0-9]*\.)*nutch.apache.org/
+--------------------------------------------------------------------------------
+这将抓取域nutch.apache.org内的任何URL.
+
+3.1 使用抓取命令
+
+注意：抓取命令被弃用了。请见3.3节关于如何使用爬取脚本，用于替代爬取命令。
+
+现在我们准备好了初始化一次爬取，使用下面的参数：
+。-dir dir 放爬取数据的目录
+。-threads threads 控制并行抓取的线程数
+。-depth depth 表示应该爬取的从根页面开始的链接深度
+。-topN N 表示每个深度层次被抓取的最大页面数。
+。运行下面的命令：
+bin/nutch crawl urls -dir crawl -depth 3 -topN 5
+。你现在应该能看到下面的目录被创建了：
+crawl/crawldb
+crawl/linkdb
+crawl/segments
+
+注意：如果你已经有一个Solr内核设置好了，并且希望用它索引，你需要添加 -solr <solrUrl> 参数到你的爬取命令，如：
+bin/nutch crawl urls -solr http://localhost:8983/solr/ -depth 3 -topN 5
+
+如果没有，请跳到<建立Solr用于搜索>，关于如何建立你的Solr实例和索引你爬取的数据。
+
+通常我们开始测试配置时，爬取较浅的深度，极大的限制每个层次抓取的页面数(-topN), 并且观察输出以检查需要的页面被抓取了，而不需要的页面没有被抓取。一旦对配置足够自信，那么对于一个完全爬取的合适的深度大约为10，每层抓取的页面数可以从几万到百万，取决于你的资源。
+
+3.2 使用单独的命令进行全网(Whole-Web)爬取
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
