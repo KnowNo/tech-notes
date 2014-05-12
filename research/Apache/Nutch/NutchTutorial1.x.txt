@@ -44,6 +44,7 @@ inject            inject new urls into the database
 generate          generate new segments to fetch from crawl db
 freegen           generate new segments to fetch from text files
 fetch             fetch a segment's pages
+...
 --------------------------------------------------------------------------------
 
 一些故障排除的贴士：
@@ -104,9 +105,23 @@ bin/nutch crawl urls -solr http://localhost:8983/solr/ -depth 3 -topN 5
 
 3.2 使用单独的命令进行全网(Whole-Web)爬取
 
+TODO
 
 
+3.3 使用爬取脚本
 
+如果你跟随了上面的3.2节关于如何一步一步被爬取，你可能会想如何能写一个脚本自动化所有上面描述的处理。
+
+Nutch开发者们已经为你写了一个:), 它可用为bin/crawl
+
+$ bin/crawl
+Missing seedDir : crawl <seedDir> <crawlDir> <solrURL> <numberOfRounds>
+
+Example: bin/crawl urls/seed.txt TestCrawl http://localhost:8983/solr/ 2
+或可用：
+Example: bin/nutch crawl urls -solr http://localhost:8983/solr/ -depth 3 -topN 5
+
+爬取脚本有许多参数集，并且你可以根据你的需求修改参数。在设置大的爬取前理解这些参数，是一个理想的情况。
 
 
 
