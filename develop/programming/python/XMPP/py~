@@ -1,0 +1,14 @@
+
+http://www.douban.com/note/31067322/
+-------------------------------------------------
+基于Python的XMPP库
+2009-04-13 22:44:58
+
+基于Python的Jabber/XMPP库：
+    * jabber.py 已经没有在更新了，XMPP实现率低
+    * xmpppy是jabber.py的继承者，使用方便简单，有彩色debug输出（如果你的shell支持彩色的话）xmpppy适合轻量级的开发，不需要依赖其他python库,XML解析库是自己编写的
+    * pyxmpp是最符合XMPP和jabber协议的库，作者本身就是Jabber标准组的成员之一
+    * pyxmpp的安装比xmpppy麻烦的多。需要libxml2、dnspython和M2Crypto，可惜不支持Win32
+    * TwistedWords提供异步IO等强大的功能，但是其Java式的复杂体系结构遭到不少Pythonic程序员的唾弃
+
+听从大家的建议，我决定研究一下pyxmpp。

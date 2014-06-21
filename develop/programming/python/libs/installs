@@ -1,0 +1,9 @@
+------ numpy
+apt-get install python-numpy
+apt-get install python-scipy
+
+------ matplotlib
+sudo apt-get install python-matplotlib
+----------------------------------------------------------------
+
+

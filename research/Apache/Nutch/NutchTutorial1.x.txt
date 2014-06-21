@@ -124,7 +124,7 @@ Example: bin/nutch crawl urls -solr http://localhost:8983/solr/ -depth 3 -topN 5
 爬取脚本有许多参数集，并且你可以根据你的需求修改参数。在设置大的爬取前理解这些参数，是一个理想的情况。
 
 
-
+bin/crawl baidu/seed.txt baidu http://localhost:8983/solr/ 2
 
 
 

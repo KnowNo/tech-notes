@@ -1,0 +1,352 @@
+== Chapter 2
+
+$ django-admin.py startproject django_bookmarks
+
+settings.py
+
+~:  'NAME': os.path.join(BASE_DIR, 'bookmarksdb.sqlite3')
+
+$ python manage.py syncdb
+
+Username (leave blank to use 'zhongxia'): bookmarks
+Email address: bookmarks@abc.com
+Password: bookmarks
+
+$ python manage.py runserver
+
+http://127.0.0.1:8000/
+
+
+== Chapter 3
+
+-- Creating the Main Page View / URL
+
+$ python manage.py startapp bookmarks
+
+bookmarks/views.py
+
+django_bookmarks/urls.py
+
+
+正则表达式：
+http://docs.python.org/lib/module-re.html
+
+Symbol / Expression	Matched String
+	. (Dot)			Any character.
+	^ (Caret)		Start of string.
+	$			End of string.
+	*			0 or more repetitions.
+	+			1 or more repetitions.
+	?			0 or 1 repetitions.
+	|			A | B means A or B.
+	[a-z]			Any lowercase character.
+	\w			Any alphanumeric character or _.
+	\d			Any digit.
+
+
+-- Models: Designing an Initial Database Schema
+
+- The Link Data Model
+
+bookmarks/models.py
+
+DB数据类型
+
+Field Type 	Description
+IntegerField 	An integer.
+TextField 	A large text field.
+DateTimeField 	A date and time field.
+EmailField 	An email field with 75 chars max.
+URLField 	A URL field with 200 chars max.
+FileField 	A file-upload field.
+
+INSTALLED_APPS = (
+~:   'django_bookmarks.bookmarks',   -->  'bookmarks'
+)
+
+$ python manage.py syncdb
+
+$ python manage.py sql bookmarks
+
+$ python manage.py shell
+This shell differs from the standard Python shell in two ways. Firstly, the project
+path is added to sys.path, which simplifies importing modules from our project.
+Secondly, a special environment variable is created to hold the path to our settings.py. 
+So whenever you need a Python shell to interact with your project, use the above command.
+
+>>> from bookmarks.models import *
+>>> link1 = Link(url='http://www.packtpub.com/')
+>>> link1.save()
+>>> link2 = Link(url='http://www.example.com/')
+>>> link2.save()
+>>> link2.url
+'http://www.example.com/'
+>>> link1.url
+'http://www.packtpub.com/'
+>>> link2.url = 'http://www.google.com/'
+>>> link2.save()
+>>> links = Link.objects.all()
+>>> for link in links:
+...   print link.url
+... 
+http://www.packtpub.com/
+http://www.google.com/
+>>> Link.objects.get(id=1)
+<Link: Link object>
+>>> link2.delete()
+>>> Link.objects.count()
+1
+
+$ sqlite3 bookmarksdb.sqlite3
+
+sqlite> select * from bookmarks_link;
+1|http://www.packtpub.com/
+sqlite> select * from bookmarks_link;
+1|http://www.packtpub.com/
+2|http://www.example.com/
+sqlite> select * from bookmarks_link;
+1|http://www.packtpub.com/
+2|http://www.google.com/
+sqlite> select * from bookmarks_link;
+1|http://www.packtpub.com/
+
+- The User Data Model
+
+- Templates:
+
+- Putting It All Together: Generating User Pages
+
+
+== Chapter 4    User Registration and Management
+
+= Session Authentication
+
+The Django authentication system is available in the django.contrib.auth package.
+. Users
+. Permissions
+. Groups
+. Messages
+
+- Creating the Login Page
+
+Django developers have carefully implemented a session management system
+
+http://127.0.0.1:8000/login/
+
+--------------------------------------------------------------
+Forbidden (403)
+
+CSRF verification failed. Request aborted.
+--------------------------------------------------------------
+<form method="post" action=".">
+    {% csrf_token %}               -----------------------> 添加，否则出错403。
+    <p><label for="id_username">Username:</label>
+--------------------------------------------------------------
+
+'user': request.user:
+• is_authenticated() logged in or not.
+• get_full_name() 
+• email_user(subject, message, from_email=None) sends an email to the user.
+• set_password(raw_password) 
+• check_password(raw_password) 
+
+= Improving Template Structure
+
+feature: template inheritance
+template tag: block,  define sections that are modifiable by child templates
+
+CSS stylesheet
+Stylesheets and images are static files; Django does not serve them. 
+In a production environment, this task is left to the web server. 
+
+as we will need to pass the user object to every template that we write in the future. 
+
+= User Registration
+
+- Django Forms
+
+The Django forms library handles 3 common tasks:
+HTML form generation.
+Server-side validation of user input.
+HTML form redisplay in case of input errors.
+
+
+direct_to_template has been deprecated. In django 1.5 try using a Class based view in urls.py
+from django.views.generic import TemplateView
+urlpatterns = patterns('',
+    url(r'^$', TemplateView.as_view(template_name='homepage.html'), name="home"),
+)
+
+= Account Management
+
+views available in jango.contrib.auth.views
+
+logout
+logout_then_login
+password_change
+password_change_done
+password_reset
+password_reset_done
+redirect_to_login
+
+== ch5 Introducing Tags
+
+= The Tag Data Model
+
+= Creating the Bookmark Submission Form
+
+- Restricting Access to Logged-in Users
+
+- Methods for Browsing Bookmarks
+
+include template tag
+
+- Improving the User Page
+
+- Creating a Tag Page
+
+- Building a Tag Cloud
+
+= A Word on Security
+
+- SQL Injection
+the Django model API is safe from these types of attacks. 
+do not need to do anything special to protect our application from SQL injection.
+
+- Cross-Site Scripting (XSS)
+a malicious user supplies JavaScript code within input.
+
+<script>alert("Test.");</script>
+This string is JavaScript code that displays a message box with the text Test. Ourapplication will accept it as a bookmark title and store it in the database.
+-->
+Django provides a feature called template filters to process variables before printing them in a template.
+
+
+== ch6 Enhancing the User Interface with Ajax
+
+= Ajax and Its Advantages
+
+Ajax, which stands for Asynchronous JavaScript and XML, consists of the following technologies:
+. HTML and CSS
+. JavaScript
+. XMLHttpRequest
+. A format for transferring data between the client and server. XML, HTML, TEXT, JSON
+
+= Using an Ajax Framework in Django
+
+- Downloading and Installing jQuery
+
+= The jQuery JavaScript Framework
+
+- Element Selectors
+
+passing a CSS selector string to function $()
+
+- jQuery Methods
+
+. methods to manipulate HTML documents
+. Accessing CSS Properties and HTML Attributes
+. Manipulating HTML Documents
+. Traversing the Document Tree
+. Handling Events
+. Sending Ajax Requests
+
+= Implementing Live Searching of Bookmarks
+
+- Implementing Searching
+
+field and operator:  field__operator()  #这里两个下划线，如title__icontains
+
+• exact: The value of the argument is an exact match of the field.
+• contains: The field contains the value of the argument.
+• startswith: The field starts with the value of the argument.
+• lt: The field is less than the value of the argument.
+• gt: The field is greater than the value of the argument.
+
+case-insensitive versions:
+iexact
+icontains
+istartswith
+
+打开页面：
+http://127.0.0.1:8000/search/
+
+- Implementing Live Searching
+
+http://127.0.0.1:8000/search/    --> 显示结果，但不重新加载页面
+
+= Editing Bookmarks in Place 就地编辑
+
+- Implementing Bookmark Editing
+
+- Implementing In-Place Editing of Bookmarks
+
+bookmark_edit.js:
+
+= Auto-Completion of Tags
+
+http://plugins.jquery.com
+http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/
+
+== ch7 Voting and Commenting
+
+= Sharing Bookmarks on the Main Page
+
+= Commenting on Bookmarks
+
+Django used to include a comments framework; 
+since Django 1.6 it's been separated to a separate project. 
+This is that project: https://github.com/django/django-contrib-comments
+
+1. Install the comments app by running pip install django-contrib-comments.
+
+2. Install the comments framework by adding 'django_comments' to INSTALLED_APPS.
+
+adding 'django.contrib.sites'
+adding SITE_ID=1 in setting.py
+
+3. Run manage.py syncdb so that Django will create the comment tables.
+
+4. Add the comment app’s URLs to your project’s urls.py:
+urlpatterns = patterns('',
+    ...
+    (r'^comments/', include('django_comments.urls')),
+    ...
+)
+
+p144
+{% comment_form --> {% render_comment_form 
+
+p145
+action="/comments/post/"  --> action="/comments/posted/" 
+
+??
+
+
+== Ch8 Creating an Administration Interface
+
+== Ch9 Advanced Browsing and Searching
+
+- Customizing Item Fields
+
+== Ch10 Building User Networks
+
+- Building Friend Networks
+
+- Inviting Friends Via Email
+
+  -- Handling Activation Links
+
+== Ch11 Extending and Deploying
+
+- Internationalization (i18n)
+
+== Ch12
+
+
+
+
+
+
+
+

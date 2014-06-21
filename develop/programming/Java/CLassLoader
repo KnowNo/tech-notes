@@ -1,0 +1,111 @@
+
+Java深度历险-2-Classloader
+
+
+编程语言的动态性：
+
+C/C++不具备动态性，需要依赖底层操作系统提供机制来实现动态性，如Windows下的动态链接库(Dynamic Linking Library)和Unix下的共享物体(Share Object)，并且需要额外的编码来利用这些机制。
+
+Java是天生具有“动态性”的编程语言，但是一般Java程序开发者很少能察觉动态性带来的优点，甚至从不曾利用Java的动态性特质。这是因为Java动态性被巧妙的隐藏起来，程序设计者不知不觉中用到了动态性。具有动态性的优点在于，不需要编写额外的代码，因此Java没有跨平台的问题。
+
+
+Java中，是通过类型载入器(class loader)来达成动态性的。
+
+Java类型在编译器处理后，变成一个个小的执行单位(.class文件)，指定main()方法作为起点执行后，Java虚拟机会找到执行时需要的.class,并载入内存。
+对于Java虚拟机来说，每个.class都是一个独立的动态链接库，只不过后缀名不是.dll或.so, 而是.class. 
+我们只需要修改单个的.class，JVM在重新启动时，便会载入新的.class文件，以此更新程序功能。这是动态性的一个基本特性。
+
+那么，如何在Java虚拟机不重启的情况下，载入最新的.class文件，同时释放旧有版本的空间呢？
+
+
+类型载入器的运作
+
+假定定义了下面的3个类：
+
+public class A
+{
+    public void print()
+    {
+        System.out.println("Using Class A") ;
+    }
+}
+
+public class B
+{
+    public void print()
+    {
+        System.out.println("Using Class B") ;
+    }
+}
+
+public class Main
+{
+    public static void main(String args[])
+    {
+        A a1 = new A() ;
+        B b1;
+    }
+}
+
+执行 java -verbose:class Main，可以看到类别载入器(class loader)所做的事情，除了将Java程序运行需要的基础类库(核心类库，Core Classes位于$JRE_HOME/lib/rt.jar)载入内存，也将Main.class, A.class载入内存，但没有载入B.class.
+
+Java类型载入器有两种载入方式：
+预先载入(pre-loading)    - 基础类库的载入方式，大多Java程序执行时必备的类库。
+需时载入(load-on-demand) - 开发者编写的Java应用程序的载入方式，只有在实例化(a1 = new A())的时候才载入，只声明(B b1)不会载入。这样可以减少内存用量。
+
+
+Java提供两种方法来达成动态性：
+隐式(implicit) - 使用new关键字的时候。
+显示(explicit) - 一种是使用java.lang.Class.forName()，另一种是使用java.lang.ClassLoader.loadClass()
+
+- Class.forName()
+
+使用Class.forName()根据类名来实例化:
+Class c = Class.forName("A");
+Object o = c.newInstance();
+A a = (A) o;
+a.print();
+
+有两个方法：
+public static Class forName(String className)
+public static Class forName(String name, boolean initialize, ClassLoader loader)
+最终都调用原生函数：
+private static native Class forName0(String name, boolean initialize, ClassLoader loader) throws ClassNotFoundException;
+转换成调用：
+forName0(className, true, ClassLoader.getCallerClassLoader());
+forName0(name, initialize, loader);
+
+A a = new A() 相当于两个步骤：
+1.类载入： Class c = Class.forName("A");
+2.实例化： Object o = c.newInstance();
+
+initialize参数为false时，只会载入类，但不会初始化静态区域，实例化时才初始化（默认调用下，静态区域是在载入类型是初始化）。
+forName("A", false, b1.getClass().getClassLoader()); # 注意，ClassLoader.getCallerClassLoader()是私有方法,不能直接调用
+
+
+- ClassLoader.loadClass()
+
+直接使用类别载入器
+
+B b = new B();
+ClassLoader loader = b.getClass().getClassLoader();
+
+Class cb = B.class;
+ClassLoader loader = cb.getClassLoader();
+
+Class a = loader.loadClass("A") ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

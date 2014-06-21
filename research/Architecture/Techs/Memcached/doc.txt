@@ -1,0 +1,202 @@
+
+1. 基本介绍和原理
+
+免费开源、高性能、分布式的内存对象缓存系统，有一般的通用性，但其目的在于通过减轻数据库负担来加速动态Web应用。
+
+Memcached是一个驻内存的key-value存储，用于存储小块的任意数据(字符串，对象)，这些数据来自数据库调用、API调用、或页面渲染的结果。
+
+它的API对大多数的流行语言都是可用的。
+
+很多memcached使用者有专门的机器，建来只用作memcached服务器。
+
+
+它由什么组成？
+
+。客户端软件，被给定一个可用的memcached服器列表
+。一个基于客户端的哈希算法，它基于输入的"key"来选择一台服务器
+。服务端软件，存储keys和它们的alues到一个内部的哈希表
+。服务端算法，决定何时抛弃旧的数据（如果超出内存容量），或重用内存
+
+服务器节点不关心你的数据（格式）是什么，数据项由一个key，一个过期时间，可选标识，和原始数据组成。它不理解数据结构；你上传的数据必需是预先序列化的。
+
+一个"memcached实现"是部分实现为客户端，部分实现为服务端。客户端知道（负责）如何发送数据项到一个特定的服务器，但不能链接一台服务器是如何操作，以及如何从服务器端获取数据(keys)。
+
+Memcached默认情况下是一个最近最少使用(LRU)的缓存。
+
+2. 安装
+
+Memcached是一个C程序，依赖于最近版本的GCC和最近版本的libevent.
+
+2.1 从发布包安装
+
+安装libevent:
+Ubuntu: apt-get install libevent-dev
+Redhat/Fedora: yum install libevent-devel
+
+安装memcached:
+Ubuntu: apt-get install memcached
+Redhat/Fedora: yum install memcached
+
+2.1 从源码安装
+
+安装libevent:
+  tar zxvf libevent-2.0.21-stable.tar.gz
+  cd libevent-2.0.21-stable
+  ./configure --prefix=/usr/local/libevent
+  make
+  make install
+
+安装memcached:
+  tar zxvf memcached-1.4.20.tar.gz
+  cd memcached-1.4.20
+  ./configure --prefix=/usr/local/memcached --with-libevent=/usr/local/libevent
+  make
+  make install
+
+3. 运行
+
+memcache启动命令示例:
+/usr/bin/memcached -m 64 -p 11211 -u memcache -l 127.0.0.1 -P /tmp/memcached.pid 
+
+常用启动参数说明：
+   -d  选项是启动一个守护进程，
+   -m  是分配给Memcache使用的内存数量，单位是MB，默认64MB
+   -v  控制输出到STDOUT/STDERR的详细信息。
+
+   -M  return error on memory exhausted (rather than removing items).
+   -u  是运行Memcache的用户，如果当前为root 的话，需要使用此参数指定用户。
+   -l  是监听的服务器IP地址，默认为所有网卡。
+   -p  是设置Memcache的TCP监听的端口，最好是1024以上的端口
+   -c  选项是最大运行的并发连接数，默认是1024
+   -P  是设置保存Memcache的pid文件
+
+查看memcached进程: ps -ef | grep memcached
+停止memcached进程: kill `/tmp/memcached.pid`
+
+查看运行配置
+echo "stats settings" | nc localhost 11211
+
+4. 客户端
+
+4.1 常用命令
+
+4.1.1 命令介绍
+
+1) 存储命令
+set <key> <flag> <expiration-time> <key-len>
+最常见的命令。存储数据，可能覆盖已经存在的数据。
+
+add
+只有在数据不存在的情况下，存储数据。新的数据项在LRU的顶部。如果数据已经存在，add失败。
+
+append
+在已经存在的一个数据项的最后追加数据。不允许超出数据项限制。对于管理列表有用。
+
+prepend
+跟append类似，但是在数据前面追加。
+
+2) 获取命令
+get
+获取数据的命令。使用一个或多个keys，返回所有匹配的结果。
+
+gets
+使用CAS的get命令的一个替代，返回一个CAS确认数据项的标识(唯一的64位数)。同cas命令一起返回这个值。如果项的CAS值从你gets它起已经改变了，它将不会被存储。
+
+3) delete
+从cache删除一个项，如果存在。
+
+4) incr/decr
+增加和减少。如果一个存储的数据项是64位整数的字符串表示，你可用运行incr/decr来改变这个数。
+
+5) 状态统计
+stats
+
+4.1.2 telnet连接测试:
+$ telnet 127.0.0.1 11211
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+#添加<a:abc>
+set a 0 3600 3              
+abc
+STORED
+#添加<b:cccc>
+add b 0 3600 4               
+cccc
+STORED
+#获取
+get a
+VALUE a 0 3
+abc
+END
+#获取
+get b
+VALUE b 0 4
+cccc
+END
+#删除
+delete b
+DELETED
+get b
+END
+#统计信息
+stats
+STAT pid 21038
+STAT uptime 5060
+STAT time 1400423512
+STAT version 1.4.13
+STAT libevent 2.0.16-stable
+STAT pointer_size 64
+STAT rusage_user 0.132008
+STAT rusage_system 0.052003
+STAT curr_connections 5
+STAT total_connections 11
+STAT connection_structures 6
+STAT reserved_fds 20
+STAT cmd_get 3
+STAT cmd_set 7
+STAT cmd_flush 0
+STAT cmd_touch 0
+STAT get_hits 2
+STAT get_misses 1
+STAT delete_misses 0
+STAT delete_hits 1
+STAT incr_misses 0
+STAT incr_hits 0
+STAT decr_misses 0
+STAT decr_hits 0
+STAT cas_misses 0
+STAT cas_hits 0
+STAT cas_badval 0
+STAT touch_hits 0
+STAT touch_misses 0
+STAT auth_cmds 0
+STAT auth_errors 0
+STAT bytes_read 323
+STAT bytes_written 334
+STAT limit_maxbytes 67108864
+STAT accepting_conns 1
+STAT listen_disabled_num 0
+STAT threads 4
+STAT conn_yields 0
+STAT hash_power_level 16
+STAT hash_bytes 524288
+STAT hash_is_expanding 0
+STAT expired_unfetched 0
+STAT evicted_unfetched 0
+STAT bytes 140
+STAT curr_items 2
+STAT total_items 3
+STAT evictions 0
+STAT reclaimed 0
+END
+
+
+4.2 Java客户端测试
+
+Java memcached client
+http://www.whalin.com/memcached
+
+
+
+

@@ -104,15 +104,13 @@ mysql> FLUSH PRIVILEGES;
 
 -- Q
 忘记root密码
--- A
+-- A1
 1) /etc/mysql/my.cnf
 在[mysqld]的段中加上一句：skip-grant-tables 
 2) 重启mysql
 sudo service mysql restart
 3) 进入mysql, 设置root密码
-
 mysql> USE mysql; 
-
 mysql> select Host,User,Password from user;
 +------------------+------------------+-------------------------------------------+
 | Host             | User             | Password                                  |
@@ -150,6 +148,11 @@ insert into mysql.user(Host,User,Password) values("localhost","APP",password("mi
 5) 重启mysql
 sudo service mysql restart
 
-
+--- A2
+sudo mysqld_safe --skip-grant-tables&
+mysql -u root mysql
+mysql> UPDATE user SET Password = password ( 'root123' ) WHERE User = 'root' ;
+mysql> FLUSH PRIVILEGES;
+退出
 
 
