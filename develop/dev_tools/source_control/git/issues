@@ -1,0 +1,9 @@
+
+- github设置pubkey后的ssh连接问题
+$ ssh git@github.com
+Agent admitted failure to sign using the key.
+Permission denied (publickey).
+->
+执行ssh-add就可以了
+$ ssh-add
+
