@@ -1,0 +1,36 @@
+参考:
+Linux 下一步步安装 Git Server
+http://aoingl.iteye.com/blog/1365201
+
+安装：
+$ apt-get install git-core
+
+服务端创建git仓库：
+~/git/repositories$ git init --bare develop-docs
+
+初始化git仓库：
+~/Documents/com/develop$ mkdir docs
+~/Documents/com/develop$ cd docs/
+~/Documents/com/develop/docs$ git init
+~/Documents/com/develop/docs$ git remote add origin ~/git/repositories/develop-docs/
+
+提交文件：
+~/Documents/com/develop/docs$ touch Readme
+~/Documents/com/develop/docs$ git add Readme
+~/Documents/com/develop/docs$ git commit -m "add Readme"
+~/Documents/com/develop/docs$ git push origin master
+~/Documents/com/develop/docs$ git pull origin master
+
+~/Documents/com/develop/docs$ vim .git/config  # 指定分支
+---------------------------------------------
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+---------------------------------------------
+~/Documents/com/develop/docs$ git push
+~/Documents/com/develop/docs$ git pull
+
+克隆到本地：
+~/Documents/com/develop$ git clone ~/git/repositories/develop-docs
+~/Documents/com/develop$ git clone ~/git/repositories/develop-docs docs
+
