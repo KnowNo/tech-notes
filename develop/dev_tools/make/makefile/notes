@@ -1,44 +1,263 @@
 
-1 Overview of make
 
-2 An Introduction to Makefiles
+第二章 GNU make 介绍
 
-2.1 What a Rule Looks Like
 
-target ... : prerequisites ...
-	recipe
+TARGET... : PREREQUISITES...
+	COMMAND
 	...
 	...
+
+prerequisites:
+规则的依赖。生成规则目标所需要的文件名列表。
+
+command:
+规则的命令行（任意的 shell 命令或者是可在shell 下执行的程序）
+一个规则可以有多个命令行,每一条命令占一行。注意:每一个命令行必须以[Tab]字符开始。
 
 Please note: you need to put a tab character at the beginning of every recipe line!
 you can set the .RECIPEPREFIX variable to an alternate character (see Section 6.14 [Special Variables], page 73).
 
-2.2 A Simple Makefile
+可以将一个较长行使用反斜线(\)来分解为多行, 但需要注意:反斜线之后不能有空格。
 
-edit : main.o kbd.o command.o display.o \
-	insert.o search.o files.o utils.o
-	cc -o edit main.o kbd.o command.o display.o \
-		insert.o search.o files.o utils.o
-main.o : main.c defs.h
-	cc -c main.c
-kbd.o : kbd.c defs.h command.h
-	cc -c kbd.c
-command.o : command.c defs.h command.h
-	cc -c command.c
-display.o : display.c defs.h buffer.h
-	cc -c display.c
-insert.o : insert.c defs.h buffer.h
-	cc -c insert.c
-search.o : search.c defs.h buffer.h
-	cc -c search.c
-files.o : files.c defs.h buffer.h command.h
-	cc -c files.c
-utils.o : utils.c defs.h
-	cc -c utils.c
+默认的情况下,make执行的是Makefile中的第一个规则,此规则的第一个目标称为默认目标。
+
+
+.PHONY : clean
 clean :
-	rm edit main.o kbd.o command.o display.o \
-		insert.o search.o files.o utils.o
+	-rm edit $(objects)
 
-We split each long line into two lines using backslash/newline;
+1. 通过“.PHONY”特殊目标将“clean”目标声明为伪目标。避免当磁盘上存在一个名为“clean”文件时,目标“clean”所在规则的命令无法执行
+2. 在命令行之前使用“-”,意思是忽略命令“rm”的执行错误
+
+
+第三章 Makefile 总述
+
+包含其它makefile文件：
+include FILENAMES...  （不能以[Tab]字符开始)
+
+1.将这些共同使用的变量或者模式规则定义在一个文件中 (6.5 如何设置变量 10.5 模式规则)
+2.可以将自动产生的依赖关系保存在另外一个文件中 (4.14 自动产生依赖)
+
+可使用“-include”来代替“include”,来忽略由于包含文件不存在或者无法创建时的错误提示.可以使用“sinclude”来代替“-include”。
+
+环境定义了一个“MAKEFILES”环境变量,make执行时首先将此变量的值作为需要读入的Makefile文件,多个文件之间使用空格分开。
+和使用“include”的区别:
+1. 环境变量指定的 makefile 文件中的“目标”不会被作为 make 执行的“终极目标”
+2. 环境变量所定义的文件列表,在执行 make 时,如果不能找到其中某一个文件。make 不会提示错误,也不退出。
+3. make 在执行时,首先读取的是环境变量“MAKEFILES”所指定的文件列表
+
+make 读 取 的 文 件 名 将 会 被 自 动 依 次 追 加 到 变 量“MAKEFILE_LIST”的定义域中
+
+
+第四章:Makefile的规则
+
+
+两种目标所在的规则是 Makefile 的第一个规则时,它们并不会被作为“终极目标”：
+1. 目标名以点号“.”开始的并且其后不存在斜线“/” （"./"为当前目录）
+2. 模式规则的目标。
+
+Makefile 中符号“$”有特殊的含义(表示变量或者函数的引用),在规则中需要使用符号“$”的地方,需要书写两个连续的(“$$”）。
+
+可使用的通配符有: “*”、“?” 和 “[...]”，可以出现在以下两种场合:
+1. 可以用在规则的目标、依赖中,
+2. 可出现在规则的命令中
+规则的一个文件名包含统配字符(“*” “.”等字符)，使用反斜线(\)进行转义处理。例如“foo\*bar”
+
+除这两种情况之外，不能直接使用通配符。而是需要通过函数“wildcard” （ 8.3 文件名处理函数 ）来实现。
+
+在 Makefile 有这样一个变量定义:“objects = *.o”。它表示变量“objects”的值是字符串“*.o”
+当需要变量“objects”代表所有.o 文件列表示,需要使用函数“wildcard” (objects = $(wildcar *.o)
+
+“$(wildcard *.c)”来获取工作目录下的所有的.c 文件列表。
+可以使用“$(patsubst %.c,%.o,$(wildcard *.c))”,将列表中所有文件名的后缀.c 替换为.o
+objects := $(patsubst %.c,%.o,$(wildcard *.c))
+
+
+使用 make 提供的目录搜索依赖文件功能(在指定的若干个目录下自动搜索依赖文件)：
+1. 一般搜索(变量VPATH)
+VPATH = src:../headers
+2. 选择性搜索(关键字vpath)
+不是一个变量,而是一个 make 的关键字
+vpath PATTERN DIRECTORIES    多个目录使用空格或者冒号(:)分开
+模式字符“%”意思是匹配一个或者多个字符,例如,“%.h”表示所有以“.h”结尾的文件。
+vpath PATTERN     清除之前为符合模式“PATTERN”的文件设置的搜索路径。
+vpath             清除所有已被设置的文件搜索路径。
+
+
+自动产生这种依赖关系的功能。Gcc 通过“-M”， gcc -M main.c
+当不需要在依赖关系中考虑标准库头文件时,对于 gcc 需要使用“-MM”参数
+
+在新版本的 make 中,推荐的方式是为每一个源文件产生一个描述其依赖关系的makefile 文件。对于一个源文件“NAME.c”
+,对应的这个 makefile 文件为“NAME.d”。“NAME.d”中描述了文件“NAME.o”
+%.d: %.c
+$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+rm -f $@.$$$$
+
+
+第五章:规则的命令
+
+
+make 在执行命令行之前会把要执行的命令行输出到标准输出设备。
+如果规则的命令行以字符“@”开始,则 make 在执行这个命令时就不会回显这个将要被执行的命令。
+
+如果使用make的命令行参数“-n”或“--just-print”,那么make执行时只显示所要执行的命令,但不会真正的去执行这些命令
+make参数“-s”或“--slient”则是禁止所有执行命令的显示
+
+命令行“cd”改变目录不会对其后的命令的执行产生影响。
+把“cd”和其后的命令写在一行上,用分号分隔。
+cd bar; gobble lose > ../foo
+
+如果使用命令行选项“-i”或者“—ignore-errors” make 将忽,略所有规则中命令执行的错误。
+使用“-”字符来忽略命令执行的错误
+
+使 用 make 的 命 令 行 选 项 “ -k ” 或 者“--keep-going”来通知 make,在出现错误时不立即退出
+“-k”参数可以帮助我们确认对那些文件的修改是正确的
+
+
+第六章:Makefile中的变量
+
+变量名是不包括“:”“#”“=”前置空白和尾空白的任何字符串。
+变量名是大小写敏感的。
+
+变量的引用方式是:“$(VARIABLE_NAME)”或者“${ VARIABLE_NAME }”
+shell 变量使用 shell 的“$tmp”格式
+
+两种变量定义(赋值)
+1. 递归方式扩展的变量，通过“=” 或者使用指示符“define”定义
+在引用的地方是严格的文本替换过程
+2. 直接展开式变量，使用“:=”定义
+
+条件赋值操作符“?=”，变量在之前没有赋值的情况下赋值
+FOO ?= bar
+
+变量的替换引用，替换变量“VAR”中所有“A”字符结尾的字为“B”结尾的字。
+“$(VAR:A=B)”(或者“${VAR:A=B}”
+bar := $(foo:.o=.c)
+函数“patsubst”，的一个简化实现
+
+bar := $(foo:%.o=%.c)
+$(patsubst A,B $(VAR))
+
+
+第七章:Makefile的条件执行
+
+`ifeq (ARG1, ARG2)'
+`ifeq 'ARG1' 'ARG2''
+`ifeq "ARG1" "ARG2"'
+`ifeq "ARG1" 'ARG2''
+`ifeq 'ARG1' "ARG2"'
+else
+endif
+
+“ifneq”
+
+“ifdef”
+“ifndef”
+
+第八章:make的内嵌函数
+
+make 函数的调用格式,以“$”开始表示一个引用。
+$(FUNCTION ARGUMENTS)
+${FUNCTION ARGUMENTS}
+
+文本处理函数
+$(subst FROM,TO,TEXT)
+$(patsubst PATTERN,REPLACEMENT,TEXT)
+$(strip STRINT)
+$(findstring FIND,IN)
+$(filter PATTERN...,TEXT)
+$(filter-out PATTERN...,TEXT)
+$(sort LIST)
+$(word N,TEXT)
+$(wordlist S,E,TEXT)
+$(words TEXT)
+$(firstword NAMES...)
+
+文件名处理函数
+$(dir NAMES...)
+$(notdir NAMES...)
+$(suffix NAMES...)
+$(basename NAMES...)
+$(addsuffix SUFFIX,NAMES...)
+$(addprefix PREFIX,NAMES...)
+$(join LIST1,LIST2)
+$(wildcard PATTERN)
+
+$(origin VARIABLE)
+
+make的控制函数
+$(error TEXT...)
+$(warning TEXT...)
+
+
+第九章:执行make
+
+部分标准的伪目标和空目标命名:
+
+
+第十章:make的隐含规则
+
+make的隐含规则：
+
+1.编译C程序, 执行$(CC) -c $(CPPFLAGS) $(CFLAGS)
+2.编译C++程序, 执行$(CXX) -c $(CPPFLAGS) $(CFLAGS)
+3...
+
+隐含变量：
+
+1.代表命令的变量
+AR， 函数库打包程序,可创建静态库.a文档。默认是“ar”
+AS，汇编程序。默认是“as”。
+CC，C编译程序。默认是“cc”。
+CXX，C++编译程序。默认是“g++”
+CPP，C程序的预处理器(输出是标准输出设备)。默认是“$(CC) -E”。
+YACC，Yacc文法分析器(针对于C程序)。默认命令是“yacc”。
+TEX，从TeX源文件创建TeX DVI文件的程序。默认是“tex”。
+RM，删除命令。默认是“rm -f”。
+
+2.命令参数的变量
+CFLAGS，执行“CC”编译器的命令行参数(编译.c源文件的选项)。
+CXXFLAGS，执行“g++”编译器的命令行参数(编译.cc源文件的选项)。
+LDFLAGS，链接器(如:“ld”)参数。
+
+自动化变量
+$@， 表示规则的目标文件名。
+$%， 当规则的目标文件是一个静态库文件时,代表静态库的一个成员名。
+$<，规则的第一个依赖文件名。
+$?，所有比目标文件更新的依赖文件列表,空格分割。
+$^，规则的所有依赖文件列表,使用空格分隔。
+$+，类似“$^”,但是它保留了依赖文件中重复出现的文件。
+$*，在模式规则和静态模式规则中,代表“茎”，“茎”是目标模式中“%”所代表的部分。
+
+
+第十四章 Makefile的约定
+
+1. 所有的 Makefile 中应该包含这样一行:
+SHELL = /bin/sh
+
+除使用下面所列出的之外,避免使用其它命令:
+cat cmp cp diff echo egrep expr false grep install-info
+ln ls mkdir mv pwd rm rmdir sed sleep sort tar test touch true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

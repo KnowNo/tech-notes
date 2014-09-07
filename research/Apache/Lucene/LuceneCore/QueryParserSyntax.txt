@@ -51,11 +51,11 @@ title:The Right Way
 将在title域中查找"The", 而在默认域(这里是text)中查找"Right"和"Way".
 
 
-3. 词修饰器 (Term Modifiers)
+4. 词修饰器 (Term Modifiers)
 
 Lucene支持修饰查询词，以提供一系列的搜索选项。
 
-3.1 通配符搜索 (Wildcard Searches)
+4.1 通配符搜索 (Wildcard Searches)
 
 Lucene支持在单个查询词内(不是在短语内)的单个或多个字符的通配符搜索。
 单个字符匹配使用 "?" 符号。
@@ -68,7 +68,7 @@ Lucene支持在单个查询词内(不是在短语内)的单个或多个字符的
 
 注意，"?"或"*"不能作为搜索的第一个字符！
 
-3.2 正则式搜索 (Regular Expression Searches)
+4.2 正则式搜索 (Regular Expression Searches)
 
 Lucene支持匹配两个正斜杠"/"之间的模式，进行正则式搜索。语法可能在版本间有修改，但目前支持的语法文档在RegExp类(org.apache.lucene.util.automaton.RegExp). 例如，查找包含"moat"和"boat"的文档: /[mb]oat/
 
@@ -77,7 +77,7 @@ org.apache.lucene.util.automaton.RegExp:
 http://lucene.apache.org/core/4_7_2/core/org/apache/lucene/util/automaton/RegExp.html?is-external=true
 --------------------------------------------------------
 
-3.3 模糊搜索 (Fuzzy Searches)
+4.3 模糊搜索 (Fuzzy Searches)
 
 Lucene支持基于Damerau-Levenshtein距离算法的模糊搜索。做模糊搜索可以在单词后加上波浪号"~". 例如，搜索一个拼写与"roam"相近的词，使用模糊搜索：
 roam~
@@ -88,12 +88,12 @@ roam~1
 如果此参数没有给出，默认值是2次编辑距离。
 之前，这里可以使用浮点数。但这个语法被考虑放弃，并将在Lucene5.0版本中移除。
 
-3.4 邻近搜索 (Proximity Searches)
+4.4 邻近搜索 (Proximity Searches)
 
 Lucene支持查找指定距离之内的词。做邻近搜索，可以在短语后使用波浪号"~", 例如搜索在10个单词内出现"apache"和"jakarta"的文档，使用搜索：
 "jakarta apache"~10
 
-3.5 范围搜索 (Range Searches)
+4.5 范围搜索 (Range Searches)
 
 范围查询允许匹配域值在指定的上下界之间的文档。范围查询可以包含或排除上下边界。排序按字典序排列。
 
@@ -104,7 +104,7 @@ title:{Aida TO Carmen}
 
 方括号表示包含边界值，花括号表示不包含。
 
-3.6 增强搜索词 (Boosting a Term)
+4.6 增强搜索词 (Boosting a Term)
 
 Lucene基于查找词提供文档匹配相关度程度。增强某个搜索词(的相关度)使用补字号, "^", 并在搜索词的最后跟随一个增强因子(一个数字)，增强因子越高，这个词的相关性就越强。
 
@@ -118,11 +118,11 @@ jakarta^4 apache
 默认情况下，增强因子是1. 虽然增强因子必须是正数，但它可以小于1 (如 0.2).
  
 
-4. 布尔操作 (Boolean Operators)
+5. 布尔操作 (Boolean Operators)
 
 布尔操作允许通过逻辑操作来组合词。Lucene支持 AND, "+", OR, NOT 和 "-" 作为布尔操作符。(注意，必须全是大写)
 
-4.1 OR
+5.1 OR
 
 OR操作符是默认的连接符。意味着如果在两个词之间如果没有布尔操作，OR操作符将被使用。OR操作连接两个词并且查找包含任意一个词的文档。等价于集合的并操作。符号"||"可以用来代替"OR"这个词。
 
@@ -131,20 +131,20 @@ OR操作符是默认的连接符。意味着如果在两个词之间如果没有
 或
 "jakarta apache" OR jakarta
 
-4.2 AND
+5.2 AND
 
 AND操作匹配两个词同时在文本中存在的文档。等价于集合的交集。符号"&&"可以用来代替"AND"这个词。
 
 搜索包含"jakarta apache"和"jakarta"的文档，使用查询:
 "jakarta apache" AND jakarta
 
-4.3 +
+5.3 +
 
 "+"或着说 包含操作符要求"+"后跟随的词必须在文档的域中出现。
 搜索必须包含"jakarta",并且可能包含"lucene"的文档，使用查询:
 +jakarta lucene
 
-4.4 NOT
+5.4 NOT
 
 NOT操作符排除包含NOT后的词的文档。等价于集合的非。符号"|"可以用来代替"NOT"这个词。
 
@@ -154,14 +154,14 @@ NOT操作符排除包含NOT后的词的文档。等价于集合的非。符号"|
 注意，NOT操作符不能使用在单个词前面(没有意义)。例如，下面的搜索将没有返回结果：
 NOT "jakarta apache"
 
-4.5 -
+5.5 -
 
 "-" 或者说排除操作符排除包含"-"后的词的文档。
 
 搜索包含"jakarta apache"但不包含"Apache Lucene"的文档，使用查询：
 "jakarta apache" -"Apache Lucene"
 
-5. 分组 (Grouping)
+6. 分组 (Grouping)
 
 Lucene支持使用圆括号组织语句来构成子查询。如果你想控制一个查询的布尔逻辑，这非常有用。
 
@@ -169,7 +169,7 @@ Lucene支持使用圆括号组织语句来构成子查询。如果你想控制�
 (jakarta OR apache) AND website
 这消除了歧义，并且确保website必须存在，而且jakarta或apache之一可能存在。
 
-6. 域内分组 (Field Grouping)
+7. 域内分组 (Field Grouping)
 
 Lucene支持对某个单独的域使用圆括号来组织多个(查询)语句。
 
@@ -177,7 +177,7 @@ Lucene支持对某个单独的域使用圆括号来组织多个(查询)语句。
 
 title:(+return +"pink panther")
 
-7. 跳过特殊字符 (Escaping Special Characters)
+8. 跳过特殊字符 (Escaping Special Characters)
 
 Lucene支持跳过构成查询语法的特殊字符。当前的特殊字符列表为：
 + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /

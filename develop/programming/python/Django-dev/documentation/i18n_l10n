@@ -1,0 +1,46 @@
+
+=== Internationalization and localization
+
+support for translation of text, formatting of dates, times and numbers, and time zones.
+
+browsers Accept-Language header
+
+
+internationalization 为本地化所做的软件上的准备。
+localization 编写翻译和本地化格式
+
+locale name   语言部分总是小写，国家部分总是大写，以下划线分隔。de_AT,es,pt_BR,zh_CN
+language code 浏览器在Accept-Language HTTP头中发送接收的语言，语言和国家部分都是小写，‘-’号连接。
+message file  一个纯文本文档，包含所有可用的翻译字符串。以.po为文件后缀。
+translation string 可翻译字符串
+format file 一个python模块，定义本地数据格式。
+
+=== Translation
+
+需要在代码和模板中放置translation strings，告诉django这些文本应该被翻译为可用的终端用户语言。
+Django提供了工具用于提取这些translation strings到一个message文件。
+在message文件中填写翻译文本后，必须进行编译。依赖于GNU gettext 工具集。
+
+Django的国际化默认是开启的，即会带来额外开销。如不需以，在settings.py中设置USE_I18N = False 
+
+USE_L10N 表示本地格式
+
+
+- Internationalization: in Python code
+
+from django.utils.translation import ugettext as _
+
+form.py 中使用 ugettext_lazy as _lazy
+http://stackoverflow.com/questions/2694798/django-form-and-i18n
+
+- Internationalization: in template code
+
+put {% load i18n %} toward the top of your template. 
+所有模板中都要加载，即便继承自其他已经加载的模板，都要加载i18n标签。
+
+
+
+
+
+
+

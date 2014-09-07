@@ -155,4 +155,12 @@ mysql> UPDATE user SET Password = password ( 'root123' ) WHERE User = 'root' ;
 mysql> FLUSH PRIVILEGES;
 退出
 
+--- Q
+授予指定IP以user为用户名secret为密码（同时创建用户），登录本机数据库权限：
+--- A
+grant all privileges on openfire.* to user@'10.101.1.%' identified by 'secret';
+grant all privileges on mydb.* to user@localhost identified by '1234';
+grant select,update on mydb.* to user@localhost identified by '1234';
+
+
 

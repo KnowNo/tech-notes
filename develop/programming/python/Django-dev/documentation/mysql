@@ -1,0 +1,65 @@
+
+
+----
+default utf8_general_ci collation  大小写不敏感
+column or table use utf8_bin collation 大小写敏感
+
+use utf8_unicode_ci because it is more accurate
+----
+
+mysql -uroot
+> CREATE DATABASE zhiluba CHARACTER SET utf8;
+> grant all privileges on zhiluba.* to zhiluba@localhost identified by 'zhiluba123';
+> FLUSH PRIVILEGES;
+
+--- settings.py ---
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file': os.path.join(BASE_DIR, 'mysql.conf'),
+        },
+    }
+}
+
+--- mysql.conf ---
+[client]
+database = zhiluba
+user = zhiluba
+password = zhiluba123
+default-character-set = utf8
+
+
+--- MySQLdb模块安装 --- 
+下载： https://pypi.python.org/pypi/MySQL-python
+
+$ unzip MySQL-python-1.2.5.zip
+$ cd MySQL-python-1.2.5/
+MySQL-python-1.2.5$ vim INSTALL
+......
+Finally, putting it together::
+
+  $ tar xfz MySQL-python-1.2.1.tar.gz
+  $ cd MySQL-python-1.2.1
+  $ # edit site.cfg if necessary
+  $ python setup.py build
+  $ sudo python setup.py install # or su first
+......
+MySQL-python-1.2.5$ vim site.cfg
+-----
+mysql_config = /usr/bin/mysql_config 
+-----
+MySQL-python-1.2.5$ python setup.py build
+MySQL-python-1.2.5$ sudo python setup.py install
+
+--- 初始化Django数据库 ----
+zhiluba$ python manage.py syncdb
+
+You just installed Django's auth system, which means you don't have any superusers defined.
+Would you like to create one now? (yes/no): yes
+Username (leave blank to use 'zhongxia'): admin
+Email address: admin@zhiluba.com
+Password: admin123
+
+
+

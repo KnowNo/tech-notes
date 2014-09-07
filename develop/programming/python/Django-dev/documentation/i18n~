@@ -1,0 +1,80 @@
+
+--- ref ---
+http://www.ibm.com/developerworks/cn/web/1101_jinjh_djangoi18n/
+http://blog.csdn.net/wangeen/article/details/24088725
+------------
+
+zhiluba/markpoint$ mkdir locale
+
+zhiluba/markpoint$ django-admin.py makemessages -l zh_CN
+CommandError: Can't find xgettext. Make sure you have GNU gettext tools 0.15 or newer installed.
+
+--- 安装 gettext ---
+http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-0.18.1.1.tar.gz
+
+tar xzvf gettext-0.18.1.1.tar.gz
+cd gettext-0.18.1.1
+./configure
+make
+sudo make install
+
+或
+apt-get install gettext
+--------------------
+
+
+$ django-admin.py makemessages -l zh_CN
+
+processing locale zh_CN
+CommandError: errors happened while running msguniq
+msguniq: error while opening "/home/zhongxia/Documents/com/develop/zhiluba/web/zhiluba/markpoint/locale/django.pot" for reading: No such file or directory
+
+--- 解决 ---
+http://stackoverflow.com/questions/20802624/unable-to-generate-django-javascript-i18n-catalog
+The problem was that there was no string to be translated (the error message could be better!). Adding a translatable string (e.g. {% trans 'dummy' %}) fixed it.
+
+在template/index.html或其他页面中，任意加上一个可翻译字符串：
+{% trans "Languages" %}
+---------------
+
+# 需要先在APP(view,template)中加上可翻译字符串，再执行此命令生成.po文件，
+# 之后在.po文件中编辑翻译字符串。
+$ django-admin.py makemessages -l zh_CN  
+
+$ tree locale/
+locale/
+└── zh_CN
+    └── LC_MESSAGES
+        └── django.po            # 生成的文件
+
+--- django.po ---
+
+... ...
+
+#: templates/markpoint/index.html:7
+msgid "Languages"
+msgstr ""
+---------------------
+
+# 编辑po文件后，编译生成".mo文件"
+$ django-admin.py compilemessages
+
+$ tree locale/
+locale/
+└── zh_CN
+    └── LC_MESSAGES
+        ├── django.mo
+        └── django.po
+
+
+模板中加入翻译
+
+{% load i18n %} 
+
+
+
+
+
+
+
+

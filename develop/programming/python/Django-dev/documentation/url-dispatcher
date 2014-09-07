@@ -1,0 +1,53 @@
+
+URLconf
+
+
+django.conf.urls 
+
+
+- patterns(prefix, pattern_description, ...)
+
+第一个参数为前缀
+后面为任意数目的URL patterns: tuple / url()
+tuple: (regular expression, Python callback function [, optional_dictionary [, optional_name]])
+----------
+python最多255个参数，url patterns超过254个时，可以分开：
+urlpatterns = patterns('',
+  ...
+  )
+urlpatterns += patterns('',
+  ...
+  )
+----------
+
+
+- url(regex, view, kwargs=None, name=None, prefix='')
+
+url()可代替patterns的tuple参数
+
+regex:
+view : view founction, called with a HttpRequest object   
+
+
+- include()
+
+include(module[, namespace=None, app_name=None])
+include(pattern_list)
+include((pattern_list, app_namespace, instance_namespace))
+
+一个view founction如果使用到其他URLconf模块的全路径引用，应该使用include()包含进来.
+如app内有自己的urls.py,在主urls.py中引用app的urls时，使用include().
+
+    module – URLconf module (or module name)
+    namespace (string) – Instance namespace for the URL entries being included
+    app_name (string) – Application namespace for the URL entries being included
+    pattern_list – Iterable of URL entries as returned by patterns()
+    app_namespace (string) – Application namespace for the URL entries being included
+    instance_namespace (string) – Instance namespace for the URL entries being included
+
+
+
+
+
+
+
