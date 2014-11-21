@@ -7,6 +7,7 @@ column or table use utf8_bin collation 大小写敏感
 use utf8_unicode_ci because it is more accurate
 ----
 
+
 mysql -uroot
 > CREATE DATABASE zhiluba CHARACTER SET utf8;
 > grant all privileges on zhiluba.* to zhiluba@localhost identified by 'zhiluba123';

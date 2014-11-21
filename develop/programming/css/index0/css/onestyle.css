@@ -1,0 +1,101 @@
+body {
+background-color: #fff;
+}
+body {
+color: #333;
+background: transparent;
+font: 12px/1.5 Arial,sans-serif;
+}
+
+html, body, ul, ol, li, dl, dt, dd, p, h1, h2, h3, h4, h5, h6, a, img, th, td, form, fieldset, iframe, object, pre, code, legend, blockquote {
+margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
+}
+
+.site-nav {
+height: 36px;
+background-color: #f6f6f6;
+font-family: Tahoma,sans-serif,Microsoft YaHei;
+position: relative;
+z-index: 200;
+}
+
+.site-nav .container, .page-header .container, .main-nav .container {
+width: 960px;
+margin: 0 auto;
+position: static;
+}
+
+.site-nav .group .left-split {
+padding-left: 8px;
+border-left: 2px solid #ebebeb;
+border-left-width: 2px;
+border-left-style: solid;
+border-left-color: rgb(235, 235, 235);
+margin-left: -2px;
+}
+
+.site-nav .group .item {
+float: left;
+padding: 0 10px;
+line-height: 14px;
+cursor: pointer;
+_zoom: 1;
+margin: 11px 0 11px -10px;
+}
+
+.site-nav a {
+color: #282828;
+}
+
+a {
+color: #333;
+text-decoration: none;
+}
+
+.site-nav .quick-menu {
+float: right;
+}
+
+.site-nav {
+height: 36px;
+background-color: #f6f6f6;
+font-family: Tahoma,sans-serif,Microsoft YaHei;
+position: relative;
+z-index: 200;
+}
+
+.page-header {
+height: 90px;
+clear: both;
+position: relative;
+}
+
+.main-nav {
+height: 39px;
+line-height: 40px;
+background-color: #ff7200;
+border-bottom: 1px solid #ed6104;
+-webkit-box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+}
+
+.main-nav .channel-nav a.cur {
+background-color: #ff8400;
+color: #fff;
+text-decoration: none;
+}
+
+.main-nav .channel-nav a {
+float: left;
+color: #fff;
+font-size: 16px;
+padding: 0 25px;
+position: relative;
+}
+
+.clearfix {
+zoom: 1;
+}

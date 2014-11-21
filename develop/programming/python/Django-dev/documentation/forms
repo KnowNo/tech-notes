@@ -1,0 +1,40 @@
+
+使用forms
+
+Django提供了一系列工具和库，用于构建forms来接收网站访问者的输入，并且处理和响应输入。
+
+
+Html forms
+
+In HTML, a form is a collection of elements inside <form>...</form> 
+
+
+--- Django's CSRF mechanism 
+
+浏览器接收cookies；
+view方法使用RequestContext，而不是Context；
+在post form中需要有{% csrf_token %} 标签；
+如果不使用CsrViewMiddleware，则必须在每个使用csrf_token模板和接收POST的views中使用csrf_protect.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

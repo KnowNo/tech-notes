@@ -79,5 +79,95 @@ if not ('django.contrib.auth.context_processors.auth' in settings.TEMPLATE_CONTE
 
 
 
+-------- 国际化 (i18n)
 
+zuqiua_site/home$ mkdir locale
+zuqiua_site/home$ django-admin.py makemessages -l zh_CN
+zuqiua_site/home$ vim locale/zh_CN/LC_MESSAGES/django.po
+zuqiua_site/home$ django-admin.py compilemessages
 
+(1) 创建目录
+zuqiua_site/home$ mkdir locale
+否则错误：
+CommandError: This script should be run from the Django Git tree....
+(2) 编辑view, templates, 添加{% load i18n %} 
+至少加上一条可翻译字符串（trans "..."）,见 (6),(7),(8)
+(3) 生成.po文件，包含翻译字符串
+zuqiua_site/home$ django-admin.py makemessages -l zh_CN
+(4) 编辑.po文件，进行翻译，并编译成.mo
+zuqiua_site/home$ vim locale/zh_CN/LC_MESSAGES/django.po
+zuqiua_site/home$ django-admin.py compilemessages
+locale/
+└── zh_CN
+    └── LC_MESSAGES
+        ├── django.mo
+        └── django.po
+
+(5) 添加语言模块
+----- zuqiua/settings.py
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # 不加这一项，中文将没有效果 
+    ......
+)
+
+ugettext = lambda s: s
+
+LANGUAGES = ( 
+    ('en-us', ugettext('English')), 
+    ('zh-CN', ugettext('Chinese')), 
+) 
+
+----- zuqiua/urls.py
+url(r'^i18n/', include('django.conf.urls.i18n')),
+
+----------- base.html
+<head>
+    ....
+    <script  type="text/javascript"> 
+            function selectdo(obj) { 
+                        str="/i18n/setlang/"; 
+                        myform = document.getElementById('langform'); 
+                        myform.method = "POST"; 
+                        myform.action = str; 
+                        myform.submit(); 
+            } 
+    </script>
+</head>
+<body>
+        <form name="langform" id="langform" method='post'> 
+            {% csrf_token %}
+            <select id="language" name="language" onchange="selectdo(this)"> 
+                 <option value="1" >{% trans "Languages" %}</option> 
+                 {% for lang in LANGUAGES %} 
+                 <option value="{{ lang.0 }}" > {{ lang.1 }}</option> 
+                 {% endfor %} 
+            </select> 
+        </form>
+
+</body>
+
+(6) templates翻译字符串
+1) {% trans "xxxxx" %}                     # 直接的翻译字符串   
+2) {% trans "add" as add_trans %}  # 定义变量
+   引用 {{ add_trans }}"
+
+(7) View中添加可翻译字符串
+from django.utils.translation import ugettext as _ 
+_('Monday'), _('Tuesday'), _('Wednesday'), _('Thursday'), _('Friday'), _('Saturday'), _('Sunday')
+
+(8) Form中对model域的可翻译字符串
+from django.utils.translation import ugettext_lazy as _lazy
+    name = forms.CharField(label=_lazy('name'), max_length=30)
+    name2 = forms.CharField(label=_lazy('name2'), max_length=30)
+
+_lazy()失效，需使用ugettext_lazy() 才能识别?
+
+(9) 需要在包含“#, fuzzy”的字符串处，删除“#, fuzzy”，才使翻译生效。
+
+6. CSS (JavaScript, IMAGE) 路径设置
+
+home/templates/home/base.html:6: <link rel="stylesheet" href="/site_media/css/base.css" type="text/css" />
+
+zuqiua/urls.py:7:     site_media = os.path.join(os.path.dirname(__file__), 'site_media')
+zuqiua/urls.py:18:    url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':site_media}),

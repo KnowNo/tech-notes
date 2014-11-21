@@ -1,0 +1,20 @@
+
+- 使用初始数据文件初始化数据库：
+
+https://docs.djangoproject.com/en/1.7/howto/initial-data/
+
+1）在app目录中建立fixture目录，建立json或yaml格式数据；
+2）安装yaml: sudo apt-get install python-yaml
+3）执行下列命令之一：
+$ python manage.py loaddata players/fixtures/player_position.yaml 
+$ python manage.py loaddata player_position
+(直接使用django-admin.py loaddata 会报错：Requested setting DEFAULT_INDEX_TABLESPACE,,,,)
+
+
+
+
+update home_cn_province_city a, (select a.id as id, a.province as province from home_cn_province a, home_cn_province_city b where a.province=b.city_en) b set a.province_id=b.id where a.city_en=b.province;
+
+update home_cn_province_city_county a, (select b.id as city_id, b.city as city from home_cn_province_city_county a, home_cn_province_city b where a.county_en=b.city) b set a.city_id=b.city_id where a.county_en=b.city;
+
+insert into home_cn_province_city_county (city_id,county,county_en,code) select city_id,county,county_en,code from zuqiua.home_cn_province_city_county;
